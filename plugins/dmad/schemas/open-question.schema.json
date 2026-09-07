@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmad.dev/schemas/open-question.schema.json",
+  "title": "DMAD Open Question",
+  "description": "L'inconnu est un livrable de première classe (principe P4). Une question ouverte est formulée COMME UNE QUESTION À UN HUMAIN, pas comme une lacune de l'analyse.",
+  "type": "object",
+  "required": ["id", "question", "priority", "audience", "why_it_matters", "raised_by"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^OQ-[0-9]{3}$" },
+    "question": {
+      "type": "string",
+      "minLength": 20,
+      "description": "Formulée à la deuxième personne, répondable en une réunion. Pas 'le comportement X est indéterminé' mais 'est-ce que X est voulu ?'"
+    },
+    "context": { "type": "string", "description": "Ce que le code fait, factuellement, pour que l'humain puisse répondre sans lire le code." },
+    "priority": {
+      "enum": ["P1", "P2", "P3", "P4"],
+      "description": "P1 impact réglementaire/financier ET confiance H | P2 bloque une capacité entière | P3 règle isolée | P4 curiosité historique"
+    },
+    "audience": {
+      "enum": ["business", "tech", "both", "management"],
+      "description": "Qui peut répondre. Une question posée au mauvais public ne reçoit jamais de réponse."
+    },
+    "why_it_matters": {
+      "type": "string",
+      "description": "L'impact si on se trompe. C'est ce qui décide si la question obtient un atelier."
+    },
+    "options": {
+      "type": "array",
+      "description": "Réponses plausibles proposées. Une question fermée obtient une réponse ; une question ouverte obtient un silence.",
+      "items": { "type": "string" }
+    },
+    "raised_by": { "type": "string" },
+    "raised_at": { "type": "string", "format": "date-time" },
+    "related_claims": { "type": "array", "items": { "type": "string" } },
+    "capability": { "type": "string" },
+    "status": { "enum": ["open", "answered", "wont_answer", "obsolete"], "default": "open" },
+    "answer": {
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "by": { "type": "string" },
+        "at": { "type": "string", "format": "date-time" },
+        "promotes_claims": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Claims dont l'intent passe de H à C grâce à cette réponse."
+        }
+      }
+    }
+  }
+}

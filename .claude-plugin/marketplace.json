@@ -1,0 +1,15 @@
+{
+  "name": "dmad-method",
+  "owner": {
+    "name": "jmellano",
+    "url": "https://github.com/jmellano"
+  },
+  "description": "DMAD — rétro-documentation agentique de code legacy, avec chaîne de preuve.",
+  "plugins": [
+    {
+      "name": "dmad",
+      "source": "./plugins/dmad",
+      "description": "Reconstruit depuis un legacy une documentation fonctionnelle et technique dont chaque affirmation porte son niveau de preuve. 12 agents, 3 gates humains, un agent adversarial et des tests de caractérisation."
+    }
+  ]
+}

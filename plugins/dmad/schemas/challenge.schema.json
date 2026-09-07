@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmad.dev/schemas/challenge.schema.json",
+  "title": "DMAD Challenge",
+  "description": "Le résultat d'une attaque du Challenger sur une claim. Les 9 angles doivent tous être examinés ; un angle non exploré est une faiblesse déclarée du run.",
+  "type": "object",
+  "required": ["id", "claim", "angles_examined", "outcome", "challenged_at"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^CHK-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$" },
+    "claim": { "type": "string" },
+    "challenged_at": { "type": "string", "format": "date-time" },
+    "angles_examined": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 1, "maximum": 9 },
+      "uniqueItems": true,
+      "description": "1 preuve trahie | 2 garde oubliée | 3 flag/config | 4 polymorphisme | 5 chemin d'erreur | 6 transaction | 7 exhaustivité | 8 code mort | 9 concurrence"
+    },
+    "angles_skipped": {
+      "type": "array",
+      "description": "Un angle non examiné doit être justifié (ex: pas de concurrence possible sur un batch mono-thread).",
+      "items": {
+        "type": "object",
+        "required": ["angle", "reason"],
+        "properties": {
+          "angle": { "type": "integer" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["angle", "severity", "finding", "evidence", "consequence"],
+        "properties": {
+          "angle": { "type": "integer", "minimum": 1, "maximum": 9 },
+          "severity": { "enum": ["low", "medium", "high", "critical"] },
+          "finding": { "type": "string" },
+          "evidence": { "type": "string" },
+          "consequence": { "type": "string", "description": "Ce que ça change pour le lecteur, pas seulement pour la claim." }
+        }
+      }
+    },
+    "weakest_claims": {
+      "type": "array",
+      "description": "Quota de doute : si aucun finding sur une capacité entière, le Challenger DOIT produire les 3 claims les plus fragiles avec l'argument de fragilité. Zéro finding sur 40 claims signale un Challenger complaisant.",
+      "items": {
+        "type": "object",
+        "required": ["claim", "fragility"],
+        "properties": {
+          "claim": { "type": "string" },
+          "fragility": { "type": "string" }
+        }
+      }
+    },
+    "outcome": { "enum": ["confirmed", "demoted", "contradicted", "split", "reformulate"] },
+    "from": { "enum": ["V", "C", "I", "H"] },
+    "to": { "enum": ["V", "C", "I", "H"] },
+    "required_action": { "type": "string" },
+    "opened_questions": { "type": "array", "items": { "type": "string" } }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "outcome": { "const": "demoted" } }, "required": ["outcome"] },
+      "then": { "required": ["from", "to", "findings"] }
+    }
+  ]
+}

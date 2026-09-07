@@ -1,0 +1,65 @@
+id: BR-FACT-021
+type: BusinessRule
+capability: facturation
+
+statement: >
+  Le montant de chaque ligne de facture est calculé avec une précision de
+  4 décimales et un arrondi au demi-supérieur (HALF_UP), puis stocké tel quel.
+  L'affichage et l'export comptable n'en présentent que 2.
+
+confidence: V
+confidence_reason: >
+  Promue en V : le test de caractérisation forgé (CT-FACT-021) passe sur le
+  code actuel et couvre les trois cas d'arrondi limites. Le type DECIMAL(12,4)
+  en base corrobore mécaniquement la précision.
+
+evidence:
+  - kind: code
+    ref: "src/billing/AmountCalculator.java#L88-L140"
+    commit: a1b2c3d
+    tool: "lsp.find_definition"
+    excerpt: "return unitPrice.multiply(qty).setScale(4, RoundingMode.HALF_UP);"
+  - kind: schema
+    ref: "invoice_lines.amount DECIMAL(12,4)"
+    tool: "schema.columns"
+  - kind: test
+    ref: "src/test/characterization/AmountCalculatorCharacterizationTest.java#L22-L58"
+    outcome: passing
+    tool: "maven.test"
+  - kind: code
+    ref: "src/accounting/export/CsvWriter.java#L61"
+    tool: "lsp.find_references"
+    excerpt: "amount.setScale(2, RoundingMode.HALF_UP)"
+
+intent:
+  statement: >
+    La précision à 4 décimales daterait de la reprise des contrats au
+    pourcentage (2017), où l'arrondi à 2 provoquait des écarts cumulés
+    sur les gros volumes.
+  confidence: H
+  evidence:
+    - kind: commit
+      ref: 4d5e6f7
+      note: "2017-06-02 — feat(billing): increase amount scale to 4 (contrats %)"
+  competing_hypotheses:
+    - "choix technique par défaut jamais questionné"
+  validated_by: null
+  question: OQ-013
+
+relates_to:
+  - UC-FACT-003
+challenged_by:
+  - CHK-2026-09-07-034
+challenge_outcome: confirmed
+open_questions:
+  - OQ-013
+
+produced_by: elucidator
+promoted_by: test-forger
+status: validated
+
+freshness:
+  verified_at_commit: a1b2c3d
+  verified_at: "2026-09-07T14:05:00Z"
+  status: fresh
+  last_checked: "2026-09-07T14:05:00Z"

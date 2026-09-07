@@ -1,0 +1,94 @@
+run_id: atlas-2026-09-07-01
+created_at: "2026-09-07T09:00:00Z"
+
+objective:
+  statement: >
+    Pouvoir faire évoluer les règles de facturation (nouveau barème au 01/01)
+    sans risquer de régression comptable, alors que plus personne dans l'équipe
+    ne connaît le calcul des montants.
+  kind: evolve
+
+mode: feature-scan
+
+perimeter:
+  repositories:
+    - github.com/acme/atlas-erp
+  include:
+    - src/billing
+    - src/accounting
+    - src/catalog
+    - db/migrations
+  exclude:
+    - path: src/legacy-import
+      reason: "arrêté en 2021, aucun appel entrant depuis (vérifié : 0 référence)"
+    - path: src/reporting-v1
+      reason: "remplacé par reporting-v2, hors objectif de la mission"
+    - path: vendor/
+      reason: "dépendances tierces, non modifiables"
+  feature:
+    label: "Facturation"
+    vocabulary:
+      - facture
+      - avoir
+      - échéance
+      - relance
+      - barème
+      - campagne de facturation
+    known_entrypoints:
+      - "POST /invoices"
+      - "JOB nightly-billing"
+
+budget:
+  max_wall_clock_minutes: 240
+  max_traversal_depth: 5
+  max_diagrams_per_capability: 8
+  characterization_tests_target: 12
+
+sources:
+  git_history: full
+  issue_tracker: "jira://ATLAS"
+  wiki: null
+  adr: null
+  runtime_evidence:
+    - coverage
+  humans:
+    - role: "Responsable comptable"
+      domains: ["facturation", "export comptable"]
+    - role: "Dev senior (arrivé en 2022)"
+      domains: ["technique"]
+
+capabilities_available:
+  code-intelligence:
+    implementation: "serena (LSP java)"
+    confidence_ceiling: V
+    status: available
+  repo-history:
+    implementation: "git"
+    confidence_ceiling: V
+    status: available
+  schema-intelligence:
+    implementation: "flyway + jdbc"
+    confidence_ceiling: V
+    status: available
+  runtime-evidence:
+    implementation: "jacoco (couverture seule, pas de trace)"
+    confidence_ceiling: C
+    status: degraded
+  doc-retrieval:
+    implementation: "context7"
+    confidence_ceiling: V
+    status: available
+
+confidentiality:
+  level: confidential
+  local_only: true
+  forbidden_egress:
+    - "extraits de code"
+    - "noms de clients"
+  redaction_rules:
+    - "montants réels remplacés par des ordres de grandeur"
+
+gate_0:
+  approved_by: "DSI Atlas"
+  approved_at: "2026-09-07T09:40:00Z"
+  notes: "Périmètre réduit à la facturation ; reporting exclu explicitement."

@@ -1,0 +1,129 @@
+# DMAD — Profil Java
+
+Java/JVM est le terrain le plus favorable à DMAD, pour trois raisons : le typage statique rend le LSP fiable, une grande partie des règles est **déclarative** (donc de niveau `V` sans effort), et l'outillage de test permet de forger des preuves exécutables.
+
+Ce document dit **où chercher quoi** dans un legacy Java. À lire avant le premier run.
+
+## Avant de lancer : rendre le projet analysable
+
+`code-intelligence` via Serena/Eclipse JDT LS a besoin que le projet **résolve ses dépendances**. Sur un legacy, c'est le premier obstacle.
+
+```bash
+mvn -q -DskipTests dependency:go-offline   # ou : mvn -q -DskipTests compile
+./gradlew --offline compileJava
+java -version                              # la version du JDK doit correspondre au projet
+```
+
+| Symptôme | Conséquence | Que faire |
+|---|---|---|
+| Le projet ne compile pas | LSP dégradé ou muet | tenter la compilation ; sinon **basculer en mode dégradé et l'annoncer au gate 0** |
+| JDK indisponible (Java 6/7) | JDT LS refuse ou dégrade | compiler avec `--release` sur un JDK récent si possible |
+| Dépendances internes introuvables | résolution partielle, `find_references` incomplet | **interdit d'affirmer une exhaustivité** — plafond `I` |
+
+**Règle :** un projet qui ne résout pas ses dépendances donne un run plafonné à `I`. Ce n'est pas rédhibitoire, mais ça doit être écrit dans `scope.yaml` et affiché dans le bandeau de la doc.
+
+## Les points d'entrée Java
+
+| Famille | Où chercher |
+|---|---|
+| HTTP | `@RestController`, `@Controller`, `@RequestMapping`, `@GetMapping`… · JAX-RS `@Path` · `web.xml` + `HttpServlet` · Struts `struts-config.xml` / `@Action` |
+| Planifié | `@Scheduled` · Quartz (`Job`, `Trigger`, tables `QRTZ_*`) · `TimerTask` |
+| Messages | `@JmsListener`, `@KafkaListener`, `@RabbitListener` · `MessageDriven` (MDB) |
+| Batch | Spring Batch (`Job`, `Step`, `ItemReader/Processor/Writer`) · `public static void main` |
+| Événements | `@EventListener`, `ApplicationListener` · `@PostConstruct` avec effets |
+| SOAP | `@WebService`, WSDL, `@Endpoint` |
+| **Hors code** | **ordonnanceur externe** (Control-M, $U, Rundeck) appelant un `main()` · **triggers et procédures stockées** |
+
+Les deux dernières lignes sont celles qu'on rate. Elles n'apparaissent **nulle part dans le dépôt** : réclamer la configuration de l'ordonnanceur et le DDL complet au gate 0.
+
+## Les règles de gestion déclaratives — le meilleur rendement
+
+C'est la spécificité Java qui change tout : **beaucoup de règles sont annotées, donc mécaniquement extractibles en niveau `V`**, sans interprétation et sans risque d'hallucination.
+
+| Source | Ce que ça donne | Niveau |
+|---|---|---|
+| **Bean Validation** (`@NotNull`, `@Size`, `@Min`, `@Pattern`, `@Past`, contraintes maison) | obligations, formats, plages | **V** |
+| **JPA** (`@Column(nullable, length, precision, scale)`, `@Enumerated`, `@Version`) | modèle de données, précision des montants | **V** |
+| **Relations JPA** (`@OneToMany`, `cascade`, `orphanRemoval`, `fetch`) | règles de cycle de vie et de suppression en cascade | **V** |
+| **Contraintes en base** (DDL, `CHECK`, `UNIQUE`, FK) | invariants non contournables | **V** |
+| **Migrations** Flyway / Liquibase | l'évolution du métier dans le temps | **V** |
+| **Sécurité** (`@PreAuthorize`, `@Secured`, `@RolesAllowed`) | qui a le droit de faire quoi | **V** |
+| `@Transactional` (propagation, `rollbackFor`, `readOnly`) | frontières transactionnelles | **V** |
+
+**Commence toujours par là.** Sur un projet Spring/JPA typique, cette passe seule produit plusieurs dizaines de règles prouvées en quelques minutes, avant même que le moindre modèle n'interprète une ligne de code.
+
+## Les pièges spécifiques Java
+
+### Le dispatch par IoC — le plus important
+Spring résout les implémentations à l'exécution. `find_implementations` donne les candidats ; **il ne dit pas lequel est injecté**.
+
+À vérifier systématiquement : `@Primary` · `@Qualifier` · `@Profile` · `@ConditionalOnProperty` / `@ConditionalOnMissingBean` · configuration XML héritée · `@Component` scanné vs `@Bean` déclaré.
+
+Sans réponse tranchée → nœud `unresolved_dispatch` avec les candidats et une question ouverte. **Ne jamais choisir le plus probable.**
+
+### L'AOP invisible
+`@Aspect`, `@Around`, `@Before`, intercepteurs, proxies CGLIB/JDK. Le comportement réel d'une méthode peut être **entièrement modifié par du code qui ne la mentionne pas**, et qu'aucune traversée d'appels ne trouvera.
+
+C'est l'angle 4 du Challenger, et sur du Spring legacy il est loin d'être théorique : recenser tous les `@Aspect` du périmètre **avant** la phase 4, et vérifier leurs pointcuts contre les classes documentées.
+
+### Les profils Spring
+`application-prod.yml`, `application-recette.yml`, `@Profile("prod")`, `@ConditionalOnProperty`. C'est la source Java numéro un de l'anti-pattern A3 (documentation vraie en recette, fausse en production).
+
+Renseigner `conditional_on.observed` **par profil**, en comparant systématiquement la valeur par défaut du dépôt à celle de production.
+
+### Les montants
+`float`/`double` pour de l'argent est un bug de gestion, pas un détail. Vérifier : `BigDecimal` vs primitifs · `setScale()` et `RoundingMode` · `@Column(precision, scale)` vs la précision du calcul · la précision d'affichage.
+
+**Un écart entre la précision calculée et la précision stockée est une règle de gestion à documenter**, pas une coquille.
+
+### Lombok
+`@Data`, `@Builder`, `@EqualsAndHashCode` génèrent du code que le LSP voit mais qui n'existe pas dans les sources. Vérifier que l'annotation processing est actif, sinon `find_references` rate les accesseurs générés.
+
+### L'héritage profond et les classes abstraites
+Les hiérarchies à 4-5 niveaux sont fréquentes dans les legacy Java. Une règle définie dans une classe mère peut être redéfinie n'importe où en dessous : `type_hierarchy` avant toute affirmation d'exhaustivité.
+
+### La réflexion et les usines
+`Class.forName()`, `ServiceLoader`, dispatch par chaîne dans une `Map<String, Handler>`. Même traitement que l'IoC : candidats + question ouverte.
+
+## Les tests de caractérisation en Java
+
+Terrain favorable : JUnit 5 + AssertJ + Mockito, et Testcontainers quand une base est nécessaire.
+
+```java
+@Test
+void une_facture_a_montant_nul_n_est_pas_transmise_au_SI_comptable() {
+    Invoice invoice = anInvoice().withTotalTTC(ZERO).build();
+    dispatcher.dispatch(invoice);
+    assertThat(accountingGateway.sentInvoices()).isEmpty();
+    assertThat(invoice.getStatus()).isEqualTo(SKIPPED);
+}
+```
+
+**Ordre de facilité** — méthode statique pure ✅ · service avec dépendances injectables ✅ · service avec `new` en dur ⚠️ *(seam manquant, à signaler)* · code accédant à un singleton statique ❌ · code lisant l'horloge système ❌ *(seam manquant)*
+
+Les deux derniers cas ne sont pas des échecs : ce sont des **seams manquants identifiés**, à documenter dans `70-seams.md`. C'est exactement ce que la task 51 appelle un « résultat précieux ».
+
+## Les seams Java typiques
+
+Par ordre de coût croissant : interface à implémentation unique (le point d'injection existe déjà) · `@Bean` de configuration (remplaçable par un profil de test) · client HTTP encapsulé (`RestTemplate`/`Feign` mockable) · appel statique (nécessite une extraction) · `new` en dur (nécessite une injection).
+
+## Le schéma de données
+
+Trois sources, à croiser :
+1. **DDL réel** — la vérité. Réclamer un export au gate 0.
+2. **Migrations** Flyway/Liquibase — l'histoire du métier.
+3. **Entités JPA** — le modèle *tel que le code le croit*.
+
+> **Les écarts entre les trois sont de l'information de première qualité.** Une colonne en base absente de l'entité, un `nullable=false` côté JPA sans `NOT NULL` en base : chacun raconte quelque chose, et mérite une question ouverte.
+
+## Checklist avant le run de demain
+
+- [ ] Le projet compile (ou le mode dégradé est acté et annoncé)
+- [ ] Le JDK correspond
+- [ ] Serena démarre et répond sur un symbole de test
+- [ ] Historique git complet (`git log --oneline | wc -l` cohérent avec l'âge du projet)
+- [ ] DDL ou accès base disponible
+- [ ] Configuration de l'ordonnanceur externe réclamée
+- [ ] Configuration de production accessible (profils, flags) — **sinon l'anti-pattern A3 est garanti**
+- [ ] Rapport de couverture si un build le produit
+- [ ] Vocabulaire métier d'amorce collecté auprès d'un humain, pas déduit du code

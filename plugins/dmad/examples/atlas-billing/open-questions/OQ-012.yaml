@@ -1,0 +1,28 @@
+id: OQ-012
+question: >
+  Les factures à montant nul doivent-elles rester exclues de l'export
+  comptable ? S'agit-il d'une règle comptable que vous appliquez
+  volontairement, ou du reliquat d'un incident technique de 2019 ?
+context: >
+  Depuis mars 2019, le système n'envoie pas au SI comptable les factures dont
+  le montant TTC est nul : il les archive avec un statut dédié. Le code a été
+  ajouté un vendredi soir en réaction à un incident d'import (INC-4471), sans
+  test ni trace de validation métier. Il n'a jamais été retouché depuis.
+  Environ 340 factures par an sont concernées.
+priority: P1
+audience: business
+why_it_matters: >
+  Si c'est une règle comptable, elle doit être documentée et protégée par un
+  test avant le changement de barème. Si c'est un contournement, il fausse
+  potentiellement les rapprochements depuis 7 ans et relève d'un sujet de
+  conformité.
+options:
+  - "Règle comptable volontaire — à conserver et à protéger par un test"
+  - "Contournement technique — à corriger, avec reprise de l'historique à évaluer"
+  - "Ne sait pas — nécessite un arbitrage avec le commissaire aux comptes"
+raised_by: archaeologist
+raised_at: "2026-09-07T12:40:00Z"
+related_claims:
+  - BR-FACT-014
+capability: facturation
+status: open

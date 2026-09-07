@@ -1,0 +1,126 @@
+# DMAD — workflow feature-scan
+# Le mode par défaut sur les gros legacy : on ne lit pas le projet, on remonte
+# depuis un vocabulaire métier vers les points d'entrée d'une capacité.
+workflow:
+  id: feature-scan
+  label: "Analyse d'une fonctionnalité"
+  default_for: "codebases > 150 kLOC, ou objectif portant sur un domaine nommé"
+
+  preconditions:
+    - "scope.mode == feature-scan"
+    - "scope.perimeter.feature.vocabulary contient >= 3 termes"
+
+  phases:
+
+    - id: 0-cadrage
+      agent: scoper
+      tasks: [00-scope-run]
+      outputs: [scope.yaml, glossary-seed.md]
+      gate:
+        checklist: gate-0-scope
+        approver: commanditaire
+        blocking: true
+
+    - id: 1-reconnaissance
+      agent: surveyor
+      model: haiku
+      tasks: [10-survey-codebase]
+      note: >
+        Sur le périmètre COMPLET, pas seulement la feature : le recensement est
+        peu coûteux et rater un point d'entrée coûte beaucoup plus cher que de
+        tous les recenser.
+      outputs: [facts/]
+
+    - id: 1b-localisation
+      agent: surveyor
+      tasks: [12-locate-feature]
+      description: "Localise la feature par vocabulaire, données, historique, tests, surface externe"
+      outputs: [feature-candidates.yaml]
+      gate:
+        checklist: null
+        approver: commanditaire
+        blocking: true
+        question: >
+          Voici les points d'entrée candidats, classés par force de signal.
+          Lesquels appartiennent réellement à la fonctionnalité ?
+        rationale: >
+          Dix minutes d'un humain ici économisent des heures de traversée dans
+          la mauvaise direction. C'est le meilleur rapport coût/valeur de tout
+          le workflow.
+
+    - id: 2-cartographie
+      agent: cartographer
+      model: haiku
+      tasks: [20-build-graph]
+      inputs: [feature-candidates.yaml (confirmés)]
+      bounded_by: "scope.budget.max_traversal_depth"
+      outputs: [graph/, boundaries.yaml]
+
+    - id: 3-decoupage
+      agent: carver
+      model: opus
+      tasks: [30-carve-capabilities]
+      note: >
+        En feature-scan, le découpage porte sur les SOUS-capacités de la
+        feature. Il reste nécessaire : une "facturation" contient souvent
+        émission, avoirs, relances et export, qui ne se documentent pas ensemble.
+      outputs: [capabilities.yaml]
+      gate:
+        checklist: gate-3-capabilities
+        approver: expert métier
+        blocking: true
+
+    - id: 4-elucidation
+      parallel:
+        - agent: elucidator
+          model: sonnet
+          tasks: [40-elucidate-usecases, 41-extract-business-rules]
+        - agent: archaeologist
+          model: sonnet
+          tasks: [42-reconstruct-intent]
+      order_by: hotspot_rank
+      outputs: [claims/ (draft)]
+
+    - id: 5-challenge
+      sequence:
+        - agent: challenger
+          model: opus
+          tasks: [50-challenge-claim]
+          outputs: [challenges/, claims/ (arbitrées)]
+        - agent: test-forger
+          model: sonnet
+          tasks: [51-forge-characterization-test]
+          scope: "règles prioritaires uniquement (cf. task 51)"
+          outputs: [tests/characterization/, promotions]
+      gate:
+        checklist: gate-5-challenge
+        approver: [développeur, référent métier]
+        blocking: true
+
+    - id: 6-restitution
+      sequence:
+        - agent: diagram-planner
+          tasks: [60-plan-diagrams]
+        - parallel:
+            - agent: writer-functional
+              tasks: [61-render-functional-doc]
+            - agent: writer-technical
+              tasks: [62-render-technical-doc]
+        - agent: curator
+          tasks: [70-compute-coverage]
+      outputs: [dmad-output/]
+      gate:
+        checklist: release-readiness
+        approver: commanditaire
+        blocking: true
+
+    - id: 7-maintien
+      agent: curator
+      tasks: [71-check-freshness]
+      trigger: "CI, ou manuel"
+      recurring: true
+
+  mandatory_disclosure: >
+    En feature-scan, la documentation porte en tête l'avertissement que les
+    interactions hors périmètre n'ont pas été analysées, avec la liste des
+    frontières atteintes et non franchies (boundaries.yaml).

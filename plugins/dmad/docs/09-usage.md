@@ -1,0 +1,117 @@
+# DMAD — Mettre en œuvre
+
+DMAD se distribue comme **plugin Claude Code**. Le corpus complet — méthode, tâches, schémas, templates, checklists, outils — voyage avec le plugin : il n'y a rien à copier dans le dépôt legacy analysé.
+
+## Installation
+
+```
+/plugin marketplace add jmellano/dmad-method
+/plugin install dmad@dmad-method
+```
+
+Puis, dans le dépôt legacy : `/dmad-run`.
+
+### En développement local
+```bash
+claude --plugin-dir /chemin/vers/dmad-method/plugins/dmad
+# après modification :
+/reload-plugins
+```
+
+### Vérifier le packaging
+```bash
+claude plugin validate /chemin/vers/dmad-method/plugins/dmad
+claude plugin validate /chemin/vers/dmad-method          # le marketplace
+```
+
+## Ce que le plugin apporte
+
+| | |
+|---|---|
+| 12 agents | `dmad-scoper`, `dmad-surveyor`, … chacun avec son périmètre de lecture et son modèle |
+| 1 skill | `/dmad-run` — orchestre le pipeline et tient les gates |
+| Config MCP | Serena (LSP), Sequential Thinking, Context7 |
+| Le corpus | `docs/`, `tasks/`, `templates/`, `checklists/`, `schemas/`, `workflows/`, `examples/` |
+| Les outils | `tools/validate.py`, `tools/selftest.sh` |
+
+Les agents référencent le corpus via `${CLAUDE_PLUGIN_ROOT}` : les procédures détaillées ne sont pas dupliquées dans les prompts, elles sont **lues à la demande**. Un agent charge la tâche dont il a besoin, pas les seize.
+
+## Correspondance DMAD ↔ Claude Code
+
+| Concept DMAD | Mécanisme |
+|---|---|
+| `dmad.reads` | `tools:` / `disallowedTools:` dans le frontmatter |
+| `agent.model` | `model: haiku \| sonnet \| opus` |
+| Contexte séparé du Challenger | un subagent = un contexte isolé, par construction |
+| Gate humain | la skill présente la décision et s'arrête |
+| Capabilities | serveurs MCP du plugin |
+| Corpus de la méthode | `${CLAUDE_PLUGIN_ROOT}/…` |
+
+**Le point important :** l'isolation de contexte des subagents est ce qui rend le Challenger réellement adversarial. Il ne voit pas le raisonnement de l'Elucidator — non par consigne, mais parce que le mécanisme ne le lui transmet pas. C'est une garantie structurelle, pas une promesse de prompt.
+
+## Le cas des rédacteurs
+
+DMAD exige que `dmad-writer-functional` et `dmad-writer-technical` **n'aient pas accès au code**. Trois niveaux d'application, du plus fort au plus faible :
+
+1. **Retrait des outils d'exploration** — `disallowedTools: Grep, Glob, Bash` dans le frontmatter. Livré tel quel par le plugin.
+2. **Règles de permission `deny`** sur les chemins sources, dans le `.claude/settings.json` du projet analysé. **À adapter au projet** : voir `settings.example.json`, dont les chemins sont des exemples.
+3. **Consigne dans le system prompt** — nécessaire mais insuffisante seule.
+
+Les deux premiers niveaux sont des contraintes réelles. Ne compter que sur le troisième revient à espérer que le modèle se retienne.
+
+## Capabilities et serveurs MCP
+
+| Capability | Implémentation |
+|---|---|
+| `code-intelligence` | [Serena](https://github.com/oraios/serena) (MCP, LSP multi-langages) |
+| `doc-retrieval` | Context7 (MCP) |
+| `reasoning` | Sequential Thinking (MCP) |
+| `repo-history` | `git` via Bash — aucun MCP |
+| `schema-intelligence` | migrations + client SQL via Bash |
+| `runtime-evidence` | rapports de couverture, logs — lecture de fichiers |
+| `diagram-engine` | Mermaid, aucune dépendance |
+| `evidence-store` | fichiers YAML versionnés |
+
+Trois MCP seulement, et **c'est délibéré** : chaque serveur consomme du contexte à chaque appel. Les cinq autres capabilities se satisfont d'outils déjà présents.
+
+## Coût et routage
+
+Le modèle fort est payé **là où l'erreur coûte le plus**, pas là où le volume est le plus gros.
+
+| Phase | Modèle | Part attendue du coût |
+|---|---|---|
+| 1 Reconnaissance | haiku | faible |
+| 2 Cartographie | haiku | moyenne — beaucoup d'appels LSP |
+| 3 Découpage | **opus** | faible en volume, fort en valeur |
+| 4 Élucidation | sonnet | **le plus gros poste** |
+| 5 Challenge | **opus** | moyen — le maillon qui protège tout |
+| 6 Restitution | sonnet | moyen |
+
+**Ces proportions n'ont pas été mesurées sur un run réel** — c'est le premier chiffre à établir (cf. [roadmap](12-roadmap.md)).
+
+## Parallélisation
+
+Deux endroits, et deux seulement :
+- **Phase 4** — `elucidator` et `archaeologist` sur la même capacité ; et plusieurs capacités en parallèle.
+- **Phase 6** — les deux rédacteurs, qui consomment le même graphe figé.
+
+**Le reste est séquentiel par nécessité** : chaque phase consomme la sortie validée de la précédente. Paralléliser le Challenger avec l'Elucidator reviendrait à réfuter des claims encore en cours d'écriture.
+
+## Confidentialité
+
+Sur du code client, `scope.confidentiality` doit être **appliqué**, pas seulement déclaré :
+- `local_only: true` ⇒ aucun serveur MCP distant (Context7 sort du réseau : le désactiver)
+- règles `deny` sur les outils réseau
+- `redaction_rules` appliquées aux `evidence.excerpt` avant écriture
+
+**Le mécanisme d'application n'est pas encore spécifié** — limite connue, bloquante pour un usage en prestation. Voir [roadmap](12-roadmap.md).
+
+## Vérifier avant de livrer
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/tools/validate.py dmad-output/
+```
+
+Puis le contrôle qui compte réellement : **tirer 5 claims au hasard, ouvrir le code aux lignes citées, vérifier que la phrase correspond.** Dix minutes. Un taux d'erreur supérieur à 1 sur 5 condamne le run.
+
+C'est le seul contrôle qui détecte l'anti-pattern A2 (la preuve trahie), parce qu'une relecture intégrale d'un texte crédible et bien sourcé ne détecte rien.

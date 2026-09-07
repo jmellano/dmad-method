@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "dmad",
+  "displayName": "DMAD — Documentation Method for Agentic Discovery",
+  "version": "0.3.0",
+  "description": "Rétro-documente un legacy en documentation fonctionnelle et technique dont chaque affirmation est prouvée, datée et vérifiable. Le pendant inverse de BMAD : BMAD génère, DMAD enquête.",
+  "author": {
+    "name": "jmellano",
+    "url": "https://github.com/jmellano"
+  },
+  "homepage": "https://github.com/jmellano/dmad-method",
+  "repository": "https://github.com/jmellano/dmad-method",
+  "license": "MIT",
+  "keywords": [
+    "legacy",
+    "documentation",
+    "reverse-engineering",
+    "retro-documentation",
+    "characterization-tests",
+    "knowledge-graph",
+    "java",
+    "bmad"
+  ]
+}

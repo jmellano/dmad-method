@@ -1,0 +1,25 @@
+{
+  "//": "Extrait à fusionner dans .claude/settings.json du projet legacy analysé.",
+
+  "permissions": {
+    "allow": [
+      "Bash(git log:*)",
+      "Bash(git blame:*)",
+      "Bash(git show:*)",
+      "Bash(git diff:*)",
+      "Bash(git shortlog:*)",
+      "Bash(tokei:*)",
+      "Bash(cloc:*)",
+      "Bash(python3 .dmad/tools/validate.py:*)"
+    ],
+
+    "//deny": "Applique la contrainte fondatrice : les rédacteurs ne lisent pas le code. Adapte les chemins à ton projet.",
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(git reset:*)",
+      "Write(./src/**)",
+      "Edit(./src/**)"
+    ]
+  }
+}
