@@ -21,6 +21,7 @@ Les documents se lisent dans l'ordre, mais chacun est autonome.
 | | |
 |---|---|
 | [09 — Mettre en œuvre](09-usage.md) | installation du plugin, correspondance avec Claude Code, coût, parallélisation, confidentialité |
+| [14 — Couche de preuve OKF](14-okf.md) | le graphe en bundle conformant, la table de correspondance, et les deux choix de conception |
 | [13 — Profil Java](13-profil-java.md) | où chercher quoi dans un legacy JVM, les pièges Spring/JPA/AOP, la checklist d'avant-run |
 
 ## Le recul
@@ -50,6 +51,7 @@ Les documents se lisent dans l'ordre, mais chacun est autonome.
 | `tools/diagram-engine.py` | rend un diagramme depuis son plan, le compte, et refuse au-delà du seuil |
 | `tools/freshness.py` | ce qui a péri, et la propagation vers le haut de la cascade |
 | `tools/coverage.py` | les chiffres du rapport de couverture ; l'interprétation reste écrite |
+| `tools/okf-export.py` | l'evidence store en bundle Open Knowledge Format conformant |
 | `tools/selftest.sh` | prouve que les garde-fous refusent bien ce qu'ils doivent refuser |
 
 > Un principe qui n'est pas contraint par un outil est un vœu pieux, et chaque message d'erreur nomme la décision qu'il applique — un message qui ne dit pas quelle règle il fait respecter se fait contourner, puis supprimer, au premier agacement.

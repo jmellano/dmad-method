@@ -113,8 +113,18 @@ Aucune de ces quatre choses ne serait sortie d'un « résume-moi ce repo ».
 
 ## Vérifier
 
+### Le bundle OKF → [`okf/`](okf/)
+
+L'evidence store exporté en Open Knowledge Format : 18 concepts, aucun orphelin, aucun lien mort. Il montre les deux choix de conception de la couche — **l'intention y est un concept propre**, parce que `verified` vouche pour le concept entier et qu'une intention validée ne prouve pas le fait ; et `confidence_reason` y survit en clé d'extension, parce que c'est le champ qui force à écrire ce qui manque pour monter d'un niveau.
+
+L'export signale au passage **cinq liens vers des artefacts absents** : ce dossier embarque un échantillon du run, pas son archive complète. Les taire reviendrait à publier une carte dont on a effacé des routes.
+
+## Vérifier
+
 ```bash
-python3 ../../tools/validate.py     .          # 17 artefacts valides
-python3 ../../tools/check-corpus.py output/    # 3 documents conformes
-../../tools/selftest.sh                        # + les 25 violations bien refusées
+python3 ../../tools/validate.py     .                    # 17 artefacts valides
+python3 ../../tools/check-corpus.py output/              # 3 documents conformes
+python3 ../../tools/coverage.py     . --commentaire output/preuves/lecture.md
+python3 ../../tools/okf-export.py   . --check            # bundle conformant
+../../tools/selftest.sh                                  # les neuf sections
 ```

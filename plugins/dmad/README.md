@@ -78,6 +78,7 @@ plugins/dmad/
 │                   diagram-engine.py rend, compte, et refuse au-delà du seuil
 │                   freshness.py      péremption, et sa propagation vers le haut
 │                   coverage.py       les chiffres ; l'interprétation reste écrite
+│                   okf-export.py     le graphe en bundle Open Knowledge Format
 │                   selftest.sh       prouve que les garde-fous mordent
 └── examples/       run de référence + fixtures de violation
 ```
@@ -98,6 +99,7 @@ plugins/dmad/
 | [11 — Glossaire](docs/11-glossaire.md) | le vocabulaire de la méthode |
 | [09 — Mettre en œuvre](docs/09-usage.md) | installation, correspondance avec Claude Code, coût, confidentialité |
 | [13 — Profil Java](docs/13-profil-java.md) | où chercher quoi dans un legacy JVM, les pièges Spring/JPA/AOP |
+| [14 — Couche de preuve OKF](docs/14-okf.md) | le graphe en bundle conformant, et pourquoi l'intention y devient un concept propre |
 | [12 — État et suite](docs/12-roadmap.md) | ce qui existe, ce qui manque, ce que DMAD ne deviendra pas |
 
 ## Installer

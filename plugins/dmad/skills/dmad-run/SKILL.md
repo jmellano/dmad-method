@@ -63,6 +63,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/tools/validate.py       dmad-output/   # les artef
 python3 ${CLAUDE_PLUGIN_ROOT}/tools/check-corpus.py   dmad-output/   # les documents
 python3 ${CLAUDE_PLUGIN_ROOT}/tools/diagram-engine.py --all dmad-output/
 python3 ${CLAUDE_PLUGIN_ROOT}/tools/coverage.py       dmad-output/ --out dmad-output/preuves/couverture.md
+python3 ${CLAUDE_PLUGIN_ROOT}/tools/okf-export.py     dmad-output/ --check
 ```
 Les deux échouent pour des raisons différentes : le premier sur un schéma violé, le second sur un invariant du corpus — un bloc de code, une section sans ancrage, un cas d'usage à six blocs. **Les lancer avant la revue**, pas après : une revue humaine ne doit pas servir à trouver ce qu'une machine trouve.
 Puis rappelle à l'utilisateur le contrôle par échantillonnage : **tirer 5 claims au hasard, ouvrir le code aux lignes citées, vérifier que la phrase correspond.** Dix minutes, et c'est le seul contrôle qui détecte l'erreur dominante des LLM — citer du vrai code en lui faisant dire autre chose.

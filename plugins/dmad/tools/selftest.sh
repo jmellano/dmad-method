@@ -130,5 +130,14 @@ else
 fi
 
 echo
+echo "== 9. L'evidence store s'exporte en bundle OKF conformant"
+if python3 tools/okf-export.py examples/atlas-billing --out "$(mktemp -d)/okf" --check \
+     --at "2026-09-08T17:00:00Z" 2>&1 | grep -q "conformant"; then
+  echo "   ok  type non vide partout, aucun orphelin, aucun lien mort"
+else
+  echo "   ÉCHEC : le bundle exporté n'est pas conformant"; fail=1
+fi
+
+echo
 if [ "$fail" -eq 0 ]; then echo "✓ selftest OK"; else echo "✗ selftest en échec"; fi
 exit $fail

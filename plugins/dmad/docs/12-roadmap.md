@@ -33,6 +33,8 @@
 
 ### Fait en v0.4
 
+- **Couche de preuve en Open Knowledge Format** — l'evidence store s'exporte en bundle conformant, validé par le validateur officiel en mode strict. L'intention y devient un concept propre, parce que `verified` vouche pour le concept entier.
+
 - **Invariants contraints** — D16, D17, D18, D19, D20 et R1/R3 sont vérifiés par `validate.py` et `check-corpus.py`, avec vingt-huit fixtures de non-régression. Chaque message nomme la décision qu'il applique.
 - **Schémas des nouveaux types** — `ExternalContract`, `BusinessObject`, `Document`.
 - **Corpus du run de référence** — `examples/atlas-billing` produit STD, SFD et SFG.
