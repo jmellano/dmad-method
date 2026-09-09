@@ -4,25 +4,55 @@ DMAD se distribue comme **plugin Claude Code**. Le corpus complet — méthode, 
 
 ## Installation
 
+### Classique
+
 ```
 /plugin marketplace add jmellano/dmad-method
 /plugin install dmad@dmad-method
 ```
 
-Puis, dans le dépôt legacy : `/dmad-run`.
+`/plugin list` doit afficher `dmad@dmad-method` en **enabled**. Puis, dans le dépôt legacy : `/dmad-run`.
 
-### En développement local
+Le marketplace sert la **branche par défaut** du dépôt : une version en cours de développement sur une autre branche ne s'installe pas ainsi.
+
+### En développement — itérer
+
 ```bash
 claude --plugin-dir /chemin/vers/dmad-method/plugins/dmad
-# après modification :
-/reload-plugins
 ```
+
+Puis `/reload-plugins` après chaque modification. C'est le seul mode qui évite de réinstaller à chaque changement, et donc le seul praticable quand on travaille *sur* la méthode plutôt qu'*avec* elle.
+
+### En développement — comme en vrai
+
+Pour vérifier que l'installation elle-même fonctionne, avant publication :
+
+```
+/plugin marketplace add /chemin/vers/dmad-method     # le DÉPÔT, pas le plugin
+/plugin install dmad@dmad-method
+```
+
+Le chemin est celui du dépôt parce que le marketplace est déclaré dans son `.claude-plugin/marketplace.json`, qui pointe ensuite vers `./plugins/dmad`. C'est l'erreur la plus fréquente.
 
 ### Vérifier le packaging
 ```bash
-claude plugin validate /chemin/vers/dmad-method/plugins/dmad
-claude plugin validate /chemin/vers/dmad-method          # le marketplace
+claude plugin validate /chemin/vers/dmad-method/plugins/dmad   # le plugin
+claude plugin validate /chemin/vers/dmad-method                # le marketplace
 ```
+
+Les deux doivent afficher `Validation passed`. Un manifeste invalide s'installe silencieusement de travers : mieux vaut le découvrir soi-même.
+
+### Savoir ce qu'on charge
+
+```bash
+claude plugin details dmad
+```
+
+Inventaire des composants et **coût en tokens projeté**. DMAD est un gros plugin, et une bonne partie de son corpus n'est lue qu'à la demande via `${CLAUDE_PLUGIN_ROOT}` — les procédures détaillées ne sont pas dupliquées dans les prompts. Cette commande dit ce qui pèse réellement au chargement, par opposition à ce que pèse le dépôt.
+
+### Ce qu'il n'y a pas à installer
+
+**Aucun serveur MCP** (D24) : rien à lancer, rien à diagnostiquer quand ça ne répond pas. Les outils du plugin sont en Python 3 et demandent `pyyaml` et `jsonschema`.
 
 ## Ce que le plugin apporte
 

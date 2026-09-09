@@ -103,12 +103,44 @@ plugins/dmad/
 
 ## Installer
 
+### Classique — depuis le marketplace
+
 ```
 /plugin marketplace add jmellano/dmad-method
 /plugin install dmad@dmad-method
 ```
 
-Puis `/dmad-run` dans le dépôt legacy. Tout le corpus (méthode, tâches, schémas, templates, outils) voyage avec le plugin — rien à copier dans le projet analysé.
+`/plugin list` doit afficher `dmad@dmad-method` en **enabled**. Puis `/dmad-run` dans le dépôt legacy.
+
+> Le marketplace sert la **branche par défaut**. Une version en cours de développement sur une autre branche passe par le mode développement.
+
+### Développement — itérer sur le plugin
+
+```bash
+claude --plugin-dir /chemin/vers/dmad-method/plugins/dmad
+```
+
+Puis `/reload-plugins` après chaque modification. C'est le seul mode qui ne demande pas de réinstaller à chaque changement.
+
+### Développement — valider le packaging
+
+Plus proche de l'installation réelle, à employer avant publication :
+
+```
+/plugin marketplace add /chemin/vers/dmad-method     # le DÉPÔT, pas le plugin
+/plugin install dmad@dmad-method
+```
+
+```bash
+claude plugin validate /chemin/vers/dmad-method/plugins/dmad
+claude plugin validate /chemin/vers/dmad-method
+```
+
+Les deux doivent afficher `Validation passed`. Un manifeste invalide s'installe silencieusement de travers.
+
+### Ce qu'il n'y a pas à installer
+
+**Aucun serveur MCP** (D24). Tout le corpus voyage avec le plugin — rien à copier dans le projet analysé. Les outils sont en Python 3 et demandent `pyyaml` et `jsonschema`.
 
 Détails, coût et confidentialité : [09 — Mettre en œuvre](docs/09-usage.md).
 Projet Java ? Lis d'abord le [profil Java](docs/13-profil-java.md).

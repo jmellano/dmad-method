@@ -8,16 +8,70 @@
 
 ## Installation
 
+### Depuis le marketplace
+
 ```
 /plugin marketplace add jmellano/dmad-method
 /plugin install dmad@dmad-method
 ```
+
+Vérifier : `/plugin list` doit afficher `dmad@dmad-method` en **enabled**.
 
 Puis, dans le dépôt legacy à documenter :
 
 ```
 /dmad-run
 ```
+
+> Le marketplace sert la **branche par défaut** du dépôt. Une version en cours de développement sur une autre branche ne s'installe pas par ce chemin — utiliser le mode développement ci-dessous.
+
+### En mode développement
+
+Deux façons, selon qu'on veut itérer sur le plugin ou seulement l'essayer avant publication.
+
+**Charger le plugin directement** — la plus courte, et celle qui permet de recharger sans réinstaller :
+
+```bash
+claude --plugin-dir /chemin/vers/dmad-method/plugins/dmad
+```
+
+Puis, après chaque modification du plugin :
+
+```
+/reload-plugins
+```
+
+**Passer par un marketplace local** — plus proche de l'installation réelle, donc ce qu'il faut employer pour valider le packaging avant publication :
+
+```
+/plugin marketplace add /chemin/vers/dmad-method
+/plugin install dmad@dmad-method
+```
+
+C'est le chemin du **dépôt**, pas celui du plugin : le marketplace est déclaré dans `.claude-plugin/marketplace.json` à la racine, et il pointe vers `./plugins/dmad`.
+
+### Vérifier le packaging avant de publier
+
+```bash
+claude plugin validate /chemin/vers/dmad-method/plugins/dmad   # le plugin
+claude plugin validate /chemin/vers/dmad-method                # le marketplace
+```
+
+Les deux doivent afficher `Validation passed`. Un manifeste invalide s'installe silencieusement de travers : la commande ne coûte rien, et elle évite de découvrir le problème chez quelqu'un d'autre.
+
+### Savoir ce qu'on charge
+
+```bash
+claude plugin details dmad
+```
+
+Inventaire des composants et **coût en tokens projeté**. DMAD est un gros plugin — quinze agents, vingt tâches, six outils — et une bonne partie n'est lue qu'à la demande via `${CLAUDE_PLUGIN_ROOT}`. Cette commande dit ce qui pèse réellement au chargement.
+
+### Aucune dépendance à installer
+
+Le plugin n'embarque **aucun serveur MCP** (D24) : rien à lancer, rien à diagnostiquer quand ça ne répond pas. Tout le corpus — méthode, tâches, schémas, gabarits, checklists, outils — voyage avec lui, et rien n'est à copier dans le projet analysé.
+
+Les outils sont en Python 3 et demandent `pyyaml` et `jsonschema`.
 
 ## Le problème
 
