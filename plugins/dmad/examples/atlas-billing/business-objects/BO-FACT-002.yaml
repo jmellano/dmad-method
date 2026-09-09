@@ -25,7 +25,7 @@ confidence_reason: >
 evidence:
   - kind: code
     ref: "src/billing/InvoiceDispatcher.java#L180-L280"
-    tool: "lsp.find_definition"
+    tool: "jcallgraph.definition"
 produced_by: carver
 freshness:
   verified_at_commit: a1b2c3d

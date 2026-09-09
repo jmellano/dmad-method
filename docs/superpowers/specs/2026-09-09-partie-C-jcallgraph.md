@@ -3,6 +3,16 @@
 > Spec détaillée. Vue d'ensemble : [reste à faire](2026-09-09-dmad-reste-a-faire.md)
 > **Dépend de** : rien. **Bloque** : rien — le cycle 1 doit fonctionner sans lui.
 
+> ## ⚠️ Socle révisé le 2026-09-09
+>
+> Cette spec décrit un socle **`javap` / bytecode**. L'outil est finalement construit sur **tree-sitter**, et développé hors de ce dépôt.
+>
+> **Ce qui reste valide** : les lots C2 à C8 dans leur intention — traversée transitive, franchissement vers les dépendances, candidats de dispatch jamais tranchés, extraction des annotations, sorties JSON et Mermaid, profil en configuration, intégration comme implémentation de `code-intelligence`. Et surtout le tableau des **angles morts**, qui est un livrable et non une réserve.
+>
+> **Ce qui change** : la section C1 et son argument central. Le bytecode portait le descripteur exact à chaque site d'appel, donc résolvait les surcharges ; une analyse syntaxique ne le fait pas gratuitement et doit reconstruire la résolution de types. En contrepartie, elle **n'exige plus que le projet compile** — ce qui, sur les legacy visés, vaut largement l'échange. C1bis (les lambdas via le pool de constantes) est sans objet et devient un problème de résolution syntaxique ordinaire.
+>
+> **Ce qui en découle dans la méthode** : la décision **D23** — le plafond de confiance se dérive de la question posée, pas de l'implémentation. Elle est née de ce changement de socle.
+
 ## L'objet
 
 Une CLI Python adossée à `javap`. **Aucun build, aucune dépendance à installer** : le JDK est déjà présent, puisque le projet compile.

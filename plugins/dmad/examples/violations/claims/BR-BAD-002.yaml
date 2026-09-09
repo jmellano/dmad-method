@@ -6,7 +6,7 @@ confidence_reason: "J'ai lu le code attentivement et cette règle est certaine."
 evidence:
   - kind: code
     ref: "src/order/Order.java#L88"
-    tool: "lsp.find_definition"
+    tool: "jcallgraph.definition"
 produced_by: elucidator
 freshness:
   verified_at_commit: a1b2c3d

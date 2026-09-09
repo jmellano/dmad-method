@@ -9,7 +9,7 @@ tags:
 sources:
 - id: ev-1
   resource: src/billing/AmountCalculator.java#L88-L140@a1b2c3d
-  author: process:lsp.find_definition
+  author: process:jcallgraph.definition
   kind: code
 - id: ev-2
   resource: invoice_lines.amount DECIMAL(12,4)
@@ -22,7 +22,7 @@ sources:
   outcome: passing
 - id: ev-4
   resource: src/accounting/export/CsvWriter.java#L61
-  author: process:lsp.find_references
+  author: process:jcallgraph.callers
   kind: code
 generated:
   by: dmad-elucidator/0.4.0

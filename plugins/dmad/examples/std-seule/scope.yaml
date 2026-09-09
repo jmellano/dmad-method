@@ -83,9 +83,20 @@ sources:
 
 capabilities_available:
   code-intelligence:
-    implementation: serena
-    confidence_ceiling: V     # abaisser à I si les dépendances ne résolvent pas
+    implementation: jcallgraph
+    confidence_ceiling: V
     status: available
+    # D23 — le plafond se dérive de la question posée, pas de l'outil.
+    # Un appel virtuel rend des candidats, jamais un choix : c'est C, et ce
+    # n'est pas une dégradation, c'est ce que l'analyse statique peut dire.
+    ceilings_by_question:
+      file_symbols: V
+      type_hierarchy: V
+      static_calls: V
+      callers: V
+      virtual_dispatch: C
+      ioc_dispatch: C
+      reflection: I
   repo-history:
     implementation: git
     confidence_ceiling: V

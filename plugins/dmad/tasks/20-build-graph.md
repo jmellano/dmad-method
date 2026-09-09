@@ -60,7 +60,7 @@ Ce journal alimente le rapport de couverture et la page « zones d'ombre ». **U
 
 ## Le dispatch dynamique
 
-Réflexion, IoC, `eval`, dispatch par chaîne, appel via configuration : le LSP ne résout pas. **Ne pas deviner.** Poser un nœud dédié :
+Réflexion, IoC, `eval`, dispatch par chaîne, appel via configuration : aucune analyse statique ne résout. **Ne pas deviner.** Poser un nœud dédié :
 
 ```yaml
 unresolved_dispatch:

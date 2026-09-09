@@ -240,7 +240,8 @@
               "C",
               "I",
               "H"
-            ]
+            ],
+            "description": "Plafond MAXIMAL atteignable avec cette implémentation. Depuis D23, il ne suffit pas à lui seul : le plafond réel se dérive de la question posée, détaillé dans ceilings_by_question."
           },
           "status": {
             "enum": [
@@ -248,6 +249,76 @@
               "degraded",
               "unavailable"
             ]
+          },
+          "ceilings_by_question": {
+            "type": "object",
+            "description": "Plafond par type de question (D23). Un plafond unique par outil est une approximation : le même analyseur prouve exhaustivement une hiérarchie de types et ne rend que des candidats sur un appel virtuel. Le plafond s'applique par arête du graphe, pas au run entier.",
+            "additionalProperties": false,
+            "properties": {
+              "file_symbols": {
+                "enum": [
+                  "V",
+                  "C",
+                  "I",
+                  "H"
+                ],
+                "default": "V"
+              },
+              "type_hierarchy": {
+                "enum": [
+                  "V",
+                  "C",
+                  "I",
+                  "H"
+                ],
+                "default": "V"
+              },
+              "static_calls": {
+                "enum": [
+                  "V",
+                  "C",
+                  "I",
+                  "H"
+                ],
+                "default": "V"
+              },
+              "callers": {
+                "enum": [
+                  "V",
+                  "C",
+                  "I",
+                  "H"
+                ],
+                "default": "V"
+              },
+              "virtual_dispatch": {
+                "enum": [
+                  "V",
+                  "C",
+                  "I",
+                  "H"
+                ],
+                "default": "C"
+              },
+              "ioc_dispatch": {
+                "enum": [
+                  "V",
+                  "C",
+                  "I",
+                  "H"
+                ],
+                "default": "C"
+              },
+              "reflection": {
+                "enum": [
+                  "V",
+                  "C",
+                  "I",
+                  "H"
+                ],
+                "default": "I"
+              }
+            }
           }
         }
       }

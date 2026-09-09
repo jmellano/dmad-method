@@ -6,7 +6,7 @@ confidence_reason: "Garde dans le code et valeur confirmée par la configuration
 evidence:
   - kind: code
     ref: "src/billing/DunningService.java#L120"
-    tool: "lsp.find_definition"
+    tool: "jcallgraph.definition"
   - kind: config
     ref: "config/application-prod.yml#L44"
     tool: "grep"

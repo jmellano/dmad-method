@@ -10,7 +10,7 @@ sources:
   kind: artifact
 - id: ev-2
   resource: src/billing/InvoiceDispatcher.java#L268
-  author: process:lsp.find_references
+  author: process:jcallgraph.callers
   kind: code
 generated:
   by: dmad-contract-resolver/0.4.0

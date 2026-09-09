@@ -65,7 +65,6 @@ plugins/dmad/
 ├── agents/         les agents, exécutables
 ├── skills/         /dmad-run — l'orchestrateur — et deux prérequis embarqués
 │                   (code-intelligence-java, patterns-gof-cqrs)
-├── .mcp.json       Serena, Sequential Thinking, Context7
 ├── docs/           la méthode : manifeste, phases, capabilities, graphe,
 │                   diagrammes, livrables, décisions, anti-patterns, profil Java
 ├── tasks/          20 procédures opérationnelles
@@ -126,7 +125,7 @@ Un principe qui n'est pas contraint par un outil est un vœu pieux. **Et chaque 
 
 ## Prérequis
 
-- Une **capability `code-intelligence`** : Serena ou un LSP natif en nominal ; tree-sitter/ctags ou grep en dégradé — avec plafond de confiance réduit et **affiché dans la documentation produite**.
+- Une **capability `code-intelligence`** : `jcallgraph`, analyseur tree-sitter, en nominal ; la recherche textuelle en repli. **Le plafond de confiance se dérive de la question posée, pas de l'outil** (D23) — une hiérarchie de types est `V`, un appel virtuel rend des candidats en `C`, une réflexion est `I` et ouvre une question. La dégradation reste affichée dans la documentation produite.
 - Accès à l'**historique git complet** (l'intention se reconstruit largement là).
 - Optionnel mais décisif : **couverture, traces ou logs de production** — la seule preuve du comportement réel plutôt que possible.
 

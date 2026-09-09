@@ -1,84 +1,70 @@
 ---
 name: code-intelligence-java
-description: Prérequis outillage d'un run DMAD sur un projet JVM - protocole de démarrage de l'indexeur sémantique, chaîne des quatre causes d'échec cumulées, fallbacks et plafonds de confiance associés. À lire AVANT la première invocation, pas après le premier échec.
+description: Ce que l'analyse de code prouve, et ce qu'elle ne prouve pas. Le plafond de confiance se dérive de la question posée, pas de l'outil employé. À lire avant la première traversée, pas après le premier doute.
 ---
 
-# Outillage sémantique sur un projet JVM
+# Ce que l'analyse de code prouve
 
-Ce skill n'explique pas comment naviguer dans du code : il explique **pourquoi la navigation échoue**, et comment distinguer une panne d'un démarrage lent. C'est un prérequis du cycle 1, à lire avant la première invocation.
+Ce skill n'explique pas comment naviguer dans du code. Il explique **ce qu'une réponse vaut**, question par question — parce que c'est de là que la confiance est dérivée, et non du nom de l'outil qui a répondu.
 
-La raison d'être de ce document tient en une observation : sur un projet réel, l'indexeur a échoué pour **quatre raisons cumulées, dont trois n'apparaissent qu'une fois la précédente résolue**. Chacune, prise isolément, ressemble à « l'outil ne marche pas ».
+L'implémentation de référence de la capability `code-intelligence` est **`jcallgraph`**, un analyseur tree-sitter. Pas de serveur à lancer, pas d'index à faire chauffer, pas de classpath à résoudre.
 
-## Ce que la navigation sémantique apporte, et ce qu'elle ne peut pas
+## Le plafond se dérive de la question
 
-| Question | Outil | Fiabilité |
+| Ce qu'on demande | Plafond | Pourquoi |
 |---|---|---|
-| que fait cette méthode ? | recherche de symbole avec corps | élevée |
-| qui appelle cette méthode ? | recherche de références | élevée, mais **non transitive** — itérer |
-| quelles implémentations de cette interface ? | recherche d'implémentations | élevée — le moyen le plus rapide de lister des stratégies |
-| quels symboles dans ce fichier ? | vue d'ensemble des symboles | élevée |
-| où sont les occurrences de ce **code métier** ? | ❌ | un code dans un commentaire n'est pas un symbole — **c'est du grep** |
-| quel contrat porte cet appel sortant ? | ❌ | l'annotation vit dans un artefact hors du projet indexé — **c'est de la lecture d'archive** |
+| symboles déclarés dans un fichier | `V` | lecture syntaxique exhaustive |
+| hiérarchie de types, implémentations d'une interface | `V` | c'est écrit dans les sources |
+| appel statique, appel sur type déclaré | `V` | la cible est écrite |
+| appelants d'une méthode | `V` si tout le périmètre est indexé, `C` sinon | l'exhaustivité dépend de ce qui a été lu |
+| appel virtuel ou d'interface | `C` — **candidats, jamais un choix** | le type dynamique n'est pas connu statiquement |
+| injection de dépendances, fabrique par chaîne | `C`, avec `unresolved_dispatch` | le câblage est ailleurs, souvent hors du code |
+| réflexion, chargement par nom | `I`, et une question ouverte | rien dans les sources ne le dit |
+| comportement modifié par aspect ou proxy | **hors de portée** | à signaler, jamais à supposer |
 
-Les deux dernières lignes sont la source d'erreur la plus fréquente : chercher longtemps avec le bon outil sur une question qu'il ne peut pas traiter.
+**Le plafond s'applique par arête du graphe, pas au run entier.** Un dispatch non résolu ne dégrade pas ce que l'outil a par ailleurs prouvé exhaustivement — et réciproquement, une hiérarchie de types bien lue n'autorise aucune affirmation d'exhaustivité sur un appel dynamique voisin.
 
-## Le protocole de démarrage — deux temps, obligatoire
+## Les questions qu'aucun analyseur ne traite
 
-**Un indexeur qui répond vide au premier appel n'est pas en panne : il chauffe.** Il n'importe le projet qu'au premier appel, et sur un dépôt à plusieurs dizaines de modules cet import prend des minutes.
+Ce sont celles qu'on perd le plus de temps à poser au mauvais outil.
 
-1. Un appel léger sur un fichier connu. **Le résultat ne compte pas, quel qu'il soit.**
-2. Attendre — quelques minutes sur un gros dépôt, sans autre appel.
-3. Rejouer le même appel. **C'est ce résultat qui fait foi.**
-4. Si le second échoue : consigner l'erreur exacte et ne rien retoucher avant d'avoir lu la section suivante.
+**« Où sont les occurrences de ce code métier ? »** Un identifiant dans un commentaire ou une javadoc n'est pas un symbole. C'est une recherche textuelle, et elle se croise ensuite avec l'analyse pour confirmer que la classe trouvée est bien invoquée depuis le chemin étudié.
 
-Conclure à l'échec au premier appel fait basculer tout le run en mode dégradé pour rien — et le plafond de confiance avec lui.
+**« Quel contrat porte cet appel sortant ? »** L'annotation vit dans l'artefact d'une dépendance, hors du périmètre analysé. C'est de la lecture d'archive — voir la task 13 et son échelle à quatre barreaux.
 
-## Les quatre causes, de la plus profonde à la plus visible
+**« Ce comportement est-il modifié quelque part ? »** Un aspect, un intercepteur, un proxy modifient une méthode sans la mentionner. Aucune traversée d'appels ne les trouve. C'est un angle du Challenger, pas une requête d'outil.
 
-### 1. Le magasin de certificats de l'environnement d'exécution embarqué
+## Ce qu'on ne fait jamais sur un dispatch non résolu
 
-L'indexeur embarque **son propre environnement d'exécution**, distinct de celui du système. S'il doit atteindre un dépôt d'artefacts interne en TLS et que l'autorité de certification n'est pas dans **ce** magasin, la résolution échoue en cascade : pas de plan de build, pas d'import, pas de classpath, aucun symbole.
+**On ne choisit pas le candidat le plus probable.** On pose un nœud dédié :
 
-**Le piège** : la ligne de commande utilise l'environnement système. Si le certificat n'est que là, `mvn compile` réussit alors que l'indexeur échoue silencieusement. **Ne jamais conclure « les dépendances sont là » sur la foi d'une compilation en ligne de commande.**
+```yaml
+unresolved_dispatch:
+  at: "src/…/InvoiceService.java#L88"
+  expression: "gateway.send(Invoice)"
+  declared_type: "com.acme.AccountingGateway"
+  candidates: ["HttpAccountingGateway", "LegacyFileGateway", "NoopGateway"]
+  resolution: unknown
+  open_question: OQ-0xx
+```
 
-*Diagnostic* : chercher `PKIX`, `CertificateException` ou `handshake` dans les journaux de l'indexeur.
+L'outil peut **réduire** la liste — une interface à implémentation unique dans le périmètre indexé est résolue — mais il ne tranche jamais par vraisemblance. Choisir silencieusement, c'est laisser bâtir trois pages sur une supposition.
 
-### 2. Les marqueurs d'échec de résolution
+## Repli, et ce qu'il coûte
 
-Quand une résolution de dépendance échoue, le gestionnaire pose un marqueur d'échec dans le dépôt local. **Tant qu'il existe et n'a pas expiré, la résolution n'est pas réessayée** — même si la cause réelle a été corrigée entre-temps.
-
-*Diagnostic* : `find ~/.m2/repository -name '*.lastUpdated' | wc -l`. Purge : le même avec `-delete`.
-
-### 3. Le cache de symboles empoisonné
-
-Si l'indexeur scanne une fois pendant que le classpath est absent, il persiste **des listes de symboles vides comme des résultats valides**, indexées sur le hash du contenu des fichiers. Un fichier non modifié ne sera jamais réévalué : le cache reste empoisonné indéfiniment.
-
-**Aggravant** : le cache est aussi chargé en mémoire au démarrage. Supprimer le fichier en cours de session ne suffit pas.
-
-*Diagnostic* : compter les entrées à zéro symbole dans le cache. Toutes vides = empoisonné. *Réparation* : arrêter le **processus** de l'indexeur, supprimer le cache, relancer.
-
-### 4. Les processus orphelins
-
-Chaque session lance son propre serveur de langage. Si le parent meurt brutalement, l'enfant est reparenté et continue de tourner en immobilisant plusieurs centaines de mégaoctets. Quelques orphelins suffisent à faire échouer l'import suivant, faute de mémoire.
-
-*Diagnostic* : lister les processus dont le parent est le processus initial et dont la ligne de commande porte le serveur de langage.
-
-## Symptôme → suspect
-
-| Symptôme | Suspect | Vérification |
+| Repli | Plafond global | Ce qu'on perd |
 |---|---|---|
-| réponse instantanée sur un fichier connu | cache (3) | compter les entrées vides |
-| réponse rapide mais toujours vide, plusieurs fichiers | cache (3) ou classpath absent (1, 2) | journaux de l'indexeur |
-| terminaison du serveur au premier appel | mémoire (4) | lister les orphelins |
-| vide au premier appel après un redémarrage propre | démarrage paresseux | attendre et rejouer |
-| délai d'attente sur une recherche globale | index pas prêt | restreindre la recherche à un fichier |
-
-## Fallbacks et plafonds
-
-| Niveau | Ce qu'on perd | Plafond du run |
-|---|---|---|
-| indexeur sémantique nominal | — | `V` |
-| analyse syntaxique sans résolution de types | le dispatch dynamique, les types injectés | `C` |
-| recherche textuelle | l'exhaustivité | `I` — **aucune affirmation d'exhaustivité autorisée** |
+| recherche textuelle | `I` | l'exhaustivité. **Aucune affirmation d'exhaustivité n'est autorisée**, quelle que soit la qualité de la lecture |
 
 Le plafond n'est pas une punition : c'est ce qui rend la dégradation **visible dans le document produit** au lieu d'être silencieuse. Il se déclare au gate 0 et s'affiche dans le bandeau des trois documents.
+
+## Rendre le projet analysable
+
+Un analyseur syntaxique n'a pas besoin que le projet compile — c'est sa principale vertu sur un legacy, où la compilation est souvent le premier obstacle et parfois un obstacle définitif.
+
+Deux choses restent utiles quand elles sont disponibles, et **aucune n'est bloquante** :
+
+- **Les dépendances résolues**, pour la traversée vers l'intérieur des artefacts et la résolution des contrats sortants au barreau 1. Sans elles, la résolution retombe au barreau du commentaire manuscrit, celui qui survit aux refactorings et ment alors sans le dire.
+- **La version du langage**, pour que l'analyse syntaxique ne bute pas sur une construction récente.
+
+Ce qui manque se déclare dans `scope.yaml` et s'affiche dans le bandeau. Un projet qui ne compile pas n'est plus un run dégradé : c'est un run normal dont certains contrats ne seront pas résolus, et qui le dit.

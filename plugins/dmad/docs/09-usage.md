@@ -30,7 +30,7 @@ claude plugin validate /chemin/vers/dmad-method          # le marketplace
 |---|---|
 | 15 agents | `dmad-scoper`, `dmad-surveyor`, … chacun avec son périmètre de lecture et son modèle |
 | 3 skills | `/dmad-run` orchestre ; `code-intelligence-java` et `patterns-gof-cqrs` sont des prérequis lus à la demande |
-| Config MCP | Serena (LSP), Sequential Thinking, Context7 |
+| Serveurs MCP | **aucun** — le plugin n'a aucune dépendance à installer |
 | Le corpus | `docs/`, `tasks/`, `templates/`, `checklists/`, `schemas/`, `workflows/`, `examples/` |
 | Les outils | `tools/validate.py`, `tools/selftest.sh` |
 
@@ -44,7 +44,7 @@ Les agents référencent le corpus via `${CLAUDE_PLUGIN_ROOT}` : les procédures
 | `agent.model` | `model: haiku \| sonnet \| opus` |
 | Contexte séparé du Challenger | un subagent = un contexte isolé, par construction |
 | Gate humain | la skill présente la décision et s'arrête |
-| Capabilities | serveurs MCP du plugin |
+| Capabilities | outils de l'hôte, exécutables locaux, ou le modèle |
 | Corpus de la méthode | `${CLAUDE_PLUGIN_ROOT}/…` |
 
 **Le point important :** l'isolation de contexte des subagents est ce qui rend le Challenger réellement adversarial. Il ne voit pas le raisonnement de l'Elucidator — non par consigne, mais parce que le mécanisme ne le lui transmet pas. C'est une garantie structurelle, pas une promesse de prompt.
@@ -61,20 +61,22 @@ Trois niveaux d'application, du plus fort au plus faible :
 
 Les deux premiers niveaux sont des contraintes réelles. Ne compter que sur le troisième revient à espérer que le modèle se retienne.
 
-## Capabilities et serveurs MCP
+## Capabilities et implémentations
 
 | Capability | Implémentation |
 |---|---|
-| `code-intelligence` | [Serena](https://github.com/oraios/serena) (MCP, LSP multi-langages) |
-| `doc-retrieval` | Context7 (MCP) |
-| `reasoning` | Sequential Thinking (MCP) |
-| `repo-history` | `git` via Bash — aucun MCP |
+| `code-intelligence` | `jcallgraph` — analyseur tree-sitter, plafond dérivé de la question (D23) |
+| `doc-retrieval` | les outils de recherche de l'hôte, quand il en a — **optionnelle** |
+| `reasoning` | le modèle lui-même |
+| `repo-history` | `git` via Bash |
 | `schema-intelligence` | migrations + client SQL via Bash |
 | `runtime-evidence` | rapports de couverture, logs — lecture de fichiers |
-| `diagram-engine` | Mermaid, aucune dépendance |
+| `diagram-engine` | `tools/diagram-engine.py` — Mermaid, aucune dépendance |
 | `evidence-store` | fichiers YAML versionnés |
 
-Trois MCP seulement, et **c'est délibéré** : chaque serveur consomme du contexte à chaque appel. Les cinq autres capabilities se satisfont d'outils déjà présents.
+**Aucun serveur MCP**, et c'est délibéré (D24). Les huit capabilities se satisfont d'outils déjà présents, d'un exécutable local ou du modèle lui-même.
+
+Ce que ça change en pratique : rien à installer, rien à lancer, rien à diagnostiquer quand ça ne répond pas — et aucun serveur qui consomme du contexte à chaque appel. Le prix est que `doc-retrieval` devient optionnelle : sur un framework ancien, ce qu'on ne peut pas vérifier se dit plutôt que de se deviner.
 
 ## Coût et routage
 
@@ -107,7 +109,7 @@ Deux endroits, et deux seulement :
 ## Confidentialité
 
 Sur du code client, `scope.confidentiality` doit être **appliqué**, pas seulement déclaré :
-- `local_only: true` ⇒ aucun serveur MCP distant (Context7 sort du réseau : le désactiver)
+- `local_only: true` ⇒ aucun appel réseau. Depuis la v0.4, **le plugin n'embarque aucun serveur MCP** : la surface est réduite aux outils de l'hôte, qu'il faut couper par règles `deny`
 - règles `deny` sur les outils réseau
 - `redaction_rules` appliquées **avant écriture**, jamais après : une donnée caviardée après coup reste dans l'historique git — que DMAD versionne et conserve
 

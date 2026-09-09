@@ -72,7 +72,7 @@ Chaque affirmation pointe vers du code. Le code bouge. DMAD rejoue et **marque c
 
 | Niveau | Nom | Ce qui le justifie | Ce que ça veut dire pour le lecteur |
 |---|---|---|---|
-| **V** | Vérifié | Fait extrait mécaniquement (AST/LSP/DDL) **ou** prouvé par un test exécuté, **ou** observé en runtime | Tu peux t'appuyer dessus |
+| **V** | Vérifié | Fait extrait mécaniquement (analyse syntaxique, DDL) **ou** prouvé par un test exécuté, **ou** observé en runtime | Tu peux t'appuyer dessus |
 | **C** | Corroboré | ≥ 2 preuves indépendantes et convergentes (ex. code + test + nommage de table) | Très probablement vrai |
 | **I** | Inféré | Lecture du code par le modèle, **une seule** source de preuve | Plausible — à relire avant de décider |
 | **H** | Hypothèse | Intention métier reconstruite, non prouvable par le code | À faire valider par un humain |
@@ -80,7 +80,7 @@ Chaque affirmation pointe vers du code. Le code bouge. DMAD rejoue et **marque c
 **Règles de dérivation (non négociables) :**
 - La confiance d'un chapitre est le **minimum de celle de ses énoncés de fait** (`statement`), jamais la moyenne. Une moyenne dilue le mensonge.
 - **Les intentions sont exclues de ce calcul.** Elles sont toutes en `H` par construction (P5) : les inclure badgerait mécaniquement tout chapitre en `H` et rendrait l'échelle inutile. Chaque intention porte son propre marquage `H`, affiché à côté de la règle qu'elle explique.
-- Une capability dégradée **plafonne** la confiance (ex. navigation par `grep` au lieu du LSP ⇒ plafond `I`). Voir `04-capabilities.md`.
+- **Le plafond se dérive de la question posée, pas de l'outil** (D23) : une hiérarchie de types est `V`, un appel virtuel rend des candidats en `C`, une réflexion est `I`. Il s'applique par arête du graphe, pas globalement au run. Voir `04-capabilities.md`.
 - Toute affirmation d'intention métier (`P5`) démarre en `H` et ne peut monter qu'après validation humaine explicite, tracée.
 - Le *Challenger* (§ agent adversarial) peut **dégrader** un niveau, jamais le monter.
 

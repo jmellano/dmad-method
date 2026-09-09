@@ -20,13 +20,13 @@ evidence:
   - kind: code
     ref: "src/billing/InvoiceDispatcher.java#L212-L228"
     commit: a1b2c3d
-    tool: "lsp.find_definition"
+    tool: "jcallgraph.definition"
   - kind: config
     ref: "config/application-prod.yml#L88"
     tool: "grep"
   - kind: config
     ref: "src/config/BillingConfig.java#L34"
-    tool: "lsp.find_definition"
+    tool: "jcallgraph.definition"
   - kind: schema
     ref: "invoices.status ENUM('DRAFT','SENT','SKIPPED','FAILED')"
     tool: "schema.columns"

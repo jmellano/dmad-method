@@ -11,7 +11,7 @@ evidence:
   - kind: code
     ref: "src/example/Rule.java#L10-L20"
     commit: aaa1111
-    tool: lsp.find_definition
+    tool: jcallgraph.definition
 produced_by: elucidator
 freshness:
   verified_at_commit: aaa1111

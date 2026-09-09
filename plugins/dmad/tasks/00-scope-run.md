@@ -53,7 +53,7 @@ Historique git complet ou tronqué (`git log --oneline | wc -l` vs âge). Ticket
 Avant le premier appel d'outil. Ce qui peut sortir de la machine, ce qui reste local, ce qui doit être caviardé.
 
 ### 8. Annoncer le budget et les plafonds
-Ordre de grandeur en temps et en coût, **et** les plafonds de confiance induits par l'outillage disponible. Un run sans LSP produira une doc plafonnée à `I` : le commanditaire doit l'apprendre maintenant.
+Ordre de grandeur en temps et en coût, **et** les plafonds de confiance induits par l'outillage disponible. Le plafond se dérive de la question posée (D23) : dire au commanditaire que les appels dynamiques ressortiront en candidats plutôt qu'en certitudes, c'est ce qui évite qu'il le découvre à la livraison.
 
 ## Modes d'échec
 | Symptôme | Cause | Correctif |

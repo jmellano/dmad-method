@@ -59,9 +59,18 @@ sources:
 
 capabilities_available:
   code-intelligence:
-    implementation: "serena (LSP java)"
+    implementation: "jcallgraph (tree-sitter)"
     confidence_ceiling: V
     status: available
+    # D23 — le plafond se dérive de la question, pas de l'outil.
+    ceilings_by_question:
+      file_symbols: V
+      type_hierarchy: V
+      static_calls: V
+      callers: V
+      virtual_dispatch: C
+      ioc_dispatch: C
+      reflection: I
   repo-history:
     implementation: "git"
     confidence_ceiling: V
@@ -75,9 +84,9 @@ capabilities_available:
     confidence_ceiling: C
     status: degraded
   doc-retrieval:
-    implementation: "context7"
-    confidence_ceiling: V
-    status: available
+    implementation: "aucune — pas d'accès à la doc d'époque de Spring 4.3"
+    confidence_ceiling: I
+    status: unavailable
 
 confidentiality:
   level: confidential

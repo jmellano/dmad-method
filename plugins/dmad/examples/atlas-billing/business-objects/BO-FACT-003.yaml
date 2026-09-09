@@ -22,7 +22,7 @@ confidence_reason: >
 evidence:
   - kind: code
     ref: "src/billing/AmountCalculator.java#L88-L140"
-    tool: "lsp.find_definition"
+    tool: "jcallgraph.definition"
 produced_by: carver
 freshness:
   verified_at_commit: a1b2c3d

@@ -6,11 +6,11 @@ Les agents **ne connaissent pas les outils**. Ils consomment des **capabilities*
 
 ```
    agents  ──consomment──►  capabilities  ──implémentées par──►  outils
-  (Carver,                (code-intelligence,                  (Serena, LSP,
-   Elucidator…)            repo-history…)                       tree-sitter, git…)
+  (Carver,                (code-intelligence,                  (jcallgraph, git,
+   Elucidator…)            repo-history…)                        grep…)
 ```
 
-Sans ça, DMAD serait « la méthode qui marche si tu as Serena installé sur un projet Java ». Avec ça, DMAD est une méthode qui **se dégrade proprement** quand l'outillage manque.
+Sans ça, DMAD serait « la méthode qui marche avec tel outil sur tel langage ». Avec ça, DMAD est une méthode qui **se dégrade proprement** quand l'outillage manque — et qui dit où elle se dégrade.
 
 ## La règle qui fait tenir l'édifice
 
@@ -37,13 +37,32 @@ type_hierarchy(symbol)            -> { parents, children }
 find_implementations(interface)   -> Symbol[]
 ```
 
-| Implémentation | Plafond | Note |
-|---|---|---|
-| **Serena / LSP natif** | `V` | Nominal. Exhaustivité et résolution des types garanties. |
-| tree-sitter + ctags | `C` | Structure fiable, résolution dynamique perdue. |
-| `grep` / ripgrep | `I` | Dernier recours. **Aucune affirmation d'exhaustivité autorisée.** |
+**Implémentation de référence : `jcallgraph`** (voir la partie C). Analyseur tree-sitter, sans serveur à lancer ni indexeur à faire chauffer.
 
-> **Arbitrage.** L'intuition de faire du LSP un prérequis est bonne : sans lui, DMAD retombe au niveau d'un « lis mon repo » sophistiqué. Mais en faire une **dépendance dure** exclut d'emblée les legacy les plus concernés — COBOL, PL/SQL, VB6, PHP4, 4GL propriétaires — c'est-à-dire le cœur de cible. D'où ce compromis : **le contrat est obligatoire, l'implémentation est libre, et la dégradation est visible dans la doc produite**.
+#### Le plafond se dérive de la question, pas de l'outil
+
+C'est le changement de la v0.4, et il découle du principe P3 : *la confiance est dérivée de la nature de la preuve.* Un plafond unique par implémentation était lui-même une approximation — le même outil peut prouver exhaustivement une hiérarchie de types et ne proposer que des candidats sur un dispatch dynamique.
+
+| Ce qu'on demande | Plafond | Pourquoi |
+|---|---|---|
+| structure d'un fichier, symboles déclarés | `V` | lecture syntaxique exhaustive |
+| hiérarchie de types, implémentations d'une interface | `V` | déclaré dans les sources, entièrement résoluble |
+| appel statique, appel sur type déclaré | `V` | la cible est écrite |
+| appelants d'une méthode | `V` si le périmètre est entièrement indexé, `C` sinon | l'exhaustivité dépend de ce qui a été lu, pas de l'outil |
+| appel virtuel ou d'interface | `C` — **liste de candidats, jamais un choix** | le type dynamique n'est pas connu statiquement |
+| injection de dépendances, fabrique par chaîne | `C` avec `unresolved_dispatch` | le câblage est ailleurs, souvent hors du code |
+| réflexion, chargement par nom | `I`, et une question ouverte | rien dans les sources ne le dit |
+| comportement modifié par aspect ou proxy | **hors de portée** | à signaler, jamais à supposer |
+
+**La règle qui tient l'édifice ne change pas** : une réponse dégradée plafonne les affirmations qui en dépendent. Ce qui change, c'est qu'elle s'applique **par arête du graphe** plutôt que globalement au run — donc plus finement, et sans pénaliser tout un run parce qu'un dispatch n'a pas pu être résolu.
+
+#### Repli
+
+| Repli | Plafond global | Note |
+|---|---|---|
+| recherche textuelle | `I` | dernier recours. **Aucune affirmation d'exhaustivité autorisée.** |
+
+> **Arbitrage, révisé en v0.4 (D23).** Faire d'un serveur de langage un prérequis dur excluait d'emblée les legacy les plus concernés — COBOL, PL/SQL, VB6, 4GL propriétaires. Le compromis d'origine gardait le contrat obligatoire et l'implémentation libre. La v0.4 va plus loin : **elle abandonne le serveur de langage** au profit d'un analyseur tree-sitter, qui n'a ni classpath à résoudre, ni magasin de certificats, ni cache à empoisonner, ni processus orphelins — quatre modes de panne dont trois n'apparaissaient qu'après avoir résolu le précédent.
 
 ### `repo-history`
 ```
@@ -71,17 +90,19 @@ logs(filter?)   -> LogSample[]
 ```
 **Seule capability qui prouve le comportement réel plutôt que le comportement possible.** Une trace de production tranche instantanément des débats que trois agents ne résoudraient pas. Quand elle est branchée, elle autorise le niveau `V` sur des chemins que le statique laisse en `I`.
 
-### `doc-retrieval`
+### `doc-retrieval` — *optionnelle*
 ```
 framework_docs(lib, version, query) -> Excerpt[]
 ```
-Implémentation : Context7 ou équivalent. Indispensable sur du legacy : comprendre le code d'un Struts 1.2 ou d'un Spring 2.5 sans sa doc d'époque produit des contresens. **La version compte autant que le nom.**
+Comprendre du Struts 1.2 ou du Spring 2.5 sans sa doc d'époque produit des contresens, et **la version compte autant que le nom**.
+
+Implémentation : les outils de recherche de l'hôte, quand il en a. **Aucun serveur n'est requis** — et quand la capability est indisponible, ce n'est pas un run dégradé, c'est un risque nommé : toute affirmation qui repose sur le comportement d'un framework ancien, plutôt que sur le code lu, est plafonnée à `I` et porte sa question ouverte.
 
 ### `reasoning`
 ```
 sequential_think(problem, budget) -> ReasoningTrace
 ```
-Réservé aux phases 3 et 5 (découpage, réfutation). Ailleurs c'est un luxe qui brûle des tokens sans gain mesurable.
+**Servi par le modèle lui-même.** Réservé au découpage et à la réfutation ; ailleurs c'est un luxe qui brûle des tokens sans gain mesurable.
 
 ### `diagram-engine`
 ```

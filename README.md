@@ -80,7 +80,7 @@ Projet Java ? → [profil Java](plugins/dmad/docs/13-profil-java.md).
 
 ## Prérequis
 
-- **[Serena](https://github.com/oraios/serena)** (ou un LSP natif) pour la navigation sémantique. Sans lui, DMAD fonctionne en mode dégradé — **et le plafond de confiance du run baisse et s'affiche** dans la documentation produite.
+- **`jcallgraph`** pour la navigation sémantique — un analyseur tree-sitter, sans serveur à lancer ni projet à faire compiler. **Le plafond de confiance se dérive de la question posée, pas de l'outil** : une hiérarchie de types est `V`, un appel virtuel rend des candidats en `C`, une réflexion ouvre une question. Ce qui n'est pas prouvé est dit tel quel dans la documentation produite.
 - Accès à l'**historique git complet** : l'intention se reconstruit largement là.
 - Optionnel mais décisif : **couverture, traces ou logs de production** — la seule preuve du comportement *réel* plutôt que *possible*.
 

@@ -15,16 +15,16 @@ Chaque fait que tu établis mécaniquement est un fait qu'aucun modèle en aval 
 - Un outil qui échoue produit une **déclaration d'échec** avec sa raison, son impact et le plafond de confiance appliqué — jamais une déduction.
 - Tu ne qualifies pas, tu ne priorises pas, tu ne résumes pas. Tu recenses.
 
-## Avant tout : rendre le projet analysable
+## Ce que tu déclares sur l'outillage
 
-Sur un projet compilé, la navigation sémantique n'a de valeur que si les **dépendances résolvent**. C'est le premier obstacle d'un legacy et il se traite en premier, parce que tout ce qui suit en dépend.
+L'analyse ne demande pas que le projet compile — c'est la principale vertu d'un analyseur syntaxique sur un legacy, où la compilation est souvent le premier obstacle et parfois un obstacle définitif.
 
-Deux pièges à connaître, détaillés dans `${CLAUDE_PLUGIN_ROOT}/docs/13-profil-java.md` :
+Deux choses restent utiles quand elles sont là, et **aucune n'est bloquante** :
 
-- **Une compilation qui passe en ligne de commande ne prouve rien** sur ce que voit l'indexeur : ils n'utilisent pas nécessairement le même environnement d'exécution ni le même magasin de certificats.
-- **Un indexeur qui répond vide au premier appel n'est pas en panne, il chauffe.** Le protocole est en deux temps : un appel léger dont le résultat ne compte pas, une attente, puis le même appel — c'est le second qui fait foi. Conclure à l'échec au premier appel fait basculer tout le run en mode dégradé pour rien.
+- **Les dépendances résolues**, pour la traversée dans les artefacts et la résolution des contrats sortants au barreau 1. Sans elles, la résolution retombe au commentaire manuscrit — celui qui survit aux refactorings et ment alors sans le dire.
+- **La version du langage**, pour que l'analyse ne bute pas sur une construction récente.
 
-Un projet dont les dépendances ne résolvent pas donne un run **plafonné à `I`**. Ce n'est pas rédhibitoire, mais ça se déclare dans `facts/` et ça s'affiche dans le bandeau des trois documents.
+Tu **déclares** ce qui manque dans `facts/`, avec son effet : ce n'est pas un run dégradé, c'est un run normal dont certains contrats ne seront pas résolus. Le plafond de confiance se dérive de la question posée, pas de l'outillage global (D23) — voir `${CLAUDE_PLUGIN_ROOT}/skills/code-intelligence-java/SKILL.md`.
 
 ## Procédure
 `${CLAUDE_PLUGIN_ROOT}/tasks/10-survey-codebase.md` puis `${CLAUDE_PLUGIN_ROOT}/tasks/11-discover-entrypoints.md`.

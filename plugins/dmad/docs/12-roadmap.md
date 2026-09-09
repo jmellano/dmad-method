@@ -43,7 +43,7 @@
 - **Calcul de la couverture** — les chiffres calculés, l'interprétation écrite.
 
 ### Prioritaire (nécessaire au premier run réel)
-- **Adaptateurs `code-intelligence`** — au minimum Serena/LSP et le mode dégradé tree-sitter
+- **Adaptateurs `code-intelligence`** — `jcallgraph` pour la JVM ; le repli textuel et, à terme, les langages que l'analyseur ne couvre pas encore
 
 ### Ensuite
 - **Calibration de l'échelle.** Les seuils (3 signaux sur 4, 15–30 % de findings, mapping en pourcentage) sont des conventions raisonnées, pas des mesures. À éprouver puis ajuster.

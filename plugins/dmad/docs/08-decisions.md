@@ -36,7 +36,9 @@ Journal des choix structurants, avec ce qui a été retenu, écarté, et pourquo
 ## D4 — Le LSP est un contrat obligatoire, pas une dépendance dure
 **Décision.** `code-intelligence` est requis ; son implémentation est libre (Serena/LSP → tree-sitter → grep) et **chaque niveau plafonne la confiance**.
 
-**Pourquoi.** Faire de Serena un prérequis dur exclurait COBOL, PL/SQL, VB6, 4GL propriétaires — c'est-à-dire exactement les projets qui ont le plus besoin de DMAD. Le compromis rend la dégradation **visible dans la doc produite** au lieu d'être silencieuse : un projet analysé au grep produit une doc plafonnée à `I`, et le lecteur le sait.
+**Pourquoi.** Faire d'un serveur de langage un prérequis dur exclurait COBOL, PL/SQL, VB6, 4GL propriétaires — c'est-à-dire exactement les projets qui ont le plus besoin de DMAD. Le compromis rend la dégradation **visible dans la doc produite** au lieu d'être silencieuse : un projet analysé au grep produit une doc plafonnée à `I`, et le lecteur le sait.
+
+> **Révisée par D23 en v0.4.** Le principe tient — le contrat est obligatoire, l'implémentation libre, la dégradation visible — mais le plafond ne s'attache plus à l'implémentation : il s'attache à **la question posée**. Et le serveur de langage a été abandonné au profit d'un analyseur tree-sitter.
 
 ---
 
@@ -202,6 +204,30 @@ lecture sur trois.
 **Décision.** La v0.4 nomme les types de nœuds, leurs champs et leurs invariants. Le **format de stockage** relève du chantier suivant, qui portera le corpus sur un bundle Open Knowledge Format.
 
 **Pourquoi.** Les deux sont séparables et leur couplage coûterait cher : écrire aujourd'hui du YAML DMAD pour le convertir demain en concepts OKF serait une réécriture, alors que définir le modèle sans son format en fait une sérialisation. Le recouvrement entre les deux vocabulaires est d'ailleurs presque champ pour champ — `evidence` et `sources`, `confidence` et les niveaux de confiance dérivés, `freshness` et `status`/`stale_after` — ce qui rend la conversion mécanique dès lors que le modèle est propre.
+
+---
+
+## D23 — Le plafond de confiance se dérive de la question, pas de l'implémentation
+**Décision.** La capability `code-intelligence` est servie par **un analyseur tree-sitter** (`jcallgraph`), et le plafond de confiance n'est plus attaché à l'implémentation : il est attaché à **ce qui est demandé**. Une hiérarchie de types est `V` ; un appel virtuel rend des candidats en `C` ; une réflexion est `I` et ouvre une question.
+
+**Pourquoi abandonner le serveur de langage.** Il promettait `V` sur tout, et il coûtait quatre modes de panne cumulés, dont trois n'apparaissaient qu'après avoir résolu le précédent : un magasin de certificats propre à son environnement d'exécution embarqué, des marqueurs d'échec de résolution qui bloquent les tentatives suivantes, un cache de symboles qui persiste des résultats vides comme s'ils étaient valides, et des processus orphelins qui épuisent la mémoire. À quoi s'ajoutait un démarrage paresseux qui faisait conclure à la panne au premier appel. Un outil dont le mode nominal demande un protocole de diagnostic à quatre étages n'est pas un prérequis raisonnable pour une méthode qui vise les legacy les plus abandonnés.
+
+**Pourquoi le plafond par question est plus juste que le plafond par outil.** Parce que c'est le principe P3 appliqué jusqu'au bout : la confiance se dérive de **la nature de la preuve**. Un plafond unique par implémentation traitait « je sais lire la hiérarchie de types de ce fichier » et « je ne sais pas quelle implémentation est injectée ici » comme la même chose. Elles ne le sont pas, et les confondre pénalisait tout un run pour un dispatch non résolu — ou, pire dans l'autre sens, laissait passer en `V` une exhaustivité que rien ne fondait.
+
+**Ce que ça change concrètement.** Le plafond s'applique **par arête du graphe** et non plus globalement au run. `scope.yaml` déclare donc un plafond maximal *et* le détail par type de question.
+
+**Ce que ça ne change pas.** La règle qui fait tenir l'édifice : une réponse dégradée plafonne les affirmations qui en dépendent, et la dégradation reste **visible dans le document produit**.
+
+---
+
+## D24 — Aucune dépendance à un serveur MCP
+**Décision.** Le plugin n'embarque aucun serveur MCP. Les huit capabilities sont servies par des outils déjà présents chez l'hôte, un exécutable local, ou le modèle lui-même.
+
+**Pourquoi.** Un serveur est une dépendance à installer, à lancer, à diagnostiquer quand il ne répond pas, et qui consomme du contexte à chaque appel. Sur les projets que DMAD vise — des legacy dont personne ne maîtrise plus l'environnement — chaque prérequis d'installation est une raison de ne pas commencer. La v0.3 en demandait trois ; la v0.4 n'en demande aucun.
+
+**Ce que ça coûte, et qui doit être dit.** `doc-retrieval` devient **optionnelle**. Comprendre du Struts 1.2 ou du Spring 2.5 sans sa doc d'époque produit des contresens, et la version compte autant que le nom. Quand la capability est absente, ce n'est pas un run dégradé : c'est un risque nommé — toute affirmation qui repose sur le comportement supposé d'un framework ancien, plutôt que sur le code effectivement lu, est plafonnée à `I` et porte sa question ouverte.
+
+**Ce que ça ne coûte pas.** `reasoning` était déjà servi par le modèle ; le serveur n'ajoutait qu'une trace. Et `code-intelligence` a changé d'implémentation pour une autre raison, indépendante (D23).
 
 ---
 

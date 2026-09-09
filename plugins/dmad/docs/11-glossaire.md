@@ -36,7 +36,7 @@ Le vocabulaire propre à DMAD. Utile pour lire les documents, et pour éviter qu
 
 | | Nom | Ce qui le justifie |
 |---|---|---|
-| **V** | Vérifié | fait mécanique (AST/LSP/schéma) ou test exécuté ou observation runtime |
+| **V** | Vérifié | fait mécanique (analyse syntaxique, schéma) ou test exécuté ou observation runtime |
 | **C** | Corroboré | ≥ 2 preuves indépendantes convergentes |
 | **I** | Inféré | lecture du code par le modèle, source unique |
 | **H** | Hypothèse | intention métier, non prouvable par le code |

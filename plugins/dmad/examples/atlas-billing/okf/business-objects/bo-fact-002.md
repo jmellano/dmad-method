@@ -8,7 +8,7 @@ tags:
 sources:
 - id: ev-1
   resource: src/billing/InvoiceDispatcher.java#L180-L280
-  author: process:lsp.find_definition
+  author: process:jcallgraph.definition
   kind: code
 generated:
   by: dmad-carver/0.4.0

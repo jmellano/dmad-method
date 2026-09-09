@@ -26,7 +26,7 @@ Les phases 1–2 remplissent le bas (mécanique, `V`). Les phases 3–4 rempliss
 |---|---|---|---|
 | `Entrypoint` | structure | Surveyor | `V` |
 | `Module` / `Component` | structure | Surveyor | `V` |
-| `Class` / `Function` | structure | Cartographer (LSP) | `V` |
+| `Class` / `Function` | structure | Cartographer | `V` |
 | `DataStore` / `Table` / `Column` | données | schema-intelligence | `V` |
 | `ExternalService` / `ApiCall` | données | Cartographer | `V` |
 | `Event` | données | Cartographer | `V` |

@@ -9,28 +9,27 @@ Le chemin le plus court entre « j'ai un legacy Java » et « j'ai une documenta
 /plugin install dmad@dmad-method
 ```
 
-Serena a besoin de `uv` :
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+Aucun serveur de langage à installer : `jcallgraph` est un analyseur tree-sitter, et il n'a pas besoin que le projet compile — c'est sa principale vertu sur un legacy, où la compilation est souvent le premier obstacle et parfois un obstacle définitif.
 
-## 2. Rendre le projet analysable — l'étape qui décide de tout
+## 2. Ce qui aide, et ce qui ne bloque pas
 
-`code-intelligence` a besoin que le projet **résolve ses dépendances**. C'est le premier obstacle sur un legacy, et il conditionne le plafond de confiance du run.
+**Le projet n'a pas besoin de compiler.** C'est la principale vertu d'un analyseur syntaxique sur un legacy, où la compilation est souvent le premier obstacle et parfois un obstacle définitif. Un projet qui ne compile pas donne un run normal.
+
+Deux choses restent utiles quand elles sont là :
 
 ```bash
 cd /chemin/vers/le/legacy
-java -version                                  # doit correspondre au projet
-mvn -q -DskipTests dependency:go-offline       # ou ./gradlew --offline compileJava
+java -version                                  # renseigne profile.jdk_version
+mvn -q -DskipTests dependency:go-offline       # optionnel, pour les contrats sortants
 ```
 
-| Résultat | Conséquence |
+| Situation | Conséquence |
 |---|---|
-| ✅ ça compile | run nominal, plafond `V` |
-| ⚠️ dépendances partielles | `find_references` incomplet ⇒ **aucune affirmation d'exhaustivité**, plafond `I` |
-| ❌ rien ne résout | mode dégradé (tree-sitter/grep), plafond `I` — utilisable, mais à annoncer |
+| ✅ les dépendances résolvent | les contrats sortants se résolvent au barreau 1 — le contrat qui fait foi |
+| ⚠️ résolution partielle | certains contrats retombent au barreau 3, le commentaire manuscrit, **qui ment sans le dire** |
+| ❌ rien ne résout | les contrats non résolus portent un placeholder visible, et une question ouverte |
 
-**Un projet qui ne compile pas n'est pas un échec.** C'est un run plafonné, et le plafond doit être écrit dans le cadrage et affiché dans la documentation produite.
+**Ce n'est pas un plafond global qui se joue ici.** Depuis la v0.4, le plafond se dérive de la question posée : une hiérarchie de types reste `V` même sans dépendances résolues, un appel virtuel reste `C` même avec. Ce qui se joue, c'est la qualité des sources des contrats — et elle se mesure, ligne « contrats par barreau » du rapport de couverture.
 
 ## 3. Rassembler avant de commencer
 

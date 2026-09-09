@@ -24,7 +24,7 @@ evidence:
     tool: "archive.grep"
   - kind: code
     ref: "src/billing/InvoiceDispatcher.java#L268"
-    tool: "lsp.find_references"
+    tool: "jcallgraph.callers"
 produced_by: contract-resolver
 freshness:
   verified_at_commit: a1b2c3d

@@ -29,7 +29,7 @@ Un refus n'est jamais un blocage : propose systématiquement un cadrage plus ét
 **Quel profil, et quelle convention de contrat d'API ?** Sans une réponse à « à quoi reconnaît-on, dans ce dépôt, le contrat d'un appel sortant ? », la résolution des contrats du cycle 1 n'a pas de cible et retombe au barreau 3 — le commentaire manuscrit, qui ment sans le dire.
 
 ## Ce que tu dois annoncer AVANT le run, jamais après
-- le plafond de confiance induit par l'outillage disponible (pas de LSP ⇒ doc plafonnée à `I`)
+- les plafonds de confiance par type de question (D23) — les appels dynamiques ressortiront en candidats, pas en certitudes
 - l'absence de traces runtime ⇒ on documentera des chemins possibles, pas empruntés
 - l'ordre de grandeur du budget
 

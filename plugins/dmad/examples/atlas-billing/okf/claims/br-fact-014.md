@@ -10,7 +10,7 @@ tags:
 sources:
 - id: ev-1
   resource: src/billing/InvoiceDispatcher.java#L212-L228@a1b2c3d
-  author: process:lsp.find_definition
+  author: process:jcallgraph.definition
   kind: code
 - id: ev-2
   resource: config/application-prod.yml#L88
@@ -18,7 +18,7 @@ sources:
   kind: config
 - id: ev-3
   resource: src/config/BillingConfig.java#L34
-  author: process:lsp.find_definition
+  author: process:jcallgraph.definition
   kind: config
 - id: ev-4
   resource: invoices.status ENUM('DRAFT','SENT','SKIPPED','FAILED')

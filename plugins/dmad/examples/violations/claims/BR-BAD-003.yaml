@@ -6,7 +6,7 @@ confidence_reason: "Deux preuves convergentes : garde dans le code et contrainte
 evidence:
   - kind: code
     ref: "src/billing/CreditNote.java#L44"
-    tool: "lsp.find_definition"
+    tool: "jcallgraph.definition"
   - kind: schema
     ref: "credit_notes CHECK (amount <= invoice_amount)"
     tool: "schema.constraints"

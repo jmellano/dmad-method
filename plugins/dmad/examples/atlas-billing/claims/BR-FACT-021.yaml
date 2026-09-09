@@ -17,7 +17,7 @@ evidence:
   - kind: code
     ref: "src/billing/AmountCalculator.java#L88-L140"
     commit: a1b2c3d
-    tool: "lsp.find_definition"
+    tool: "jcallgraph.definition"
   - kind: schema
     ref: "invoice_lines.amount DECIMAL(12,4)"
     tool: "schema.columns"
@@ -27,7 +27,7 @@ evidence:
     tool: "maven.test"
   - kind: code
     ref: "src/accounting/export/CsvWriter.java#L61"
-    tool: "lsp.find_references"
+    tool: "jcallgraph.callers"
 
 intent:
   statement: >

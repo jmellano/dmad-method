@@ -28,7 +28,7 @@ L'ordre n'est pas anodin. Dans BMAD, la persona porte l'essentiel. Dans DMAD, **
 - **Garde-fou :** si un outil échoue, il **déclare l'échec** — il ne comble pas par déduction.
 
 ### `Cartographer` — le cartographe
-- **Lit :** le code via `code-intelligence` (LSP), les faits de la phase 1.
+- **Lit :** le code via `code-intelligence` (`jcallgraph`), les faits du cycle 1.
 - **Produit :** nœuds et arêtes du Knowledge Graph.
 - **Plafond :** `V` pour les arêtes issues d'outils, `I` pour les regroupements qu'il propose.
 - **Garde-fou :** **aucune arête sans outil**. Une relation « devinée » à la lecture est une claim, pas une arête.

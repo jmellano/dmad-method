@@ -1,12 +1,14 @@
 # DMAD — Profil Java
 
-Java/JVM est le terrain le plus favorable à DMAD, pour trois raisons : le typage statique rend le LSP fiable, une grande partie des règles est **déclarative** (donc de niveau `V` sans effort), et l'outillage de test permet de forger des preuves exécutables.
+Java/JVM est le terrain le plus favorable à DMAD, pour trois raisons : le typage statique rend l'analyse fiable **sans exécution ni compilation**, une grande partie des règles est **déclarative** (donc de niveau `V` sans effort), et l'outillage de test permet de forger des preuves exécutables.
 
 Ce document dit **où chercher quoi** dans un legacy Java. À lire avant le premier run.
 
 ## Avant de lancer : rendre le projet analysable
 
-`code-intelligence` via Serena/Eclipse JDT LS a besoin que le projet **résolve ses dépendances**. Sur un legacy, c'est le premier obstacle.
+L'analyse syntaxique n'a **pas** besoin que le projet compile. C'est la principale vertu de `jcallgraph` sur un legacy Java, où la compilation est souvent le premier obstacle et parfois un obstacle définitif.
+
+Les dépendances résolues restent utiles — pour la traversée dans les artefacts et la résolution des contrats sortants au barreau 1 — mais elles ne conditionnent plus le run.
 
 ```bash
 mvn -q -DskipTests dependency:go-offline   # ou : mvn -q -DskipTests compile
@@ -14,15 +16,15 @@ mvn -q -DskipTests dependency:go-offline   # ou : mvn -q -DskipTests compile
 java -version                              # la version du JDK doit correspondre au projet
 ```
 
-> **Le protocole de démarrage de l'indexeur et ses quatre causes d'échec cumulées sont dans le skill embarqué [`code-intelligence-java`](../skills/code-intelligence-java/SKILL.md).** À lire avant la première invocation, pas après le premier échec : un indexeur qui répond vide au premier appel n'est pas en panne, il chauffe — et conclure trop vite fait basculer tout le run en mode dégradé pour rien.
+> **Ce que l'analyse prouve, question par question, est dans le skill embarqué [`code-intelligence-java`](../skills/code-intelligence-java/SKILL.md).** À lire avant la première traversée : le plafond de confiance s'y dérive de ce qu'on demande, pas de l'outil qui répond (D23).
 
-| Symptôme | Conséquence | Que faire |
+| Situation | Conséquence | Que faire |
 |---|---|---|
-| Le projet ne compile pas | LSP dégradé ou muet | tenter la compilation ; sinon **basculer en mode dégradé et l'annoncer au gate 0** |
-| JDK indisponible (Java 6/7) | JDT LS refuse ou dégrade | compiler avec `--release` sur un JDK récent si possible |
-| Dépendances internes introuvables | résolution partielle, `find_references` incomplet | **interdit d'affirmer une exhaustivité** — plafond `I` |
+| Le projet ne compile pas | l'analyse fonctionne | rien de bloquant ; les contrats sortants retomberont au barreau 3 ou 4 |
+| Dépendances non résolues | pas de traversée dans les artefacts | tenter `dependency:go-offline` ; sinon **le déclarer**, et accepter des contrats non résolus |
+| Version du langage inconnue | l'analyse peut buter sur une construction récente | renseigner `profile.jdk_version` dans `scope.yaml` |
 
-**Règle :** un projet qui ne résout pas ses dépendances donne un run plafonné à `I`. Ce n'est pas rédhibitoire, mais ça doit être écrit dans `scope.yaml` et affiché dans le bandeau de la doc.
+**Règle :** ce qui n'a pas pu être résolu s'écrit dans `scope.yaml` et s'affiche dans le bandeau. Un contrat non résolu porte un placeholder visible — **jamais un code plausible**.
 
 ## Les points d'entrée Java
 
@@ -79,7 +81,9 @@ Renseigner `conditional_on.observed` **par profil**, en comparant systématiquem
 **Un écart entre la précision calculée et la précision stockée est une règle de gestion à documenter**, pas une coquille.
 
 ### Lombok
-`@Data`, `@Builder`, `@EqualsAndHashCode` génèrent du code que le LSP voit mais qui n'existe pas dans les sources. Vérifier que l'annotation processing est actif, sinon `find_references` rate les accesseurs générés.
+`@Data`, `@Builder`, `@EqualsAndHashCode` génèrent des accesseurs **qui n'existent pas dans les sources**. Une analyse syntaxique ne les voit donc pas : un appel à `getMontant()` sur une classe annotée peut n'avoir aucune déclaration correspondante.
+
+Ce n'est pas une panne, c'est une arête que l'outil ne peut pas poser. Elle se traite comme un dispatch non résolu : signalée, jamais devinée.
 
 ### L'héritage profond et les classes abstraites
 Les hiérarchies à 4-5 niveaux sont fréquentes dans les legacy Java. Une règle définie dans une classe mère peut être redéfinie n'importe où en dessous : `type_hierarchy` avant toute affirmation d'exhaustivité.
@@ -102,7 +106,7 @@ Un appel HTTP sortant vers un autre module d'un même système d'information por
 
 **Le chemin d'accès est le point délicat.** Le code appelant n'importe pas l'interface annotée : il importe une interface de service applicatif qui ne porte aucune annotation. La chaîne générée typique compte trois ou quatre maillons entre l'import et l'annotation. Le motif de nommage se déclare dans `scope.yaml` au gate 0 — sans lui, la résolution retombe au barreau 3.
 
-**Ce que le LSP ne peut pas faire ici.** L'annotation vit dans un `-sources.jar` du dépôt Maven local, **hors du workspace indexé**. Aucun outil de navigation sémantique ne la trouvera : c'est du grep sur archive.
+**Ce qu'aucune navigation de symboles ne fait ici.** L'annotation vit dans un `-sources.jar` du dépôt Maven local, **hors du périmètre analysé**. C'est de la lecture d'archive, pas de la navigation.
 
 `unzip` n'est pas garanti présent sur un poste agent. Passer par Python :
 
@@ -159,7 +163,7 @@ Trois sources, à croiser :
 
 - [ ] Le projet compile (ou le mode dégradé est acté et annoncé)
 - [ ] Le JDK correspond
-- [ ] Serena démarre et répond sur un symbole de test
+- [ ] `jcallgraph` répond sur un symbole de test
 - [ ] Historique git complet (`git log --oneline | wc -l` cohérent avec l'âge du projet)
 - [ ] DDL ou accès base disponible
 - [ ] Configuration de l'ordonnanceur externe réclamée
