@@ -9,15 +9,40 @@ L'intention est la bonne : sur un legacy, un schéma vaut trente pages. Mais « 
 - **Le hairball.** Un diagramme de classes généré sur un legacy de 400 classes est un nuage de flèches que personne n'ouvre deux fois. Ce n'est pas de la documentation, c'est une capture d'écran de la complexité.
 - **Le diagramme sans question.** Généré parce qu'on peut, pas parce que quelqu'un se demandait quelque chose. Il occupe de la place, vieillit, et fait douter du reste.
 
-DMAD garde donc l'ambition — **beaucoup de diagrammes** — mais l'encadre par trois règles qui font la différence entre une doc dense et une doc bruyante.
+DMAD garde donc l'ambition — **beaucoup de diagrammes** — mais l'encadre par quatre règles qui font la différence entre une doc dense et une doc bruyante.
 
-## Les trois règles
+## Les quatre règles
 
 **R1 — Un diagramme = une question.** Le `Diagram Planner` doit écrire la question avant de générer. La question est affichée **au-dessus** du diagramme dans la doc. Pas de question formulable ⇒ pas de diagramme.
 
-**R2 — Seuil de lisibilité.** Au-delà de **~20 nœuds** (~12 pour une séquence), on ne simplifie pas : on **découpe en plusieurs diagrammes**, chacun avec sa propre question. Un diagramme illisible est une non-livraison.
+**R2 — Seuil de lisibilité, paramétrable.** Au-delà du seuil, on ne simplifie pas : on **découpe en plusieurs diagrammes**, chacun avec sa propre question. Un diagramme illisible est une non-livraison.
+
+Les seuils sont déclarés dans `scope.yaml` (D15). Valeurs par défaut, sur trois indicateurs cumulés :
+
+| Indicateur | Défaut | Ce qu'il mesure |
+|---|---|---|
+| Nœuds `N` | ≤ 12 (≤ 12 participants en séquence) | au-delà, l'œil ne suit plus |
+| Arêtes `E` | ≤ 15 | la densité de liens, qui sature avant le nombre de nœuds |
+| Complexité de McCabe | ≤ 10 | les chemins linéairement indépendants du graphe de contrôle |
+
+**Le nombre de niveaux d'abstraction n'est pas un choix : c'est la sortie de cette contrainte.** On ajoute un niveau chaque fois que les indicateurs dépassent le seuil — autant de niveaux qu'il en faut, ni plus (empilement inutile) ni moins (diagramme illisible).
+
+C'est l'arbitrage entre les deux leviers de décomposition. La **longueur** est la séquence d'opérations d'un niveau donné ; la **profondeur** est l'empilement des niveaux. Un diagramme trop long se répare en décomposant certaines étapes en sous-niveau — on convertit de la longueur en profondeur. Un empilement de sous-niveaux triviaux se répare en fusionnant — l'inverse. Les deux leviers ne se substituent pas : ils s'ajustent en tension.
 
 **R3 — Généré depuis le graphe, jamais rédigé.** Les agents décrivent un sous-graphe + une intention ; le `diagram-engine` rend. Un diagramme ne peut donc pas contredire la doc — les deux sortent de la même source. Et chaque diagramme hérite du **badge de confiance** de son sous-graphe.
+
+**R4 — Nommé par ce qu'il montre, jamais par son type.** « Diagramme de séquence 3 » ne dit rien ; « Échanges du calcul de refacturation avec les services amont » dit à quoi sert la figure avant qu'on la regarde. Le type de rendu est un détail d'implémentation qui n'a rien à faire dans un titre.
+
+## Les quatre diagrammes cardinaux
+
+Avant le catalogue large, quatre types portent l'essentiel de la charge et répondent chacun à une question précise. **Utiliser le bon outil pour la bonne question**, pas le même à toutes les sauces.
+
+| Diagramme | Répond à | Quand |
+|---|---|---|
+| **flowchart** | quels traitements et quels contrôles, dans quel ordonnancement, avec quels objets métier en entrée et en sortie de chaque étape | l'enchaînement des opérations d'un niveau — c'est l'outil du levier *longueur* |
+| **sequenceDiagram** | quels objets métier, depuis quelles sources et vers quels puits, dans quel ordre temporel | les échanges entre le processus et le monde extérieur — un participant par acteur externe |
+| **stateDiagram** | quels états d'un objet métier, et par quel traitement on transite | un objet à cycle de vie réel — **jamais systématique** |
+| **erDiagram** | quelles relations entre objets métier, établies à quel moment, servant à quel contrôle | plusieurs objets en persistance dont les relations portent de l'information |
 
 ## Catalogue
 
