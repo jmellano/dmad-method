@@ -1,0 +1,11 @@
+# Violation : un code lu dans un commentaire manuscrit, présenté comme le contrat.
+# C'est l'anti-pattern A16 — un code faux ressemble exactement à un code vrai.
+id: CTR-BAD-002
+call_site: "src/billing/InvoiceDispatcher.java#L240"
+code: "SIM_APP_ACH_031"
+resolution_rung: 3
+confidence: V
+evidence:
+  - kind: comment
+    ref: "src/billing/InvoiceDispatcher.java#L238"
+produced_by: contract-resolver

@@ -1,0 +1,9 @@
+# Violation : dérive d'une STD que personne n'a figée.
+# Bâtir sur un document non revu propage les corrections deux fois.
+id: DOC-SFD-FACT-002
+kind: SFD
+unit: business_object_tree
+unit_ref: "BO-FACT-002"
+path: "dmad-output/sfd/recouvrement.md"
+derives_from: [DOC-STD-FACT-001]
+produced_by: writer-sfd

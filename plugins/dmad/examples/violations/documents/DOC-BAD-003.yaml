@@ -1,0 +1,11 @@
+# Violation : une SFG découpée par arbre de business objects.
+# Chaque document du corpus a son unité, et une seule (D20) : forcer un
+# document dans le découpage d'un autre ajoute un niveau de titre sans
+# rien clarifier.
+id: DOC-SFG-FACT-003
+kind: SFG
+unit: business_object_tree
+unit_ref: "BO-FACT-001"
+path: "dmad-output/sfg/facturation.md"
+derives_from: [DOC-SFD-FACT-002]
+produced_by: writer-sfg

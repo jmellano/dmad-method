@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmad.dev/schemas/document.schema.json",
+  "title": "DMAD Document",
+  "description": "La carte d'identité d'un document du corpus. Porte sa position dans la cascade STD → SFD → SFG (D17, D19, D20) — pas son contenu, qui est le Markdown lui-même.",
+  "type": "object",
+  "required": ["id", "kind", "unit", "unit_ref", "path", "produced_by"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^DOC-(STD|SFD|SFG)-[A-Z0-9]+-[0-9]{3}$" },
+    "kind": { "enum": ["STD", "SFD", "SFG"] },
+    "unit": {
+      "enum": ["entrypoint", "business_object_tree", "use_case"],
+      "description": "L'unité documentaire (D20). Une par kind : STD par point d'entrée, SFD par arbre de business objects, SFG par cas d'usage."
+    },
+    "unit_ref": { "type": "string" },
+    "path": { "type": "string" },
+    "derives_from": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Identifiants des documents de l'étage inférieur (D17). Vide pour une STD, qui dérive du graphe et des claims. Obligatoire et non vide pour une SFD et une SFG."
+    },
+    "feeds": { "type": "array", "items": { "type": "string" } },
+    "claims_rendered": { "type": "array", "items": { "type": "string" } },
+    "confidence": { "enum": ["V", "C", "I", "H"] },
+    "frozen_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Figé par la revue de fin de cycle. Le cycle suivant ne démarre pas sur un document non figé (D19)."
+    },
+    "frozen_by": {
+      "type": "object",
+      "required": ["who", "role", "when"],
+      "additionalProperties": false,
+      "properties": {
+        "who": { "type": "string" },
+        "role": { "type": "string" },
+        "when": { "type": "string", "format": "date-time" },
+        "disputed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Claims explicitement contestées en revue. Une revue qui n'en signale aucune est un signal d'alarme, pas un succès."
+        },
+        "corrections": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "produced_by": { "type": "string" },
+    "scope_warning": {
+      "type": "string",
+      "description": "En feature-scan : l'avertissement de périmètre porté en tête du document."
+    }
+  }
+}

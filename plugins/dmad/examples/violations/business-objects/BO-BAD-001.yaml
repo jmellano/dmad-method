@@ -1,0 +1,18 @@
+# Violation : nommé d'après la méthode dont il est issu, pas d'après ce qu'il est.
+# Un analyste ne reconnaîtrait pas ce nom.
+id: BO-BAD-001
+functional_name: "traiterLigne"
+capability: facturation
+recursive_depth: 0
+business_layer: "préparation"
+own_leaves:
+  - kind: database
+    ref: "TBL-lignes"
+    role: traitement
+confidence: I
+confidence_reason: "Lecture du code par le modèle, source unique, non challengée."
+evidence:
+  - kind: code
+    ref: "src/billing/LineProcessor.java#L44-L91"
+    tool: lsp.find_definition
+produced_by: carver

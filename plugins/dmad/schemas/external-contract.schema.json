@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmad.dev/schemas/external-contract.schema.json",
+  "title": "DMAD External Contract",
+  "description": "Un appel sortant vers un service tiers, identifié par son contrat. Feuille du graphe au même titre qu'un accès base ou un événement (D18). Le barreau de résolution dit d'où vient le code, et la confiance en est dérivée : un code faux ressemble exactement à un code vrai.",
+  "type": "object",
+  "required": ["id", "call_site", "resolution_rung", "produced_by"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^CTR-[A-Z0-9]+-[0-9]{3}$",
+      "description": "Ex: CTR-FACT-014"
+    },
+    "call_site": {
+      "type": "string",
+      "pattern": "#L[0-9]+",
+      "description": "fichier#Lnnn — le site d'appel dans le module étudié, pas la déclaration."
+    },
+    "code": {
+      "type": "string",
+      "description": "Le code de contrat. Absent au barreau 4, où le placeholder du document en tient lieu."
+    },
+    "resolution_rung": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4,
+      "description": "1 annotation du contrat (fait foi) · 2 Javadoc générée · 3 commentaire manuscrit · 4 non résolu. Chercher jusqu'au plus haut atteignable, et écrire lequel a servi."
+    },
+    "artifact": {
+      "type": "string",
+      "description": "Artefact où le contrat a été lu. Requis aux barreaux 1 et 2."
+    },
+    "artifact_version": {
+      "type": "string",
+      "description": "OBLIGATOIRE aux barreaux 1 et 2. L'artefact lu est figé à la version que le module consomme, pas celle que le module appelé publie aujourd'hui. Sans ce champ la preuve devient fausse au prochain bump, sans que rien ne le signale."
+    },
+    "http_verb": { "enum": ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"] },
+    "route": { "type": "string" },
+    "operation": { "type": "string" },
+    "confidence": {
+      "enum": ["V", "C", "I"],
+      "description": "Dérivée du barreau : 1→V, 2→C, 3→I. Absente au barreau 4, qui n'affirme rien."
+    },
+    "confidence_reason": { "type": "string", "minLength": 20 },
+    "direction": {
+      "enum": ["outbound", "inbound"],
+      "default": "outbound",
+      "description": "L'échelle à quatre barreaux vaut pour les appels sortants. Un contrat entrant se lit dans les sources du module lui-même : un module ne dépend pas de sa propre API."
+    },
+    "invocation_confirmed": {
+      "type": "boolean",
+      "description": "L'appel part-il réellement du chemin étudié ? Une classe utilitaire peut porter un contrat annoté sans être invoquée depuis le périmètre."
+    },
+    "failure_behavior": { "type": "string" },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "produced_by": { "type": "string" },
+    "open_questions": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^OQ-[0-9]{3}$" }
+    },
+    "freshness": { "$ref": "#/$defs/freshness" }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "required": ["kind", "ref"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "enum": ["code", "artifact", "javadoc", "comment", "absence"] },
+        "ref": { "type": "string" },
+        "tool": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "required": ["verified_at_commit", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "verified_at_commit": { "type": "string" },
+        "verified_at": { "type": "string", "format": "date-time" },
+        "status": { "enum": ["fresh", "shifted", "stale", "broken"] },
+        "last_checked": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

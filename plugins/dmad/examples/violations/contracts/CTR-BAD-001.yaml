@@ -1,0 +1,16 @@
+# Violation : barreau 1 sans version d'artefact.
+# Le contrat est plausible, et le restera après que la dépendance aura changé
+# de version — sans que rien ne le signale. C'est l'anti-pattern A14.
+id: CTR-BAD-001
+call_site: "src/billing/InvoiceDispatcher.java#L212"
+code: "SIM_APP_ACH_022"
+resolution_rung: 1
+artifact: "acme/erp/accounting-api"
+http_verb: GET
+route: "/rechercherCommande"
+operation: "rechercherCommande"
+confidence: V
+evidence:
+  - kind: artifact
+    ref: "accounting-api-sources.jar!/AccountingExposeWebService.java"
+produced_by: contract-resolver

@@ -1,0 +1,9 @@
+# Violation : contrat non résolu, mais muet.
+# Un placeholder visible se corrige ; un placeholder sans question se propage.
+id: CTR-BAD-003
+call_site: "src/billing/InvoiceDispatcher.java#L260"
+resolution_rung: 4
+evidence:
+  - kind: absence
+    ref: "aucun artefact de sources pour ce module dans le dépôt local"
+produced_by: contract-resolver

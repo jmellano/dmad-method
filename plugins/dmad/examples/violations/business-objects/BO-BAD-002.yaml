@@ -1,0 +1,15 @@
+# Violation double : sous-objet inexistant, et profondeur incohérente avec l'arbre.
+# Une profondeur est celle de l'arbre, pas une étiquette libre.
+id: BO-BAD-002
+functional_name: "Arrivée à refacturer"
+capability: facturation
+recursive_depth: 0
+business_layer: "préparation"
+sub_objects: [BO-FANTOME-999]
+confidence: I
+confidence_reason: "Lecture du code par le modèle, source unique, non challengée."
+evidence:
+  - kind: code
+    ref: "src/billing/Arrival.java#L12-L80"
+    tool: lsp.find_definition
+produced_by: carver

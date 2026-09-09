@@ -1,0 +1,9 @@
+# Violation : une SFD sans ancrage. L'information y apparaît de nulle part —
+# c'est la cascade percée, anti-pattern A15.
+id: DOC-SFD-FACT-001
+kind: SFD
+unit: business_object_tree
+unit_ref: "BO-FACT-001"
+path: "dmad-output/sfd/facturation.md"
+derives_from: []
+produced_by: writer-sfd
