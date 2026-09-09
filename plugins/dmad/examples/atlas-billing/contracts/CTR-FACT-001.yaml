@@ -1,0 +1,31 @@
+# Barreau 1 : le contrat lu dans l'artefact de la dépendance. Il fait foi, et il
+# donne d'un coup le code, le verbe, la route et le nom d'opération.
+id: CTR-FACT-001
+call_site: "src/billing/InvoiceDispatcher.java#L268"
+code: "ACC_INV_TRANSMIT_001"
+resolution_rung: 1
+artifact: "acme/atlas/accounting-api"
+artifact_version: "4.7.2"
+http_verb: POST
+route: "/invoices/transmit"
+operation: "transmettreFacture"
+confidence: V
+confidence_reason: >
+  Annotation de contrat lue dans l'artefact de la dépendance, qui fait foi.
+  Invocation confirmée depuis le chemin étudié par recherche de références.
+direction: outbound
+invocation_confirmed: true
+failure_behavior: >
+  Échec HTTP : la facture passe en statut FAILED et est retentée à la campagne
+  suivante. Elle n'est pas ré-émise.
+evidence:
+  - kind: artifact
+    ref: "accounting-api-4.7.2-sources.jar!/AccountingExposeWebService.java#L44"
+    tool: "archive.grep"
+  - kind: code
+    ref: "src/billing/InvoiceDispatcher.java#L268"
+    tool: "lsp.find_references"
+produced_by: contract-resolver
+freshness:
+  verified_at_commit: a1b2c3d
+  status: fresh

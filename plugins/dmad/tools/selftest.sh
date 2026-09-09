@@ -24,7 +24,7 @@ else
 fi
 
 echo
-echo "== 3. Les violations connues sont TOUTES refusées (6 v0.3 + 8 v0.4)"
+echo "== 3. Les violations connues sont TOUTES refusées (6 v0.3 + 9 v0.4)"
 expected=(
   "evidence: \[\] should be non-empty"
   "confidence V sur une claim BusinessRule sans preuve exécutée"
@@ -38,6 +38,7 @@ expected=(
   "D18 — contrat non résolu sans question ouverte"
   "ressemble à un identifiant de code"
   "sub_objects référence BO-FANTOME-999"
+  "recursive_depth 0 avec des sous-objets"
   "D17 — une SFD sans derives_from"
   "D19 — dérive de DOC-STD-FACT-001, qui n'est pas figé"
   "D20 — une SFG a pour unité"
@@ -83,8 +84,8 @@ fi
 
 echo
 echo "== 5. Le corpus du run de référence est conforme"
-if python3 tools/check-corpus.py examples/atlas-billing > /dev/null; then
-  echo "   ok  examples/atlas-billing"
+if python3 tools/check-corpus.py examples/atlas-billing/output > /dev/null; then
+  echo "   ok  examples/atlas-billing/output — STD, SFD, SFG"
 else
   echo "   ÉCHEC : le corpus du run de référence devrait être conforme"; fail=1
 fi

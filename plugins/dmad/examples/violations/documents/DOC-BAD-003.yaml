@@ -7,5 +7,5 @@ kind: SFG
 unit: business_object_tree
 unit_ref: "BO-FACT-001"
 path: "dmad-output/sfg/facturation.md"
-derives_from: [DOC-SFD-FACT-002]
+derives_from: [DOC-SFD-EXTERNE-001]   # hors du run : la cascade n'est pas le sujet ici
 produced_by: writer-sfg

@@ -18,7 +18,6 @@ evidence:
     ref: "src/billing/AmountCalculator.java#L88-L140"
     commit: a1b2c3d
     tool: "lsp.find_definition"
-    excerpt: "return unitPrice.multiply(qty).setScale(4, RoundingMode.HALF_UP);"
   - kind: schema
     ref: "invoice_lines.amount DECIMAL(12,4)"
     tool: "schema.columns"
@@ -29,7 +28,6 @@ evidence:
   - kind: code
     ref: "src/accounting/export/CsvWriter.java#L61"
     tool: "lsp.find_references"
-    excerpt: "amount.setScale(2, RoundingMode.HALF_UP)"
 
 intent:
   statement: >

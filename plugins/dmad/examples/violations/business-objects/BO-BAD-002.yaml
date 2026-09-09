@@ -1,9 +1,9 @@
-# Violation double : sous-objet inexistant, et profondeur incohérente avec l'arbre.
-# Une profondeur est celle de l'arbre, pas une étiquette libre.
+# Violation : un sous-objet qui n'existe pas. Un niveau de la vue récursive
+# renvoie alors dans le vide.
 id: BO-BAD-002
 functional_name: "Arrivée à refacturer"
 capability: facturation
-recursive_depth: 0
+recursive_depth: 1
 business_layer: "préparation"
 sub_objects: [BO-FANTOME-999]
 confidence: I

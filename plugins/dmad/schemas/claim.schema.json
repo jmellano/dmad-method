@@ -208,14 +208,11 @@
             "not_run"
           ]
         },
-        "excerpt": {
-          "type": "string",
-          "maxLength": 500
-        },
         "note": {
           "type": "string"
         }
-      }
+      },
+      "description": "Ce qui fonde une claim. Une preuve est un POINTEUR — fichier:lignes, commit, table, ticket — jamais un extrait. D16 interdit le code dans le corpus ; le laisser transiter par une claim rouvrirait le canal, puisque les rédacteurs lisent les claims."
     },
     "intent": {
       "type": "object",

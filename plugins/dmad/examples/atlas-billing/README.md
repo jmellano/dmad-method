@@ -3,8 +3,10 @@
 Un run DMAD complet et fictif, déroulé de bout en bout. Il sert trois usages :
 
 1. **Montrer à quoi ressemble la méthode en pratique**, plutôt que de la décrire
-2. **Servir de fixture de non-régression** — `tools/validate.py` s'exécute dessus
+2. **Servir de fixture de non-régression** — `validate.py` et `check-corpus.py` s'exécutent dessus
 3. **Fournir un modèle** pour un premier run réel
+
+Depuis la v0.4, il produit le **corpus à trois documents** : une STD par point d'entrée, une SFD par arbre de business objects, une SFG par cas d'usage. Chacun est l'abstraction du précédent et **aveugle à l'étage n−2**.
 
 ## Le contexte
 
@@ -52,11 +54,35 @@ Résultat : `demoted` de `C` à `I`, reformulation exigée, et une question ouve
 
 En parallèle, le Test Forger écrit `AmountCalculatorCharacterizationTest`. Le test passe → **`BR-FACT-021` est promue en `V`**. C'est le seul mécanisme qui atteint le niveau maximal, et il produit au passage un filet de sécurité réutilisable pour le changement de barème.
 
-### Phase 6 — Restitution → [`output/`](output/)
+### Cycle 1 — la STD → [`output/std/nightly-billing.md`](output/std/nightly-billing.md)
 
-- **[Documentation fonctionnelle](output/fonctionnel/facturation.md)** — aucun nom de classe. La règle `V` est affirmative (« Le montant est calculé… »), la règle `I` est au conditionnel (« D'après l'analyse du code, … ne serait pas transmise »), l'intention est explicitement une hypothèse. **Un lecteur pressé qui ignore les badges perçoit quand même l'incertitude**, parce qu'elle est dans la langue.
-- **[Fiche de module](output/technique/module-billing.md)** — le bus factor à 1, le couplage non prévu avec `reporting`, le contournement par la CLI, et une section « limites » explicite.
-- **[Rapport de couverture](output/preuves/couverture.md)** — 22 % du code, 90 % des hotspots, 100 % des points d'entrée de la capacité. Le run est bon, et il le démontre au lieu de le prétendre.
+Dix-sept sections, **aucune omise** : la section « Événements » porte son constat d'absence plutôt que de disparaître, et la section « Requêtes clés » signale que les requêtes de `reporting` portent sur les mêmes tables **sans appartenir à ce batch** — le piège d'attribution le plus probable ici.
+
+**Aucun bloc de code, aucune requête.** Des références : `AmountCalculator.java:88`, `invoice_lines.amount DECIMAL(12,4)`. C'est la conformité ISO 25010, et c'est ce qui rend tenable la coupure des rédacteurs : tant qu'un extrait est permis, aller lire le code a un motif légitime.
+
+La section 9 montre **les deux bouts de l'échelle des contrats** : un contrat résolu au barreau 1, avec son artefact et sa version, et un contrat non résolu qui porte un placeholder visible plutôt qu'un identifiant plausible.
+
+La revue de cycle 1 a produit une **correction factuelle** : le document annonçait une reprise indéfinie de la transmission ; elle s'arrête à cinq campagnes. Le développeur l'a vue, la traversée l'avait manquée.
+
+### Cycle 2 — la SFD → [`output/sfd/facturation.md`](output/sfd/facturation.md)
+
+Vue récursive à trois niveaux, chacun avec ses six blocs. **Analysée bas → haut, rédigée haut → bas.**
+
+Ce que la classification ISO 25010 fait apparaître et qu'une rédaction libre aurait manqué : le statut de litige est lu **par commande** — environ 1 400 lectures par campagne — et le barème **par ligne**, jusqu'à quarante par facture. Deux données `ad-hoc` en boucle, signalées comme telles. C'est le premier candidat à l'optimisation, et il ne se voit nulle part ailleurs.
+
+Le document ne contient **aucun nom de classe et aucun nom de patron** : le Template Method reconnu par le Carver a servi au découpage, il n'apparaît pas.
+
+### Cycle 3 — la SFG → [`output/sfg/facturation.md`](output/sfg/facturation.md)
+
+Deux cas d'usage, sept blocs chacun, dont « ce qui n'est pas couvert » — le bloc qu'on oublie, et le plus structurant.
+
+**Le constat de méthode le plus instructif du run est là** : le découpage initial suivait les deux points d'entrée techniques, et il a fallu écrire les deux sections en entier pour voir que la vraie ligne de partage n'est pas le déclencheur mais **le jeu de règles appliqué**.
+
+Et une **correction factuelle** consignée dans l'historique, avec ce qui était écrit et pourquoi c'était faux : la version 1.0 présentait la reprise comme une garantie de non-perte. La SFD disait « reprise à la campagne suivante » sans dire jusqu'à quand ; la dérivation avait comblé le silence par une promesse. **C'est exactement le risque propre au troisième document** — le lecteur de la SFG n'a aucun moyen de le détecter.
+
+### Le rapport de couverture → [`output/preuves/couverture.md`](output/preuves/couverture.md)
+
+22 % du code, 90 % des hotspots, 100 % des points d'entrée de la capacité — et la ligne nouvelle en v0.4 : **un contrat résolu sur deux, avec la répartition par barreau**. Elle mesure la qualité des sources, pas seulement le nombre de contrats trouvés.
 
 ## Ce que ce run illustre
 
@@ -68,6 +94,10 @@ En parallèle, le Test Forger écrit `AmountCalculatorCharacterizationTest`. Le 
 | **P5** — le code ne dit pas le pourquoi | `intent` séparé, en `H`, avec `competing_hypotheses` |
 | **P9** — couverture mesurée | 22 % assumé et argumenté |
 | Anti-hallucination | 2 dispatchs non résolus enregistrés au lieu d'être devinés |
+| **D16** — aucun code dans le corpus | la STD porte des références, la section 8 remplace le SQL par tables et intention |
+| **D17** — cascade | chaque niveau de la SFD ancré dans la STD, chaque règle de la SFG tracée vers la SFD |
+| **D18** — contrat versionné | `CTR-FACT-001` porte `accounting-api:4.7.2` ; `CTR-FACT-002` porte un placeholder assumé |
+| **D19** — revue par cycle | trois revues, trois corrections, dont deux factuelles |
 | Configuration | `conditional_on` sur `BR-FACT-014` — la doc n'est pas la même en prod et en local |
 
 ## Le résultat, en une phrase
@@ -84,6 +114,7 @@ Aucune de ces quatre choses ne serait sortie d'un « résume-moi ce repo ».
 ## Vérifier
 
 ```bash
-python3 ../../tools/validate.py .     # 7 artefacts valides
-../../tools/selftest.sh               # + les 5 violations bien refusées
+python3 ../../tools/validate.py     .          # 17 artefacts valides
+python3 ../../tools/check-corpus.py output/    # 3 documents conformes
+../../tools/selftest.sh                        # + les 25 violations bien refusées
 ```

@@ -1,6 +1,6 @@
 # Violations — fixtures de non-régression
 
-Quatorze artefacts volontairement fautifs. Chacun correspond à un **mode de défaillance réel** de la rétro-documentation par LLM, et chacun doit être refusé par `tools/validate.py`.
+Quinze artefacts volontairement fautifs. Chacun correspond à un **mode de défaillance réel** de la rétro-documentation par LLM, et chacun doit être refusé par `tools/validate.py`.
 
 **Une fixture, une violation.** C'est la convention du dossier : une fixture qui en déclenche deux ne dit plus laquelle le garde-fou a attrapée.
 
@@ -13,7 +13,7 @@ Quatorze artefacts volontairement fautifs. Chacun correspond à un **mode de dé
 | `BR-BAD-005` | Affirmation d'exhaustivité alors que la navigation s'est faite au `grep` | **plafond de capability** | Un « aucun autre appelant » non vérifiable fonde une décision de refactoring |
 | `RISK-BAD-006` | Un constat structurel en `V` sans nommer l'outil qui l'a mesuré | **traçabilité mécanique** | Une impression du modèle (« beaucoup de modifications récentes ») prend le statut de mesure |
 
-## Les huit fixtures de la v0.4
+## Les neuf fixtures d'artefacts de la v0.4
 
 | Fixture | Défaillance simulée | Décision violée | Ce qui se passerait sans le garde-fou |
 |---|---|---|---|
@@ -22,6 +22,7 @@ Quatorze artefacts volontairement fautifs. Chacun correspond à un **mode de dé
 | `CTR-BAD-003` | Contrat non résolu, sans question ouverte | **D18** | Un placeholder visible se corrige ; un placeholder muet se propage |
 | `BO-BAD-001` | Business object nommé d'après la méthode dont il est issu | **nommage** | La SFD parle le langage du code à un lecteur qui ne l'a pas |
 | `BO-BAD-002` | Sous-objet inexistant dans l'arbre | **cohérence du graphe** | Un niveau de la vue récursive renvoie dans le vide |
+| `BO-BAD-003` | Profondeur 0 alors que l'objet invoque un sous-objet | **cohérence du graphe** | La profondeur devient une étiquette libre, et les niveaux de la SFD ne veulent plus rien dire |
 | `DOC-BAD-001` | SFD sans `derives_from` | **D17** | L'information apparaît de nulle part : c'est la cascade percée, anti-pattern A15 |
 | `DOC-BAD-002` | SFD dérivant d'une STD non figée | **D19** | Les corrections de la revue se propagent deux fois |
 | `DOC-BAD-003` | SFG découpée par arbre de business objects | **D20** | Un document plié dans le découpage d'un autre gagne un niveau de titre et perd son lecteur |

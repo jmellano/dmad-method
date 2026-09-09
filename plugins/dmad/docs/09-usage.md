@@ -109,7 +109,9 @@ Deux endroits, et deux seulement :
 Sur du code client, `scope.confidentiality` doit être **appliqué**, pas seulement déclaré :
 - `local_only: true` ⇒ aucun serveur MCP distant (Context7 sort du réseau : le désactiver)
 - règles `deny` sur les outils réseau
-- `redaction_rules` appliquées aux `evidence.excerpt` avant écriture
+- `redaction_rules` appliquées **avant écriture**, jamais après : une donnée caviardée après coup reste dans l'historique git — que DMAD versionne et conserve
+
+> **La surface de risque a diminué en v0.4.** Les extraits de code étaient le principal vecteur de fuite ; D16 les a supprimés des documents, et `evidence.excerpt` a disparu du schéma des claims — c'était le dernier canal par lequel du code atteignait un rédacteur censé en être coupé. Restent les références précises, qui sont le cœur de la méthode et ne peuvent pas disparaître.
 
 **Le mécanisme d'application n'est pas encore spécifié** — limite connue, bloquante pour un usage en prestation. Voir [roadmap](12-roadmap.md).
 

@@ -47,6 +47,10 @@ SFG_BLOCS = [
 
 RE_FENCE = re.compile(r"^\s*```([A-Za-z0-9_+-]+)\s*$", re.M)
 RE_REGLE = re.compile(r"\b((?:RG|BR|INV)-[A-Z0-9]+(?:-[0-9]+)?)\b")
+# Une règle est DÉCLARÉE quand elle ouvre une ligne de tableau. Une règle
+# seulement citée dans le corps d'une autre — « sans appliquer RG-003 » — est
+# un renvoi, pas une déclaration : l'exiger en traçabilité produirait du bruit.
+RE_REGLE_DECLAREE = re.compile(r"^\s*\|\s*((?:RG|BR|INV)-[A-Z0-9]+(?:-[0-9]+)?)\b", re.M)
 
 
 def lire(path):
@@ -205,8 +209,10 @@ def check_sfg(rel, corps, erreurs):
 
         corps_regles, tracabilite = set(), set()
         for bloc_titre, bloc_texte in sections(texte, "###"):
-            cible = tracabilite if "traçabilité" in bloc_titre.lower() else corps_regles
-            cible.update(RE_REGLE.findall(bloc_texte))
+            if "traçabilité" in bloc_titre.lower():
+                tracabilite.update(RE_REGLE.findall(bloc_texte))
+            else:
+                corps_regles.update(RE_REGLE_DECLAREE.findall(bloc_texte))
         toutes_regles |= corps_regles
 
         for regle in sorted(corps_regles - tracabilite):

@@ -1,0 +1,23 @@
+id: DOC-STD-FACT-001
+kind: STD
+unit: entrypoint
+unit_ref: "JOB nightly-billing"
+path: "output/std/nightly-billing.md"
+feeds: [DOC-SFD-FACT-001]
+claims_rendered: [BR-FACT-014, BR-FACT-021, RISK-FACT-001]
+confidence: I
+frozen_at: "2026-09-07T16:20:00Z"
+frozen_by:
+  who: "Dev senior Atlas"
+  role: "développeur"
+  when: "2026-09-07T16:20:00Z"
+  disputed: [BR-FACT-014]
+  corrections:
+    - >
+      Section 9 : le comportement d'échec de transmission disait « retentée
+      indéfiniment ». Le développeur a corrigé — la reprise s'arrête au bout de
+      cinq campagnes, dans une constante que la traversée avait manquée.
+produced_by: writer-std
+scope_warning: >
+  feature-scan « Facturation » : les interactions hors périmètre n'ont pas été
+  analysées. 17 frontières atteintes et non franchies.

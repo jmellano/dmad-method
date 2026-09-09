@@ -21,15 +21,12 @@ evidence:
     ref: "src/billing/InvoiceDispatcher.java#L212-L228"
     commit: a1b2c3d
     tool: "lsp.find_definition"
-    excerpt: "if (config.skipZeroAmount() && invoice.totalTTC().signum() == 0) { invoice.markSkipped(); return; }"
   - kind: config
     ref: "config/application-prod.yml#L88"
     tool: "grep"
-    excerpt: "billing.skipZeroAmount: true"
   - kind: config
     ref: "src/config/BillingConfig.java#L34"
     tool: "lsp.find_definition"
-    excerpt: "@Value(\"${billing.skipZeroAmount:false}\") private boolean skipZeroAmount;"
   - kind: schema
     ref: "invoices.status ENUM('DRAFT','SENT','SKIPPED','FAILED')"
     tool: "schema.columns"
