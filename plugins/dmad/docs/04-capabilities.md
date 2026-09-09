@@ -111,7 +111,8 @@ La colonne vertébrale. Persiste les claims, leurs preuves, leur niveau, leur hi
 | Challenger | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | ✓ |
 | Test Forger | ✓ | | ✓ | ✓ | ✓ | | | ✓ |
 | Diagram Planner | | | | | | | ✓ | ✓ |
-| Writers | | | | | | | ✓ | ✓ |
+| Contract Resolver | ✓ | | | | | | | ✓ |
+| Writers (STD, SFD, SFG) | | | | | | | ✓ | ✓ |
 | Curator | | | | | | | | ✓ |
 
 Les cases vides sont des **interdictions**, pas des oublis : elles matérialisent le périmètre de lecture de chaque agent (cf. `03-agents.md`).

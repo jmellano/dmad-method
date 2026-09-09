@@ -45,8 +45,12 @@ Un LLM à qui l'on demande « tu es sûr à combien de % ? » invente un nombre.
 ### P5 — Le code dit *quoi*, jamais *pourquoi*
 L'intention métier ne se déduit pas du code. Elle se reconstruit à partir de l'historique git, des messages de commit, des noms de tests, du vocabulaire des tables, des tickets — et se **valide auprès d'humains**. Toute affirmation d'intention est marquée comme hypothèse jusqu'à validation humaine.
 
-### P6 — Deux lecteurs, deux documents, un seul graphe
-La doc fonctionnelle et la doc technique ne sont pas deux rédactions parallèles (qui divergeraient). Ce sont deux **rendus** du même *Knowledge Graph*. Une correction dans le graphe se propage aux deux.
+### P6 — Trois lecteurs, trois documents, une cascade d'abstraction
+Les trois documents du corpus — STD, SFD, SFG — ne sont pas trois rédactions parallèles, qui divergeraient. **Chacun est l'abstraction du précédent**, et n'a le droit de lire que lui : la SFD ne lit pas le code, la SFG ne lit ni le code ni la STD.
+
+Deux lectures indépendantes du même matériau divergent ; une abstraction, non. Et une information absente d'un étage ne peut pas apparaître à l'étage supérieur : le trou se propage visiblement au lieu d'être comblé silencieusement là où il serait le plus difficile à détecter — chez le lecteur métier, qui n'a aucun moyen de vérifier.
+
+Le *Knowledge Graph* reste le seul état partagé : une correction dans le graphe se propage à toute la cascade.
 
 ### P7 — Un diagramme répond à une question
 Un diagramme qui ne répond à aucune question précise ne sort pas. Un diagramme de classes global d'un legacy est un plat de spaghetti illisible : ce n'est pas de la documentation, c'est du bruit avec des flèches.

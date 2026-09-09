@@ -2,13 +2,15 @@
 
 ## Où en est le projet
 
-**v0.2 — la méthode est spécifiée et outillée.** Ce qui existe :
+**v0.4 — le corpus à trois documents est spécifié.** Ce qui existe :
 
 | Brique | État |
 |---|---|
 | Manifeste, principes, échelle de confiance | ✅ |
 | Méthode : 8 phases, 3–4 gates, 2 modes | ✅ |
-| 12 agents avec périmètre de lecture et plafond | ✅ |
+| 15 agents avec périmètre de lecture et plafond | ✅ |
+| Corpus STD → SFD → SFG, trois cycles, trois revues | ✅ |
+| Résolution des contrats sortants, échelle à quatre barreaux | ✅ |
 | 8 capabilities contractualisées | ✅ |
 | 16 tâches opérationnelles | ✅ |
 | Schémas JSON Schema + validateur + selftest | ✅ |
@@ -30,6 +32,9 @@
 ## Ce qui reste à construire
 
 ### Prioritaire (nécessaire au premier run réel)
+- **Contrainte mécanique des invariants v0.4** — D16 (aucun bloc de code), D17 (tout étage référence l'étage inférieur) et l'obligation de `artifact_version` sont **écrits mais pas encore contrôlés par `validate.py`**. Tant que c'est le cas, ce sont des consignes, pas des garde-fous — et le manifeste dit qu'un principe non contraint par un schéma est un vœu pieux
+- **Schémas des nouveaux types** — `ExternalContract`, `BusinessObject`, `Document` ; leur sérialisation relève du chantier OKF (D22), mais leur validation ne peut pas l'attendre
+- **Corpus du run de référence** — `examples/atlas-billing` rend encore l'ancienne arborescence `fonctionnel|technique`
 - **Implémentation du `diagram-engine`** — le contrat est défini, le rendu ne l'est pas
 - **`freshness.py`** — la phase 7 est spécifiée, l'outil n'existe pas
 - **Adaptateurs `code-intelligence`** — au minimum Serena/LSP et le mode dégradé tree-sitter
