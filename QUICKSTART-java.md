@@ -44,6 +44,10 @@ Et une quatrième, la plus importante :
 
 - [ ] **Le vocabulaire métier**, collecté auprès d'un humain — pas déduit du code. Cinq à vingt termes tels qu'ils sont employés en réunion. C'est le levier principal de la localisation.
 
+Et une cinquième, propre à la v0.4 :
+
+- [ ] **La convention de contrat d'API du dépôt** — à quoi reconnaît-on, ici, le contrat d'un appel sortant ? Quelle annotation, quel suffixe d'interface exposée, quel groupe d'artefacts. Sans elle, la résolution des contrats retombe au barreau du commentaire manuscrit, celui qui survit aux refactorings et **ment alors sans le dire**.
+
 ## 4. Lancer
 
 ```
@@ -57,16 +61,36 @@ Réponds sérieusement : cette réponse oriente tout le run. « Faire évoluer l
 
 ## 5. Ce qui va t'être demandé
 
-Trois à quatre arrêts. Ce ne sont pas des validations de politesse : ce sont les moments où dix minutes d'un humain économisent des heures d'agents.
+Un arrêt par cycle, plus les gates. Ce ne sont pas des validations de politesse : ce sont les moments où dix minutes d'un humain économisent des heures d'agents.
 
-| Gate | Ce qu'on te demande | Compter |
+| Arrêt | Ce qu'on te demande | Qui | Compter |
+|---|---|---|---|
+| **Gate 0 — Cadrage** | objectif, périmètre, vocabulaire, budget, **jusqu'où va le corpus** | commanditaire | 15 min |
+| **Localisation** *(feature-scan)* | quels points d'entrée appartiennent vraiment à la fonctionnalité | commanditaire | 10 min |
+| **Revue de cycle 1** | la STD est-elle juste ? | développeur | 30–45 min par document |
+| **Gate 3 — Découpage** | valider ou corriger les capacités et les business objects | **expert métier** | 30–45 min |
+| **Revue de cycle 2** | la SFD se contredit-elle quelque part ? | analyste + métier | 45–60 min |
+| **Revue de cycle 3** | ces intentions sont-elles les bonnes ? | utilisateur métier | 45 min |
+
+Le **gate 3 reste le plus important** : tout le fonctionnel est organisé selon ce découpage. Depuis la v0.4 il se tient **après** la revue de la STD, donc devant un expert qui vient de lire la carte technique.
+
+**Une revue qui ne demande aucune correction est un signal d'alarme**, pas un succès : elle signifie que le relecteur n'a pas cherché, ou que le document est trop vague pour être contesté.
+
+### Le contrôle de dix minutes, à chaque revue
+
+Tire **cinq affirmations au hasard**, ouvre le code aux lignes citées, vérifie que la phrase correspond. C'est le seul contrôle qui détecte l'erreur dominante des modèles — citer du vrai code en lui faisant dire autre chose — parce qu'un texte crédible et bien sourcé ne déclenche aucune alarme à la lecture.
+
+## 5bis. Choisir jusqu'où aller
+
+DMAD produit **trois documents en cascade** : la STD par point d'entrée, la SFD par arbre de business objects, la SFG par cas d'usage. Chacun est l'abstraction du précédent, et le suivant ne démarre pas tant que le précédent n'est pas figé par sa revue.
+
+| Corpus | Ce qu'on obtient | Qui doit être disponible |
 |---|---|---|
-| **0 — Cadrage** | objectif, périmètre, vocabulaire, budget | 15 min |
-| **1b — Localisation** *(feature-scan)* | quels points d'entrée candidats appartiennent vraiment à la fonctionnalité | 10 min |
-| **3 — Découpage** | valider ou corriger les capacités métier proposées | 30–45 min, **avec un expert métier** |
-| **5 — Challenge** | arbitrer les contradictions et les tests rouges | variable |
+| `[std]` | la carte technique d'un point d'entrée | un développeur |
+| `[std, sfd]` | + les règles, les données, les niveaux d'abstraction | + un analyste et un référent métier |
+| `[std, sfd, sfg]` | + l'intention et les cas d'usage | + un utilisateur métier |
 
-Le **gate 3 est le plus important** : tout ce qui suit est organisé selon ce découpage. Un expert métier y corrige en trente minutes ce que des heures d'agents auraient mal deviné.
+**Pour un premier run, prends `[std]` sur un seul point d'entrée.** Le cadrage type est dans [`examples/std-seule/`](plugins/dmad/examples/std-seule/) : c'est le plus petit run qui produise un livrable défendable, et le moins cher pour mesurer le coût réel avant de s'engager.
 
 ## 6. Choisir le mode
 
@@ -80,7 +104,8 @@ Le **gate 3 est le plus important** : tout ce qui suit est organisé selon ce d�
 ## 7. Avant de considérer que c'est fini
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/tools/validate.py dmad-output/
+python3 ${CLAUDE_PLUGIN_ROOT}/tools/validate.py     dmad-output/
+python3 ${CLAUDE_PLUGIN_ROOT}/tools/check-corpus.py dmad-output/
 ```
 
 Puis **le contrôle qui compte** — dix minutes, et c'est le seul qui détecte l'erreur dominante des LLM :
@@ -91,8 +116,8 @@ Plus d'une erreur sur cinq condamne le run : il faut repasser le Challenger avec
 
 ## Ce que tu dois obtenir
 
-- une **documentation fonctionnelle** sans un seul nom de classe, avec un niveau de preuve par affirmation
-- une **documentation technique** avec renvois `fichier:lignes` et une section « limites de l'analyse »
+- une **STD** par point d'entrée : dix-sept sections dont aucune omise, des renvois `fichier:lignes`, une section « limites de l'analyse » — et **aucun bloc de code**
+- si tu es allé plus loin, une **SFD** sans un seul nom de classe, et une **SFG** sans une seule trace de technique
 - des **tests de caractérisation** qui prouvent les règles critiques — et te servent de filet pour la suite
 - un **registre de questions** priorisé, prêt pour l'atelier métier
 - un **rapport de couverture** honnête

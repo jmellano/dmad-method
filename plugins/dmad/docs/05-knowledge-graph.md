@@ -7,12 +7,16 @@ Le graphe est **le seul état partagé** de DMAD. Les documents, les diagrammes,
 Il porte trois strates :
 
 ```
-  STRATE MÉTIER        Capability · UseCase · BusinessRule · Actor · Term · StateMachine
+  STRATE CORPUS        Document · Diagram              ← v0.4
+        ▲  renders / anchors / derives_from
+  STRATE MÉTIER        Capability · UseCase · BusinessRule · BusinessObject · Actor · Term · StateMachine
         ▲  realizes / constrains
   STRATE STRUCTURE     Module · Component · Class · Function · Entrypoint
         ▲  reads / writes / calls
-  STRATE DONNÉES       DataStore · Table · Column · ExternalService · Event
+  STRATE DONNÉES       DataStore · Table · Column · ExternalService · ExternalContract · Event · DataFlow
 ```
+
+La strate du corpus est l'ajout de la v0.4. Elle n'existe pas pour décrire le système : elle existe pour que **la cascade soit un objet du graphe** plutôt qu'une convention de rédaction — donc vérifiable.
 
 Les phases 1–2 remplissent le bas (mécanique, `V`). Les phases 3–4 remplissent le haut (interprétatif, `I`/`H`). **La confiance décroît en montant** — et c'est normal : c'est le prix de la remontée vers le sens.
 
@@ -35,6 +39,11 @@ Les phases 1–2 remplissent le bas (mécanique, `V`). Les phases 3–4 rempliss
 | `Term` (glossaire) | métier | Curator | variable |
 | `OpenQuestion` | transverse | tout agent | n/a |
 | `Risk` / `Hotspot` | transverse | Surveyor | `V` |
+| `ExternalContract` | données | Contract Resolver | dérivée du barreau : 1→`V`, 2→`C`, 3→`I` |
+| `BusinessObject` | métier | Carver | `I` |
+| `DataFlow` | données | Cartographer | `V` si typé par outil |
+| `Diagram` | transverse | Diagram Planner | héritée de son sous-graphe |
+| `Document` | transverse | rédacteurs | minimum de ses claims |
 
 ## Types d'arêtes
 
@@ -43,6 +52,11 @@ Les phases 1–2 remplissent le bas (mécanique, `V`). Les phases 3–4 rempliss
 
 **Interprétatives (issues d'agents) :**
 `belongs_to` (structure → capacité) · `realizes` (fonction → cas d'usage) · `constrains` (règle → cas d'usage) · `explains` (intention → règle) · `contradicts` · `questions`
+
+**De cascade (v0.4) :**
+`derives_from` (document → document de l'étage inférieur) · `anchors` (section → claim ou section amont) · `renders` (document → claims qu'il publie)
+
+Ces trois-là ne décrivent pas le système analysé : elles décrivent **le corpus lui-même**. C'est ce qui rend la cascade vérifiable — une section sans arête `anchors` est une information apparue de nulle part, et le validateur la refuse.
 
 > **Invariant du graphe :** une arête mécanique ne peut pas être créée par un agent sans appel d'outil correspondant enregistré dans l'evidence store. C'est vérifiable automatiquement, et c'est ce qui rend l'hallucination structurelle détectable.
 

@@ -139,6 +139,36 @@ Repère : **15 à 30 % de claims dégradées** est le taux attendu sur un legacy
 
 ---
 
+## A14 — Le contrat périmé par un bump de version
+
+**Le symptôme.** La documentation cite le code d'un appel sortant — la clé d'entrée de son exploitation. Six mois plus tard, la dépendance a changé de version, le contrat a bougé, et le document affirme toujours l'ancien. Rien ne s'est cassé, rien n'a alerté : **le code cité reste plausible**.
+
+**Pourquoi c'est vicieux.** L'artefact lu est figé à la version que le module **consomme**, pas à ce que le module appelé publie aujourd'hui. Un lecteur qui appelle la supervision avec un code périmé tombe sur un service qui n'existe plus, ou pire, sur un autre.
+
+**La parade.** `artifact_version` obligatoire sur tout nœud `ExternalContract`, refusé à l'écriture sinon, et comparé à la version résolue par le build à chaque passe de fraîcheur.
+
+---
+
+## A15 — La cascade percée
+
+**Le symptôme.** Un rédacteur de SFD, bloqué par un trou de la STD, va lire le code. Un rédacteur de SFG, bloqué par une SFD imprécise, va lire la STD. Le document produit est correct, personne ne remarque rien.
+
+**Pourquoi c'est un problème.** Le document cesse d'être une **abstraction** du précédent et redevient une **lecture indépendante** du même matériau. Or deux lectures indépendantes divergent — c'est mécanique — et la divergence apparaîtra plus tard, entre deux documents qu'on croyait cohérents par construction. Pire : la lecture faite en contrebande n'a traversé ni le Challenger ni le Test Forger, alors que le document, lui, porte les badges de confiance de la chaîne.
+
+**La parade.** Trois niveaux : `disallowedTools` sur les rédacteurs, règles `deny` sur les chemins, et surtout la `gap_request` qui **remonte d'un cycle** — un rédacteur bloqué a un recours, sinon il contourne.
+
+---
+
+## A16 — Le faux barreau
+
+**Le symptôme.** Un code de contrat lu dans un commentaire manuscrit, présenté dans la documentation comme s'il venait du contrat lui-même.
+
+**Pourquoi c'est indétectable.** **Un code faux ressemble exactement à un code vrai.** Rien dans sa forme ne trahit sa source, et le commentaire manuscrit a une propriété redoutable : il survit à un refactoring qui a changé la méthode appelée. Il ment alors sans le dire, et il ment avec l'apparence de la précision.
+
+**La parade.** `resolution_rung` obligatoire, et la confiance **dérivée** du barreau plutôt que choisie : 1 pour l'annotation qui fait foi, 2 pour la Javadoc générée, 3 pour le commentaire, rien pour le placeholder. Un placeholder visible se corrige ; un code plausible se propage.
+
+---
+
 ## Tableau de correspondance
 
 | Anti-pattern | Garde-fou principal | Où |
@@ -156,3 +186,6 @@ Repère : **15 à 30 % de claims dégradées** est le taux attendu sur un legacy
 | A11 photo qui jaunit | phase 7, freshness | `71-check-freshness` |
 | A12 run sans fin | gate 0 + hotspots + règle de budget | `workflows/` |
 | A13 analyse/prescription | documenter ce qui est | `03-agents` |
+| A14 contrat périmé | `artifact_version` obligatoire + fraîcheur | `external-contract.schema.json`, D18 |
+| A15 cascade percée | échelle de lecture + `gap_request` d'un cycle | `03-agents`, D17, `check-corpus.py` |
+| A16 faux barreau | `resolution_rung` + confiance dérivée | `13-resolve-outbound-contracts`, D18 |

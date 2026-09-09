@@ -46,6 +46,26 @@ Sans cette distinction, la règle stricte rejetterait les hotspots mesurés par
 git ; sans le garde-fou du second versant, « le modèle a trouvé que » se
 déguiserait en mesure.
 
+## Les onze fixtures de corpus
+
+Sous `corpus/` et `corpus-bloque/`. Elles portent sur les **documents**, pas sur les artefacts, et c'est `check-corpus.py` qui les refuse.
+
+| Fixture | Défaillance simulée | Décision violée |
+|---|---|---|
+| `std/std-bloc-de-code.md` | un extrait de code dans une STD | **D16** |
+| `std/std-bloc-sql.md` | une requête dans une STD | **D16** |
+| `std/std-section-manquante.md` | une section supprimée faute d'objet, au lieu du constat d'absence | dix-sept sections |
+| `std/std-diagramme-sans-question.md` | un diagramme qu'aucune question n'introduit | **R1** |
+| `sfd/sfd-sans-derives-from.md` | une SFD qui ne dit pas de quoi elle est l'abstraction | **D17** |
+| `sfd/sfd-section-sans-ancrage.md` | un niveau dont l'information n'est ancrée nulle part | **D17** |
+| `sfg/sfg-six-blocs.md` | « ce qui n'est pas couvert » manquant | sept blocs |
+| `sfg/sfg-frontiere-vide.md` | la frontière est un titre sans contenu | sept blocs |
+| `sfg/sfg-regle-sans-tracabilite.md` | une règle que rien ne source | traçabilité |
+| `sfg/sfg-index-incoherent.md` | un index inverse édité à la main | index généré |
+| `corpus-bloque/` | une SFG produite malgré une contradiction non levée | blocage du cycle 3 |
+
+Le dernier vit dans son propre dossier parce que sa condition est **le run**, pas un fichier : il faut un challenge non résolu et une SFG pour que la violation existe.
+
 ## Pourquoi ces fixtures existent
 
 Les principes du manifeste ne valent que s'ils sont **exécutables**. Ces fichiers sont la preuve que les schémas et les règles croisées de `validate.py` refusent réellement les dérives, plutôt que de les décrire dans un document que personne ne relit.

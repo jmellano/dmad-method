@@ -1,6 +1,5 @@
 {
   "//": "Extrait à fusionner dans .claude/settings.json du projet legacy analysé.",
-
   "permissions": {
     "allow": [
       "Bash(git log:*)",
@@ -10,16 +9,31 @@
       "Bash(git shortlog:*)",
       "Bash(tokei:*)",
       "Bash(cloc:*)",
-      "Bash(python3 .dmad/tools/validate.py:*)"
+      "Bash(mvn -q dependency\\:*)",
+      "Bash(python3 .dmad/tools/validate.py:*)",
+      "Bash(python3 .dmad/tools/check-corpus.py:*)"
     ],
-
-    "//deny": "Applique la contrainte fondatrice : les rédacteurs ne lisent pas le code. Adapte les chemins à ton projet.",
+    "//deny": "Applique l'échelle de lecture (D17) : chaque rédacteur est coupé du code ET de l'étage n-2 de la cascade. ADAPTE LES CHEMINS À TON PROJET — ceux-ci sont des exemples. Le premier niveau d'application reste disallowedTools dans le frontmatter des agents ; ces règles sont le second, et une consigne de prompt serait le troisième — nécessaire, jamais suffisant seul.",
     "deny": [
       "Bash(git push:*)",
       "Bash(git commit:*)",
       "Bash(git reset:*)",
       "Write(./src/**)",
       "Edit(./src/**)"
+    ],
+    "//deny-par-agent": "Claude Code n'applique pas de règles par agent : ce bloc documente ce qu'il faudrait couper si l'on exécutait les rédacteurs dans des sessions séparées. C'est la façon la plus sûre de tenir D17.",
+    "deny-writer-std": [
+      "Read(./src/**)"
+    ],
+    "deny-writer-sfd": [
+      "Read(./src/**)",
+      "Read(./dmad-output/graph/**)"
+    ],
+    "deny-writer-sfg": [
+      "Read(./src/**)",
+      "Read(./dmad-output/graph/**)",
+      "Read(./dmad-output/std/**)",
+      "Read(./dmad-output/preuves/claims/**)"
     ]
   }
 }
