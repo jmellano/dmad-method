@@ -9,7 +9,7 @@
     {
       "name": "dmad",
       "source": "./plugins/dmad",
-      "description": "Reconstruit depuis un legacy une documentation fonctionnelle et technique dont chaque affirmation porte son niveau de preuve. 12 agents, 3 gates humains, un agent adversarial et des tests de caractérisation."
+      "description": "Reconstruit depuis un legacy un corpus de trois documents en cascade d'abstraction — STD, SFD, SFG — dont chaque affirmation porte son niveau de preuve. 15 agents, trois cycles scellés par une revue humaine, un agent adversarial et des tests de caractérisation."
     }
   ]
 }

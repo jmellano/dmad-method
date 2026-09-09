@@ -1,6 +1,6 @@
 # DMAD — workflow full-scan
 # Tout le périmètre. Réaliste jusqu'à ~150 kLOC selon budget ; au-delà, les
-# phases 4-6 sont priorisées par hotspots plutôt qu'exhaustives.
+# cycles 2 et 3 sont priorisés par hotspots plutôt qu'exhaustifs.
 workflow:
   id: full-scan
   label: "Analyse complète du périmètre"
@@ -9,93 +9,183 @@ workflow:
   preconditions:
     - "scope.mode == full-scan"
 
-  phases:
+  # Le corpus visé est déclaré au gate 0. Un cycle non demandé n'est pas exécuté.
+  # Le budget épuisé s'arrête sur un DOCUMENT TERMINÉ, jamais au milieu d'un cycle.
+  corpus: "scope.corpus"          # [std] | [std, sfd] | [std, sfd, sfg]
+
+  cycles:
 
     - id: 0-cadrage
       agent: scoper
       tasks: [00-scope-run]
-      outputs: [scope.yaml]
+      outputs: [scope.yaml, glossary-seed.md]
       gate:
         checklist: gate-0-scope
         approver: commanditaire
         blocking: true
 
-    - id: 1-reconnaissance
-      agent: surveyor
-      model: haiku
-      tasks: [10-survey-codebase, 11-discover-entrypoints]
-      outputs: [facts/]
-      checkpoint:
-        description: "Point de décision sur le volume, sans validation formelle"
-        rule: >
-          Si le recensement révèle un volume incompatible avec le budget, le
-          Surveyor remonte l'écart AVANT la cartographie et propose : réduire
-          le périmètre, basculer en feature-scan, ou accepter une élucidation
-          limitée aux hotspots. Découvrir le dépassement en phase 4 coûte
-          l'intégralité des phases 2 et 3.
+    # ---------------------------------------------------------------- cycle 1
+    - id: 1-std
+      label: "Spécification technique détaillée"
+      unit: entrypoint
+      produces: "dmad-output/std/<point-d-entree>.md"
+      steps:
 
-    - id: 2-cartographie
-      agent: cartographer
-      model: haiku
-      tasks: [20-build-graph]
-      inputs: [facts/entrypoints.json (tous)]
-      bounded_by: "scope.budget.max_traversal_depth"
-      outputs: [graph/, boundaries.yaml]
+        - agent: surveyor
+          model: haiku
+          tasks: [10-survey-codebase, 11-discover-entrypoints]
+          outputs: [facts/]
+          checkpoint:
+            description: "Point de décision sur le volume, sans validation formelle"
+            rule: >
+              Si le recensement révèle un volume incompatible avec le budget, le
+              Surveyor remonte l'écart AVANT la cartographie et propose : réduire
+              le périmètre, basculer en feature-scan, ou ne viser que la STD.
+              Découvrir le dépassement au cycle 2 coûte l'intégralité du cycle 1.
 
-    - id: 3-decoupage
-      agent: carver
-      model: opus
-      tasks: [30-carve-capabilities]
-      outputs: [capabilities.yaml]
-      gate:
-        checklist: gate-3-capabilities
-        approver: expert métier
-        blocking: true
+        - agent: cartographer
+          model: haiku
+          tasks: [20-build-graph]
+          inputs: ["facts/entrypoints.json (tous)"]
+          bounded_by: "scope.budget.max_traversal_depth"
+          outputs: [graph/, boundaries.yaml]
 
-    - id: 4-elucidation
-      parallel:
-        - agent: elucidator
-          tasks: [40-elucidate-usecases, 41-extract-business-rules]
-        - agent: archaeologist
-          tasks: [42-reconstruct-intent]
-      order_by: hotspot_rank
-      budget_rule: >
-        Quand le budget s'épuise, on s'arrête sur une capacité TERMINÉE plutôt
-        que d'en laisser six à moitié faites. Une capacité documentée en
-        entier vaut mieux que six ébauches — et le rapport de couverture dit
-        clairement lesquelles ont été traitées.
-      outputs: [claims/ (draft)]
+        - agent: contract-resolver
+          model: haiku
+          tasks: [13-resolve-outbound-contracts]
+          inputs: ["graph/ (feuilles de type contract)"]
+          outputs: [contracts/]
+          invariant: "tout ExternalContract porte artifact_version — refusé à l'écriture sinon"
 
-    - id: 5-challenge
-      sequence:
         - agent: challenger
           model: opus
           tasks: [50-challenge-claim]
-        - agent: test-forger
-          tasks: [51-forge-characterization-test]
-      gate:
-        checklist: gate-5-challenge
-        approver: [développeur, référent métier]
-        blocking: true
+          angles: [preuve_trahie, polymorphisme, config, chemin_erreur, exhaustivite, aop, ioc]
 
-    - id: 6-restitution
-      sequence:
         - agent: diagram-planner
           tasks: [60-plan-diagrams]
-        - parallel:
-            - agent: writer-functional
-              tasks: [61-render-functional-doc]
-            - agent: writer-technical
-              tasks: [62-render-technical-doc]
+          bounded_by: "scope.diagram_thresholds"
+
+        - agent: writer-std
+          tasks: [63-render-std]
+
+      gate:
+        checklist: revue-cycle-1-std
+        approver: développeur
+        blocking: true
+        allows: [corrections, complements]
+        rationale: >
+          Une erreur qui survit ici traverse tout le corpus en gagnant en
+          abstraction, donc en devenant plus difficile à réfuter à chaque étage.
+
+    # ---------------------------------------------------------------- cycle 2
+    - id: 2-sfd
+      label: "Spécification fonctionnelle détaillée"
+      unit: business_object_tree
+      requires: "std figée"
+      produces: "dmad-output/sfd/<processus>.md"
+      steps:
+
+        - agent: carver
+          model: opus
+          tasks: [30-carve-capabilities, 31-identify-business-objects]
+          outputs: [capabilities.yaml, business-objects/]
+          gate:
+            checklist: gate-3-capabilities
+            approver: expert métier
+            blocking: true
+            rationale: >
+              Le gate le plus important de la méthode. Depuis la v0.4 il se tient
+              APRÈS la revue de la STD, donc devant un expert qui vient de lire
+              la carte technique.
+
+        - agent: elucidator
+          tasks: [40-elucidate-usecases, 41-extract-business-rules, 43-classify-iso25010]
+          order_by: hotspot_rank
+          outputs: ["claims/ (draft)"]
+          budget_rule: >
+            Quand le budget s'épuise, on s'arrête sur une capacité TERMINÉE
+            plutôt que d'en laisser six à moitié faites.
+
+        - agent: challenger
+          model: opus
+          tasks: [50-challenge-claim]
+          angles: [preuve_trahie, exhaustivite, garde, feature_flag, transaction, code_mort, concurrence]
+
+        - agent: test-forger
+          tasks: [51-forge-characterization-test]
+          note: "seul chemin vers V"
+
+        - agent: diagram-planner
+          tasks: [60-plan-diagrams]
+
+        - agent: writer-sfd
+          tasks: [64-render-sfd]
+
+      gate:
+        checklist: revue-cycle-2-sfd
+        approver: [analyste, référent métier]
+        blocking: true
+        allows: [corrections, complements]
+
+    # ---------------------------------------------------------------- cycle 3
+    - id: 3-sfg
+      label: "Spécification fonctionnelle générale"
+      unit: use_case
+      requires: "sfd figée"
+      produces: "dmad-output/sfg/<domaine>.md"
+      steps:
+
+        - agent: archaeologist
+          tasks: [42-reconstruct-intent]
+          ceiling: H
+
         - agent: curator
-          tasks: [70-compute-coverage]
+          task: "contrôle de cohérence de la SFD"
+          blocking: true
+          rule: >
+            Toute contradiction non résolue dans la SFD BLOQUE la production de
+            la SFG. Elle ne la dégrade pas, elle la bloque : une contradiction
+            laissée en SFD devient une promesse fausse faite à l'utilisateur, et
+            son lecteur n'a aucun moyen de la détecter.
+            Une contradiction se tranche DANS LE CODE, pas dans la SFD — deux
+            sections contradictoires sont souvent vraies toutes les deux, à deux
+            moments différents du traitement.
+
+        - agent: elucidator
+          task: "arbitrage des règles partagées, traduction du vocabulaire"
+
+        - agent: challenger
+          model: opus
+          tasks: [50-challenge-claim]
+          angles: [promesse]
+
+        - agent: writer-sfg
+          tasks: [65-render-sfg]
+
+      gate:
+        checklist: revue-cycle-3-sfg
+        approver: utilisateur métier
+        blocking: true
+        allows: [corrections, complements]
+        note: >
+          C'est la seule séance où une intention peut monter de H à C, par
+          validation humaine tracée. C'est son principal intérêt.
+
+    # ---------------------------------------------------------------- clôture
+    - id: cloture
+      agent: curator
+      tasks: [70-compute-coverage]
       outputs: [dmad-output/]
       gate:
         checklist: release-readiness
         approver: commanditaire
         blocking: true
 
-    - id: 7-maintien
+    - id: maintien
       agent: curator
       tasks: [71-check-freshness]
       recurring: true
+      rule: >
+        La péremption se propage vers le haut : une claim de STD périmée périme
+        les sections de SFD qui en dérivent, et ainsi de suite.

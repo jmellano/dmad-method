@@ -14,6 +14,8 @@ mvn -q -DskipTests dependency:go-offline   # ou : mvn -q -DskipTests compile
 java -version                              # la version du JDK doit correspondre au projet
 ```
 
+> **Le protocole de démarrage de l'indexeur et ses quatre causes d'échec cumulées sont dans le skill embarqué [`code-intelligence-java`](../skills/code-intelligence-java/SKILL.md).** À lire avant la première invocation, pas après le premier échec : un indexeur qui répond vide au premier appel n'est pas en panne, il chauffe — et conclure trop vite fait basculer tout le run en mode dégradé pour rien.
+
 | Symptôme | Conséquence | Que faire |
 |---|---|---|
 | Le projet ne compile pas | LSP dégradé ou muet | tenter la compilation ; sinon **basculer en mode dégradé et l'annoncer au gate 0** |
@@ -85,6 +87,43 @@ Les hiérarchies à 4-5 niveaux sont fréquentes dans les legacy Java. Une règl
 ### La réflexion et les usines
 `Class.forName()`, `ServiceLoader`, dispatch par chaîne dans une `Map<String, Handler>`. Même traitement que l'IoC : candidats + question ouverte.
 
+## La résolution des contrats sortants
+
+Un appel HTTP sortant vers un autre module d'un même système d'information porte en général un **code de contrat**. C'est la clé d'entrée de son exploitation : propriétaire, supervision, contrat. La task 13 en fait un nœud `ExternalContract`, feuille du graphe.
+
+**Le code se lit à quatre endroits de fiabilité très inégale**, et le barreau atteint détermine la confiance :
+
+| Barreau | Où | Confiance |
+|---|---|---|
+| 1 | l'annotation de contrat sur l'interface exposée du module appelé, **dans l'artefact de la dépendance** | `V` |
+| 2 | la Javadoc de l'interface de dépendance, générée depuis la même source | `C` |
+| 3 | un commentaire manuscrit dans le code appelant | `I` |
+| 4 | le placeholder | — |
+
+**Le chemin d'accès est le point délicat.** Le code appelant n'importe pas l'interface annotée : il importe une interface de service applicatif qui ne porte aucune annotation. La chaîne générée typique compte trois ou quatre maillons entre l'import et l'annotation. Le motif de nommage se déclare dans `scope.yaml` au gate 0 — sans lui, la résolution retombe au barreau 3.
+
+**Ce que le LSP ne peut pas faire ici.** L'annotation vit dans un `-sources.jar` du dépôt Maven local, **hors du workspace indexé**. Aucun outil de navigation sémantique ne la trouvera : c'est du grep sur archive.
+
+`unzip` n'est pas garanti présent sur un poste agent. Passer par Python :
+
+```python
+import zipfile, pathlib, re
+root = pathlib.Path.home() / ".m2/repository" / GROUP_PATH
+pat  = re.compile(ANNOTATION_REGEX)          # déclaré dans scope.yaml
+for jar in root.rglob("*-sources.jar"):
+    z = zipfile.ZipFile(jar)
+    for name in z.namelist():
+        if name.endswith(EXPOSED_INTERFACE_SUFFIX):
+            for code in pat.findall(z.read(name).decode("utf-8", "replace")):
+                print(code, jar.name, name.split("/")[-1])
+```
+
+**Deux mises en garde.**
+
+L'échelle vaut pour les appels **sortants**. Les points d'entrée du module étudié n'ont pas d'artefact dans le dépôt local — un module ne dépend pas de sa propre API. Pour documenter les contrats entrants, lire les sources du module lui-même. Chercher un artefact qui n'existe pas coûte longtemps.
+
+**Le module appelé est figé à la version de la dépendance.** L'artefact lu porte un numéro qui n'est pas celui du module étudié : un code relevé décrit le contrat **tel que le module étudié le consomme**, pas tel que le module appelé le publie aujourd'hui. C'est pourquoi `artifact_version` est obligatoire sur le nœud.
+
 ## Les tests de caractérisation en Java
 
 Terrain favorable : JUnit 5 + AssertJ + Mockito, et Testcontainers quand une base est nécessaire.
@@ -127,3 +166,6 @@ Trois sources, à croiser :
 - [ ] Configuration de production accessible (profils, flags) — **sinon l'anti-pattern A3 est garanti**
 - [ ] Rapport de couverture si un build le produit
 - [ ] Vocabulaire métier d'amorce collecté auprès d'un humain, pas déduit du code
+- [ ] **Convention de contrat d'API déclarée** — quelle annotation, quel suffixe d'interface exposée, quel groupe d'artefacts. Sans elle, la résolution des contrats retombe au barreau 3
+- [ ] **Corpus visé décidé** — STD seule, jusqu'à la SFD, ou complet
+- [ ] **Seuils de lisibilité** actés (défaut : N ≤ 12, E ≤ 15, McCabe ≤ 10)

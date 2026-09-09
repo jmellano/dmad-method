@@ -1,6 +1,6 @@
 # DMAD
 
-**Documentation Method for Agentic Discovery** — une méthode agentique pour reconstruire, depuis un code legacy, une documentation **fonctionnelle et technique** dont chaque affirmation est prouvée, datée et vérifiable.
+**Documentation Method for Agentic Discovery** — une méthode agentique pour reconstruire, depuis un code legacy, un **corpus de trois documents en cascade d'abstraction** — technique, fonctionnel détaillé, fonctionnel général — dont chaque affirmation est prouvée, datée et vérifiable.
 
 > DMAD est le pendant inverse de [BMAD](https://github.com/bmad-code-org/BMAD-METHOD).
 > BMAD descend d'une intention vers du code. DMAD remonte d'un code vers une intention.
@@ -16,6 +16,21 @@ Demander à un LLM de documenter un legacy produit en quelques minutes une docum
 
 Tout DMAD est construit autour de ce risque unique. Les treize façons dont il se manifeste sont cataloguées dans [les anti-patterns](docs/10-antipatterns.md) ; chaque garde-fou de la méthode répond à l'un d'eux.
 
+## Le corpus
+
+```
+code ──────► STD ──────► SFD ──────► SFG
+             technique    fonctionnel   métier
+             détaillée    détaillée     générale
+
+             un point     un arbre de   un cas
+             d'entrée     business obj. d'usage
+```
+
+Chaque document est **l'abstraction du précédent**, et **aveugle à l'étage n−2** : la SFD ne lit pas le code, la SFG ne lit ni le code ni la STD. Ce n'est pas trois rendus du même graphe — c'est une suite, et c'est ce qui garantit qu'un niveau abstrait n'est pas une seconde lecture indépendante qui divergera.
+
+**Aucun des trois ne contient de bloc de code.** La STD porte des références ; les deux autres ignorent jusqu'à l'existence du code.
+
 ## Les quatre idées
 
 1. **Aucune affirmation sans preuve.** Chaque phrase porte ses `evidence` : `fichier:lignes`, commit, test, migration, trace. Contrôlé mécaniquement — une claim sans preuve est refusée à l'écriture.
@@ -23,22 +38,18 @@ Tout DMAD est construit autour de ce risque unique. Les treize façons dont il s
 3. **L'inconnu est un livrable.** Le registre des questions ouvertes est l'ordre du jour de l'atelier métier, et souvent le livrable le plus rentable du run.
 4. **Un agent adversarial garde la porte.** Le `Challenger` ne rédige rien : son seul métier est de faire tomber les affirmations des autres. Seul un test de caractérisation qui passe fait monter une claim au niveau maximal.
 
-## Le pipeline
+## Le pipeline — trois cycles
 
 ```
-Scoper ─⛔─► Surveyor ─► Cartographer ─► Carver ─⛔─► Elucidator ─┐
- cadrage    inventaire     graphe       capacités  cas d'usage   │
-                                                  Archaeologist ─┤
-                                                     intention   ▼
-                                                             Challenger
-                                                             Test Forger
-                                                                  │
-                                                                 ⛔
-                                                                  ▼
-                                    Diagram Planner ─► Writers ─► Curator
+Cycle 0   Scoper ─⛔─►
+Cycle 1   Surveyor ─► Cartographer ─► Contract Resolver ─► Challenger ─► Writer:STD ─⛔─►
+Cycle 2   Carver ─⛔─► Elucidator ─► Challenger ─► Test Forger ─► Writer:SFD ─⛔─►
+Cycle 3   Archaeologist ─► Curator ─► Challenger ─► Writer:SFG ─⛔
 ```
 
-⛔ = gate humain bloquant. Les trois gates (quatre en `feature-scan`) empêchent quatre heures d'agents de partir dans la mauvaise direction.
+⛔ = gate ou revue humaine. Chaque cycle est scellé par une revue qui peut demander **corrections et compléments** ; le cycle suivant ne démarre pas sur un document non figé.
+
+**Le budget épuisé s'arrête sur un document terminé**, jamais au milieu d'un cycle. Une STD seule est un livrable qui se défend.
 
 ## Voir la méthode en action
 
@@ -51,12 +62,13 @@ Un run complet déroulé de bout en bout : le cadrage, le découpage validé par
 ```
 plugins/dmad/
 ├── .claude-plugin/plugin.json
-├── agents/         les 12 agents, exécutables
-├── skills/         /dmad-run — l'orchestrateur
+├── agents/         les agents, exécutables
+├── skills/         /dmad-run — l'orchestrateur — et deux prérequis embarqués
+│                   (code-intelligence-java, patterns-gof-cqrs)
 ├── .mcp.json       Serena, Sequential Thinking, Context7
 ├── docs/           la méthode : manifeste, phases, capabilities, graphe,
 │                   diagrammes, livrables, décisions, anti-patterns, profil Java
-├── tasks/          16 procédures opérationnelles
+├── tasks/          20 procédures opérationnelles
 ├── templates/      gabarits de sortie
 ├── checklists/     les gates et les definitions of done
 ├── workflows/      full-scan et feature-scan
@@ -70,13 +82,13 @@ plugins/dmad/
 | | |
 |---|---|
 | [01 — Manifeste](docs/01-manifeste.md) | pourquoi, 10 principes, échelle de confiance |
-| [02 — Méthode](docs/02-methode.md) | les 8 phases, les gates, les modes, le routage des modèles |
+| [02 — Méthode](docs/02-methode.md) | le corpus, les trois cycles, les gates, les modes, le routage des modèles |
 | [03 — Agents](docs/03-agents.md) | le casting, les périmètres de lecture, les plafonds |
 | [04 — Capabilities](docs/04-capabilities.md) | contrats outils, dégradation, matrice agents × capabilities |
 | [05 — Knowledge Graph](docs/05-knowledge-graph.md) | schéma, format des claims, séparation fait/intention |
-| [06 — Diagrammes](docs/06-diagrammes.md) | catalogue de 13 vues, règles anti-hairball |
-| [07 — Livrables](docs/07-livrables.md) | arborescence de sortie, les trois artefacts qui font la différence |
-| [08 — Décisions](docs/08-decisions.md) | 10 arbitrages, ce qui a été écarté et pourquoi |
+| [06 — Diagrammes](docs/06-diagrammes.md) | les quatre diagrammes cardinaux, seuils paramétrables, règles anti-hairball |
+| [07 — Livrables](docs/07-livrables.md) | les trois documents, les dix-sept sections de la STD, les artefacts qui font la différence |
+| [08 — Décisions](docs/08-decisions.md) | les arbitrages, ce qui a été écarté et pourquoi — dont D15 à D22 |
 | [10 — Anti-patterns](docs/10-antipatterns.md) | les 13 défaillances de la rétro-doc, et leur parade |
 | [11 — Glossaire](docs/11-glossaire.md) | le vocabulaire de la méthode |
 | [09 — Mettre en œuvre](docs/09-usage.md) | installation, correspondance avec Claude Code, coût, confidentialité |
@@ -114,7 +126,7 @@ Un principe qui n'est pas contraint par un schéma est un vœu pieux : `tools/va
 
 ## État
 
-**v0.2 — méthode spécifiée et outillée.** Ce qui manque est le seul jalon qui compte : **un run sur un vrai legacy**. Tant qu'il n'a pas eu lieu, DMAD est une spécification cohérente — ce qui ne prouve rien. Voir [l'état et la suite](docs/12-roadmap.md).
+**v0.4 — corpus à trois documents spécifié.** Ce qui manque est le seul jalon qui compte : **un run sur un vrai legacy**. Tant qu'il n'a pas eu lieu, DMAD est une spécification cohérente — ce qui ne prouve rien. Voir [l'état et la suite](docs/12-roadmap.md).
 
 ## Filiation
 

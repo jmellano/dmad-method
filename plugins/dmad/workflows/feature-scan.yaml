@@ -10,7 +10,9 @@ workflow:
     - "scope.mode == feature-scan"
     - "scope.perimeter.feature.vocabulary contient >= 3 termes"
 
-  phases:
+  corpus: "scope.corpus"
+
+  cycles:
 
     - id: 0-cadrage
       agent: scoper
@@ -21,6 +23,7 @@ workflow:
         approver: commanditaire
         blocking: true
 
+    # -------------------------------------------------------------- cycle 1
     - id: 1-reconnaissance
       agent: surveyor
       model: haiku
@@ -48,7 +51,7 @@ workflow:
           la mauvaise direction. C'est le meilleur rapport coût/valeur de tout
           le workflow.
 
-    - id: 2-cartographie
+    - id: 1a-cartographie
       agent: cartographer
       model: haiku
       tasks: [20-build-graph]
@@ -56,71 +59,47 @@ workflow:
       bounded_by: "scope.budget.max_traversal_depth"
       outputs: [graph/, boundaries.yaml]
 
-    - id: 3-decoupage
-      agent: carver
-      model: opus
-      tasks: [30-carve-capabilities]
-      note: >
-        En feature-scan, le découpage porte sur les SOUS-capacités de la
-        feature. Il reste nécessaire : une "facturation" contient souvent
-        émission, avoirs, relances et export, qui ne se documentent pas ensemble.
-      outputs: [capabilities.yaml]
-      gate:
-        checklist: gate-3-capabilities
-        approver: expert métier
-        blocking: true
+    - id: 1c-contrats
+      agent: contract-resolver
+      model: haiku
+      tasks: [13-resolve-outbound-contracts]
+      inputs: ["graph/ (feuilles de type contract)"]
+      outputs: [contracts/]
 
-    - id: 4-elucidation
-      parallel:
-        - agent: elucidator
-          model: sonnet
-          tasks: [40-elucidate-usecases, 41-extract-business-rules]
-        - agent: archaeologist
-          model: sonnet
-          tasks: [42-reconstruct-intent]
-      order_by: hotspot_rank
-      outputs: [claims/ (draft)]
-
-    - id: 5-challenge
+    - id: 1d-restitution-std
       sequence:
         - agent: challenger
           model: opus
           tasks: [50-challenge-claim]
-          outputs: [challenges/, claims/ (arbitrées)]
-        - agent: test-forger
-          model: sonnet
-          tasks: [51-forge-characterization-test]
-          scope: "règles prioritaires uniquement (cf. task 51)"
-          outputs: [tests/characterization/, promotions]
-      gate:
-        checklist: gate-5-challenge
-        approver: [développeur, référent métier]
-        blocking: true
-
-    - id: 6-restitution
-      sequence:
         - agent: diagram-planner
           tasks: [60-plan-diagrams]
-        - parallel:
-            - agent: writer-functional
-              tasks: [61-render-functional-doc]
-            - agent: writer-technical
-              tasks: [62-render-technical-doc]
-        - agent: curator
-          tasks: [70-compute-coverage]
-      outputs: [dmad-output/]
+        - agent: writer-std
+          tasks: [63-render-std]
+      gate:
+        checklist: revue-cycle-1-std
+        approver: développeur
+        blocking: true
+        allows: [corrections, complements]
+
+    # Les cycles 2 et 3 sont identiques à ceux du full-scan — voir full-scan.yaml.
+    # Seule différence : chaque document porte en tête l'avertissement de périmètre.
+    - id: 2-sfd
+      same_as: "full-scan#2-sfd"
+      requires: "std figée"
+
+    - id: 3-sfg
+      same_as: "full-scan#3-sfg"
+      requires: "sfd figée"
+
+    - id: cloture
+      agent: curator
+      tasks: [70-compute-coverage]
       gate:
         checklist: release-readiness
         approver: commanditaire
         blocking: true
 
-    - id: 7-maintien
-      agent: curator
-      tasks: [71-check-freshness]
-      trigger: "CI, ou manuel"
-      recurring: true
-
-  mandatory_disclosure: >
-    En feature-scan, la documentation porte en tête l'avertissement que les
-    interactions hors périmètre n'ont pas été analysées, avec la liste des
-    frontières atteintes et non franchies (boundaries.yaml).
+  # Règle d'honnêteté propre au mode : chaque document du corpus porte en tête
+  # l'avertissement que les interactions hors périmètre n'ont pas été analysées,
+  # avec la liste des frontières atteintes et non franchies.
+  honesty_rule: "boundaries.yaml est publié dans les trois documents"
