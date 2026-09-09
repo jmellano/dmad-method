@@ -1,0 +1,8 @@
+{
+  "//": "Produit par le Surveyor en cycle 1. Mesures mécaniques, jamais estimées.",
+  "files":       {"reached": 412,  "total": 1847},
+  "functions":   {"reached": 3108, "total": 14200},
+  "entrypoints": {"reached": 8,    "total": 51},
+  "hotspots":    {"reached": 18,   "total": 20},
+  "tables":      {"reached": 12,   "total": 88}
+}

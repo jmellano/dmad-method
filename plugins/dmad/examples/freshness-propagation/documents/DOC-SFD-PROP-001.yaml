@@ -1,0 +1,12 @@
+# Ne publie que la claim FRAÎCHE. Doit néanmoins ressortir périmé, par héritage.
+id: DOC-SFD-PROP-001
+kind: SFD
+unit: business_object_tree
+unit_ref: BO-PROP-001
+path: "sfd/example.md"
+derives_from: [DOC-STD-PROP-001]
+feeds: [DOC-SFG-PROP-001]
+claims_rendered: [BR-PROP-002]
+confidence: I
+frozen_at: "2026-09-08T12:00:00Z"
+produced_by: writer-sfd

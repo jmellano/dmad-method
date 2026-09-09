@@ -108,5 +108,27 @@ else
 fi
 
 echo
+echo "== 7. La péremption remonte la cascade"
+out=$(python3 tools/freshness.py examples/freshness-propagation 2>&1)
+if grep -qE "DOC-SFG-PROP-001.*hérité" <<< "$out"; then
+  echo "   ok  une claim périmée en STD périme jusqu'à la SFG"
+else
+  echo "   ÉCHEC : la propagation n'a pas atteint la SFG"; fail=1
+fi
+if python3 tools/freshness.py examples/atlas-billing --strict > /dev/null; then
+  echo "   ok  le run de référence n'a rien de périmé"
+else
+  echo "   ÉCHEC : le run de référence devrait être frais"; fail=1
+fi
+
+echo
+echo "== 8. La couverture se calcule"
+if python3 tools/coverage.py examples/atlas-billing | grep -q "Contrats sortants résolus"; then
+  echo "   ok  contrats par barreau, niveaux de preuve, corpus produit"
+else
+  echo "   ÉCHEC : le rapport de couverture ne se calcule pas"; fail=1
+fi
+
+echo
 if [ "$fail" -eq 0 ]; then echo "✓ selftest OK"; else echo "✗ selftest en échec"; fi
 exit $fail

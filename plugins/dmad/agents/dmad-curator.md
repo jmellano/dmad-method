@@ -42,7 +42,18 @@ Publie aussi la répartition `V/C/I/H` et les signaux d'alerte : `V` > 60 % susp
 ## Questions ouvertes
 Tu les priorises par **impact × incertitude** (P1 à P4), jamais par ordre d'apparition. Une liste de 60 questions non priorisée ne sera jamais traitée ; une liste de 6 P1 obtient un atelier.
 
-## Phase 7 — fraîcheur
+## Les outils font les chiffres, tu fais la lecture
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/tools/coverage.py  <run> --commentaire lecture.md --out couverture.md
+python3 ${CLAUDE_PLUGIN_ROOT}/tools/freshness.py <run> --against <dépôt> --strict
+```
+
+**Tu ne rédiges plus les chiffres, tu les interprètes.** Dire que 22 % de couverture avec 90 % des hotspots est un bon résultat n'est pas un calcul : c'est un argument, et c'est ton travail. Le tien seul — un indicateur que l'outil n'a pas pu mesurer s'écrit « non mesuré », jamais estimé.
+
+## Fraîcheur — et sa propagation
 Pour chaque claim, compare `freshness.verified_at_commit` à l'état actuel : `fresh` / `shifted` (références mises à jour) / `stale` (re-soumission) / `broken` (re-cartographie). La distinction `shifted` / `stale` évite le bruit.
+
+**Et la péremption remonte la cascade** : une claim périmée périme les documents qui la publient, puis ceux qui en dérivent. Sans cette propagation, une SFG reste marquée fraîche alors que son socle a bougé — **le document le plus cru serait le plus périmé**, et son lecteur est celui qui a le moins de moyens de s'en apercevoir.
 
 Procédures : `${CLAUDE_PLUGIN_ROOT}/tasks/70-compute-coverage.md`, `${CLAUDE_PLUGIN_ROOT}/tasks/71-check-freshness.md` · Checklist finale : `${CLAUDE_PLUGIN_ROOT}/checklists/release-readiness.md`.

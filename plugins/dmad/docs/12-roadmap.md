@@ -31,14 +31,17 @@
 
 ## Ce qui reste à construire
 
+### Fait en v0.4
+
+- **Invariants contraints** — D16, D17, D18, D19, D20 et R1/R3 sont vérifiés par `validate.py` et `check-corpus.py`, avec vingt-huit fixtures de non-régression. Chaque message nomme la décision qu'il applique.
+- **Schémas des nouveaux types** — `ExternalContract`, `BusinessObject`, `Document`.
+- **Corpus du run de référence** — `examples/atlas-billing` produit STD, SFD et SFG.
+- **`diagram-engine`** — les diagrammes sont rendus depuis un plan, comptés, et refusés au-delà du seuil. Un diagramme retouché à la main est détecté.
+- **`freshness.py`** — avec la propagation de la péremption vers le haut.
+- **Calcul de la couverture** — les chiffres calculés, l'interprétation écrite.
+
 ### Prioritaire (nécessaire au premier run réel)
-- **Contrainte mécanique des invariants v0.4** — D16 (aucun bloc de code), D17 (tout étage référence l'étage inférieur) et l'obligation de `artifact_version` sont **écrits mais pas encore contrôlés par `validate.py`**. Tant que c'est le cas, ce sont des consignes, pas des garde-fous — et le manifeste dit qu'un principe non contraint par un schéma est un vœu pieux
-- **Schémas des nouveaux types** — `ExternalContract`, `BusinessObject`, `Document` ; leur sérialisation relève du chantier OKF (D22), mais leur validation ne peut pas l'attendre
-- **Corpus du run de référence** — `examples/atlas-billing` rend encore l'ancienne arborescence `fonctionnel|technique`
-- **Implémentation du `diagram-engine`** — le contrat est défini, le rendu ne l'est pas
-- **`freshness.py`** — la phase 7 est spécifiée, l'outil n'existe pas
 - **Adaptateurs `code-intelligence`** — au minimum Serena/LSP et le mode dégradé tree-sitter
-- **Calcul automatique de la couverture** — aujourd'hui décrit, pas implémenté
 
 ### Ensuite
 - **Calibration de l'échelle.** Les seuils (3 signaux sur 4, 15–30 % de findings, mapping en pourcentage) sont des conventions raisonnées, pas des mesures. À éprouver puis ajuster.

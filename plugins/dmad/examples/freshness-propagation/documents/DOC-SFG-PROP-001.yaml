@@ -1,0 +1,12 @@
+# Ne publie aucune claim périmée et ne connaît même pas la STD.
+# C'est précisément pour lui que la propagation existe.
+id: DOC-SFG-PROP-001
+kind: SFG
+unit: use_case
+unit_ref: CU-01
+path: "sfg/example.md"
+derives_from: [DOC-SFD-PROP-001]
+claims_rendered: [BR-PROP-002]
+confidence: H
+frozen_at: "2026-09-08T14:00:00Z"
+produced_by: writer-sfg
