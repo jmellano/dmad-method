@@ -5,13 +5,15 @@
 
 ## Vue d'ensemble
 
-| Partie | Objet | Dépend de | Poids |
-|---|---|---|---|
-| **A** | Achever la v0.4 — contraindre ce qu'elle a écrit | — | moyen |
-| **B** | Couche de preuve OKF | A2 | moyen |
-| **C** | Outil `jcallgraph` | — | lourd, parallélisable |
-| **D** | Dette ouverte de la v0.3, aggravée par la cascade | — | à trancher, pas à coder |
-| **E** | Le premier run réel | A minimal | le seul jalon qui compte |
+| Partie | Objet | Dépend de | Poids | Spec détaillée |
+|---|---|---|---|---|
+| **A** | Achever la v0.4 — contraindre ce qu'elle a écrit | — | moyen | [partie A](2026-09-09-partie-A-achever-v04.md) |
+| **B** | Couche de preuve OKF | A2 | moyen | [partie B](2026-09-09-partie-B-couche-preuve-okf.md) |
+| **C** | Outil `jcallgraph` | — | lourd, parallélisable | [partie C](2026-09-09-partie-C-jcallgraph.md) |
+| **D** | Dette ouverte de la v0.3, aggravée par la cascade | — | à trancher, pas à coder | [partie D](2026-09-09-partie-D-dette-ouverte.md) |
+| **E** | Le premier run réel | A1, A2 | le seul jalon qui compte | [partie E](2026-09-09-partie-E-premier-run-reel.md) |
+
+**Ce document est la vue d'ensemble.** Chaque partie a sa spec détaillée, autonome, avec ses lots, ses critères de fin et ses questions ouvertes. Les sections ci-dessous en sont le résumé.
 
 **L'ordre recommandé est A1 → A2 → E (sur un point d'entrée) → B ∥ C → A3-A6.** La raison est dans la partie E : tant qu'aucun run réel n'a eu lieu, tout le reste est de l'investissement à l'aveugle, et A1 est ce qui rend un run réel *évaluable*.
 
