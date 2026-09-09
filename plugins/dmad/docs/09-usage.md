@@ -28,8 +28,8 @@ claude plugin validate /chemin/vers/dmad-method          # le marketplace
 
 | | |
 |---|---|
-| 12 agents | `dmad-scoper`, `dmad-surveyor`, … chacun avec son périmètre de lecture et son modèle |
-| 1 skill | `/dmad-run` — orchestre le pipeline et tient les gates |
+| 15 agents | `dmad-scoper`, `dmad-surveyor`, … chacun avec son périmètre de lecture et son modèle |
+| 3 skills | `/dmad-run` orchestre ; `code-intelligence-java` et `patterns-gof-cqrs` sont des prérequis lus à la demande |
 | Config MCP | Serena (LSP), Sequential Thinking, Context7 |
 | Le corpus | `docs/`, `tasks/`, `templates/`, `checklists/`, `schemas/`, `workflows/`, `examples/` |
 | Les outils | `tools/validate.py`, `tools/selftest.sh` |
@@ -51,7 +51,9 @@ Les agents référencent le corpus via `${CLAUDE_PLUGIN_ROOT}` : les procédures
 
 ## Le cas des rédacteurs
 
-DMAD exige que `dmad-writer-functional` et `dmad-writer-technical` **n'aient pas accès au code**. Trois niveaux d'application, du plus fort au plus faible :
+DMAD exige que les trois rédacteurs **n'aient pas accès au code**, et que chacun soit en outre aveugle à l'étage n−2 de la cascade : `dmad-writer-sfd` ne lit que la STD figée et les claims, `dmad-writer-sfg` ne lit que la SFD figée.
+
+Trois niveaux d'application, du plus fort au plus faible :
 
 1. **Retrait des outils d'exploration** — `disallowedTools: Grep, Glob, Bash` dans le frontmatter. Livré tel quel par le plugin.
 2. **Règles de permission `deny`** sur les chemins sources, dans le `.claude/settings.json` du projet analysé. **À adapter au projet** : voir `settings.example.json`, dont les chemins sont des exemples.
@@ -78,24 +80,29 @@ Trois MCP seulement, et **c'est délibéré** : chaque serveur consomme du conte
 
 Le modèle fort est payé **là où l'erreur coûte le plus**, pas là où le volume est le plus gros.
 
-| Phase | Modèle | Part attendue du coût |
-|---|---|---|
-| 1 Reconnaissance | haiku | faible |
-| 2 Cartographie | haiku | moyenne — beaucoup d'appels LSP |
-| 3 Découpage | **opus** | faible en volume, fort en valeur |
-| 4 Élucidation | sonnet | **le plus gros poste** |
-| 5 Challenge | **opus** | moyen — le maillon qui protège tout |
-| 6 Restitution | sonnet | moyen |
+| Cycle | Étape | Modèle | Part attendue du coût |
+|---|---|---|---|
+| 1 | Reconnaissance | haiku | faible |
+| 1 | Cartographie | haiku | moyenne — beaucoup d'appels LSP |
+| 1 | Contrats sortants | haiku | faible — lecture d'archive |
+| 1 | Challenge + rédaction STD | opus, sonnet | moyen |
+| 2 | Découpage | **opus** | faible en volume, fort en valeur |
+| 2 | Élucidation | sonnet | **le plus gros poste** |
+| 2 | Challenge | **opus** | moyen — le maillon qui protège tout |
+| 2 | Rédaction SFD | sonnet | moyen |
+| 3 | Intention + rédaction SFG | sonnet | faible |
+
+**Un run `corpus: [std]` ne paie que les quatre premières lignes** — c'est le moyen le moins cher de mesurer les proportions réelles avant de s'engager sur le corpus complet.
 
 **Ces proportions n'ont pas été mesurées sur un run réel** — c'est le premier chiffre à établir (cf. [roadmap](12-roadmap.md)).
 
 ## Parallélisation
 
 Deux endroits, et deux seulement :
-- **Phase 4** — `elucidator` et `archaeologist` sur la même capacité ; et plusieurs capacités en parallèle.
-- **Phase 6** — les deux rédacteurs, qui consomment le même graphe figé.
+- **Cycle 1** — plusieurs points d'entrée en parallèle : chaque STD est un document indépendant.
+- **Cycle 2** — plusieurs capacités en parallèle, une fois le gate 3 passé.
 
-**Le reste est séquentiel par nécessité** : chaque phase consomme la sortie validée de la précédente. Paralléliser le Challenger avec l'Elucidator reviendrait à réfuter des claims encore en cours d'écriture.
+**Le reste est séquentiel par nécessité**, et la v0.4 le rend plus strict encore : les trois rédacteurs ne peuvent pas travailler en parallèle, puisque chacun lit le document figé du cycle précédent. Paralléliser le Challenger avec l'Elucidator reviendrait à réfuter des claims encore en cours d'écriture.
 
 ## Confidentialité
 

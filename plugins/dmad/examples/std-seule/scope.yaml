@@ -1,0 +1,102 @@
+# Cadrage minimal : UN point d'entrée, la STD seule.
+# Le plus petit run DMAD qui produise un livrable défendable.
+#
+# Copier dans le dépôt legacy, remplacer ce qui est entre chevrons, puis /dmad-run.
+# Valider avant de lancer :
+#   python3 <plugin>/tools/validate.py .
+
+run_id: "<AAAA-MM-JJ>-<point-entree>-std"
+created_at: "<AAAA-MM-JJTHH:MM:SSZ>"
+
+objective:
+  # La réponse à : dans trois semaines, que devez-vous pouvoir faire
+  # que vous ne pouvez pas faire aujourd'hui ? Minimum 20 caractères,
+  # et une réponse sérieuse — elle oriente tout le run.
+  statement: >
+    Pouvoir modifier <le point d'entrée> sans passer trois jours à
+    ré-investiguer ce qu'il fait et ce qu'il appelle.
+  kind: maintain          # evolve | maintain | decide_refactor | audit | onboard | migrate
+
+mode: feature-scan
+
+# On ne demande que la STD. La cascade est ordonnée : ajouter sfd exigerait
+# que la STD soit figée par une revue humaine, et sfg que la SFD le soit.
+corpus: [std]
+
+perimeter:
+  repositories:
+    - "<chemin ou nom du dépôt>"
+  include:
+    - "<module>/src/main/java"
+  exclude:
+    - path: "**/generated/**"
+      reason: "code généré — aucune intention métier à y reconstruire"
+    - path: "**/src/test/**"
+      reason: "hors périmètre du cycle 1 ; relu au cycle 2 comme source de règles"
+  feature:
+    label: "<nom du traitement, en vocabulaire métier>"
+    # known_entrypoints renseigné ⇒ l'étape de localisation et son gate sont sautés.
+    # On sait déjà où regarder : le run démarre directement sur la cartographie.
+    known_entrypoints:
+      - "<FQCN ou nom du job/route/consumer>"
+    # vocabulary n'est pas requis quand known_entrypoints est fourni — le schéma
+    # accepte l'un ou l'autre. Mais il en faudra au moins trois pour enchaîner sur
+    # la SFD : c'est avec eux qu'on nomme les business objects.
+    # vocabulary: ["<terme 1>", "<terme 2>", "<terme 3>"]
+
+profile:
+  language: java
+  build_tool: maven
+  jdk_version: "<17>"
+  contract_convention:
+    # Sans ce bloc, la résolution des contrats sortants retombe au barreau 3 —
+    # le commentaire manuscrit, qui survit aux refactorings et ment alors sans le dire.
+    annotation: "<paquet.qualifie.Annotation>"
+    code_pattern: "<SIM_[A-Z]{3}_[A-Z]{3}_[0-9]{3}>"
+    exposed_interface_suffix: "<ExposeWebService>"
+    artifact_group_path: "<groupe/sous-groupe>"     # sous ~/.m2/repository
+    resolution_chain:
+      - "<XxxExpose>"
+      - "<XxxExposeImpl>"
+      - "<XxxExposeServiceAdapter>"
+      - "<XxxExposeWebService>"
+
+diagram_thresholds:
+  max_nodes: 12
+  max_edges: 15
+  max_mccabe: 10
+  max_sequence_participants: 12
+
+budget:
+  max_traversal_depth: 5
+  max_wall_clock_minutes: 180
+
+sources:
+  git_history: full           # full | truncated | none
+  issue_tracker: null
+  wiki: null
+  adr: null
+  runtime_evidence: [none]    # coverage | traces | logs | none
+  humans:
+    - role: "<développeur qui connaît le traitement>"
+      domains: ["<le domaine>"]
+
+capabilities_available:
+  code-intelligence:
+    implementation: serena
+    confidence_ceiling: V     # abaisser à I si les dépendances ne résolvent pas
+    status: available
+  repo-history:
+    implementation: git
+    confidence_ceiling: V
+    status: available
+  runtime-evidence:
+    implementation: none
+    confidence_ceiling: I
+    status: unavailable
+
+confidentiality:
+  level: internal             # public | internal | confidential | restricted
+  local_only: false
+
+# gate_0 est rempli PAR la validation humaine, pas avant. Le laisser absent.

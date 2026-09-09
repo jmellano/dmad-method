@@ -4,90 +4,222 @@
   "title": "DMAD Scope",
   "description": "Cadrage d'un run. Produit par le Scoper, validé au gate 0. Rien ne démarre sans ce fichier.",
   "type": "object",
-  "required": ["run_id", "objective", "mode", "perimeter", "budget", "sources", "confidentiality"],
+  "required": [
+    "run_id",
+    "objective",
+    "mode",
+    "perimeter",
+    "budget",
+    "sources",
+    "confidentiality"
+  ],
   "additionalProperties": false,
   "properties": {
-    "run_id": { "type": "string" },
-    "created_at": { "type": "string", "format": "date-time" },
+    "run_id": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
     "objective": {
       "type": "object",
-      "required": ["statement", "kind"],
+      "required": [
+        "statement",
+        "kind"
+      ],
       "description": "La réponse à : dans trois semaines, que devez-vous pouvoir faire que vous ne pouvez pas faire aujourd'hui ?",
       "properties": {
-        "statement": { "type": "string", "minLength": 20 },
+        "statement": {
+          "type": "string",
+          "minLength": 20
+        },
         "kind": {
-          "enum": ["evolve", "maintain", "decide_refactor", "audit", "onboard", "migrate"],
+          "enum": [
+            "evolve",
+            "maintain",
+            "decide_refactor",
+            "audit",
+            "onboard",
+            "migrate"
+          ],
           "description": "Oriente la priorisation de tout le run."
         }
       }
     },
-    "mode": { "enum": ["full-scan", "feature-scan"] },
+    "mode": {
+      "enum": [
+        "full-scan",
+        "feature-scan"
+      ]
+    },
     "perimeter": {
       "type": "object",
-      "required": ["repositories", "include", "exclude"],
+      "required": [
+        "repositories",
+        "include",
+        "exclude"
+      ],
       "properties": {
-        "repositories": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-        "include": { "type": "array", "items": { "type": "string" } },
+        "repositories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "include": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "exclude": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["path", "reason"],
+            "required": [
+              "path",
+              "reason"
+            ],
             "properties": {
-              "path": { "type": "string" },
-              "reason": { "type": "string", "description": "Une exclusion se justifie et s'écrit. Jamais implicite." }
+              "path": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string",
+                "description": "Une exclusion se justifie et s'écrit. Jamais implicite."
+              }
             }
           }
         },
         "feature": {
           "type": "object",
-          "description": "Obligatoire en mode feature-scan.",
-          "required": ["label", "vocabulary"],
+          "description": "Obligatoire en mode feature-scan. Le vocabulaire est le levier de la localisation ; quand les points d'entrée sont déjà connus il peut attendre, mais il reste nécessaire au cycle 2 pour nommer les business objects.",
+          "required": [
+            "label"
+          ],
           "properties": {
-            "label": { "type": "string" },
+            "label": {
+              "type": "string"
+            },
             "vocabulary": {
               "type": "array",
-              "items": { "type": "string" },
+              "items": {
+                "type": "string"
+              },
               "minItems": 3,
               "description": "Vocabulaire métier d'amorce. Levier principal de la localisation."
             },
-            "known_entrypoints": { "type": "array", "items": { "type": "string" } }
-          }
+            "known_entrypoints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Points d'entrée déjà identifiés. Quand la liste est fournie, l'étape de localisation et son gate sont sautés — on sait déjà où regarder."
+            }
+          },
+          "anyOf": [
+            {
+              "required": [
+                "vocabulary"
+              ]
+            },
+            {
+              "required": [
+                "known_entrypoints"
+              ]
+            }
+          ]
         }
       }
     },
     "budget": {
       "type": "object",
-      "required": ["max_traversal_depth"],
+      "required": [
+        "max_traversal_depth"
+      ],
       "properties": {
-        "max_tokens": { "type": "integer" },
-        "max_wall_clock_minutes": { "type": "integer" },
-        "max_traversal_depth": { "type": "integer", "default": 5 },
-        "max_diagrams_per_capability": { "type": "integer", "default": 8 },
-        "characterization_tests_target": { "type": "integer" }
+        "max_tokens": {
+          "type": "integer"
+        },
+        "max_wall_clock_minutes": {
+          "type": "integer"
+        },
+        "max_traversal_depth": {
+          "type": "integer",
+          "default": 5
+        },
+        "max_diagrams_per_capability": {
+          "type": "integer",
+          "default": 8
+        },
+        "characterization_tests_target": {
+          "type": "integer"
+        }
       }
     },
     "sources": {
       "type": "object",
-      "required": ["git_history"],
+      "required": [
+        "git_history"
+      ],
       "properties": {
-        "git_history": { "enum": ["full", "truncated", "none"] },
-        "issue_tracker": { "type": ["string", "null"] },
-        "wiki": { "type": ["string", "null"] },
-        "adr": { "type": ["string", "null"] },
+        "git_history": {
+          "enum": [
+            "full",
+            "truncated",
+            "none"
+          ]
+        },
+        "issue_tracker": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "wiki": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "adr": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "runtime_evidence": {
           "type": "array",
-          "items": { "enum": ["coverage", "traces", "logs", "none"] }
+          "items": {
+            "enum": [
+              "coverage",
+              "traces",
+              "logs",
+              "none"
+            ]
+          }
         },
         "humans": {
           "type": "array",
           "description": "Les experts encore joignables et leur domaine. Détermine ce qui pourra sortir de H.",
           "items": {
             "type": "object",
-            "required": ["role", "domains"],
+            "required": [
+              "role",
+              "domains"
+            ],
             "properties": {
-              "role": { "type": "string" },
-              "domains": { "type": "array", "items": { "type": "string" } }
+              "role": {
+                "type": "string"
+              },
+              "domains": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
             }
           }
         }
@@ -99,29 +231,164 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
-          "implementation": { "type": "string" },
-          "confidence_ceiling": { "enum": ["V", "C", "I", "H"] },
-          "status": { "enum": ["available", "degraded", "unavailable"] }
+          "implementation": {
+            "type": "string"
+          },
+          "confidence_ceiling": {
+            "enum": [
+              "V",
+              "C",
+              "I",
+              "H"
+            ]
+          },
+          "status": {
+            "enum": [
+              "available",
+              "degraded",
+              "unavailable"
+            ]
+          }
         }
       }
     },
     "confidentiality": {
       "type": "object",
-      "required": ["level"],
+      "required": [
+        "level"
+      ],
       "description": "À trancher AVANT le premier appel d'outil.",
       "properties": {
-        "level": { "enum": ["public", "internal", "confidential", "restricted"] },
-        "local_only": { "type": "boolean", "default": false },
-        "forbidden_egress": { "type": "array", "items": { "type": "string" } },
-        "redaction_rules": { "type": "array", "items": { "type": "string" } }
+        "level": {
+          "enum": [
+            "public",
+            "internal",
+            "confidential",
+            "restricted"
+          ]
+        },
+        "local_only": {
+          "type": "boolean",
+          "default": false
+        },
+        "forbidden_egress": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "redaction_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
     "gate_0": {
       "type": "object",
       "properties": {
-        "approved_by": { "type": "string" },
-        "approved_at": { "type": "string", "format": "date-time" },
-        "notes": { "type": "string" }
+        "approved_by": {
+          "type": "string"
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "corpus": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "std",
+          "sfd",
+          "sfg"
+        ]
+      },
+      "minItems": 1,
+      "default": [
+        "std",
+        "sfd",
+        "sfg"
+      ],
+      "description": "Jusqu'où va le run. La cascade est ordonnée : sfd exige std, sfg exige sfd. Décidé au gate 0, pas en cours de route — le budget épuisé s'arrête sur un document terminé."
+    },
+    "diagram_thresholds": {
+      "type": "object",
+      "description": "Seuils de lisibilité (D15). Au-delà, on découpe en plusieurs diagrammes, on ne simplifie pas. Ce sont eux qui décident du nombre de niveaux d'abstraction de la SFD, donc de sa longueur.",
+      "additionalProperties": false,
+      "properties": {
+        "max_nodes": {
+          "type": "integer",
+          "default": 12
+        },
+        "max_edges": {
+          "type": "integer",
+          "default": 15
+        },
+        "max_mccabe": {
+          "type": "integer",
+          "default": 10
+        },
+        "max_sequence_participants": {
+          "type": "integer",
+          "default": 12
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "description": "Le langage et ses conventions locales. Sans contract_convention, la résolution des contrats sortants (task 13) n'a pas de cible et retombe au barreau 3 — le commentaire manuscrit, qui survit aux refactorings et ment alors sans le dire.",
+      "required": [
+        "language"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "language": {
+          "type": "string",
+          "description": "java, kotlin, cobol, plsql…"
+        },
+        "build_tool": {
+          "type": "string",
+          "description": "maven, gradle…"
+        },
+        "jdk_version": {
+          "type": "string"
+        },
+        "contract_convention": {
+          "type": "object",
+          "description": "À quoi reconnaît-on, dans CE dépôt, le contrat d'un appel sortant.",
+          "additionalProperties": false,
+          "properties": {
+            "annotation": {
+              "type": "string",
+              "description": "Nom qualifié de l'annotation porteuse du code"
+            },
+            "code_pattern": {
+              "type": "string",
+              "description": "Regex du code, ex. SIM_[A-Z]{3}_[A-Z]{3}_[0-9]{3}"
+            },
+            "exposed_interface_suffix": {
+              "type": "string",
+              "description": "Suffixe de l'interface annotée"
+            },
+            "artifact_group_path": {
+              "type": "string",
+              "description": "Sous-arborescence du dépôt local à explorer"
+            },
+            "resolution_chain": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Les maillons entre l'import du code appelant et l'interface annotée"
+            }
+          }
+        }
       }
     }
   }
