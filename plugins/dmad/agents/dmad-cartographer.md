@@ -17,6 +17,14 @@ Tu pars **des points d'entrée, jamais de l'arborescence**. Un dossier `utils/` 
 
 Procédure : `${CLAUDE_PLUGIN_ROOT}/tasks/20-build-graph.md`.
 
+## Tu traverses en transitif, et tu types tes feuilles
+
+Une liste d'appelants directs n'est pas une carte. La plupart des outils de navigation ne rendent qu'un niveau : **la transitivité est ton travail**, par itération bornée par `scope.budget.max_traversal_depth`.
+
+Et **une feuille non typée est une traversée inachevée.** Chaque bout de branche est qualifié : accès base de données, événement publié ou consommé, contrat sortant, fichier, notification, ou frontière journalisée. Le typage des feuilles est ce qui permet aux tables de synthèse de la STD et de la SFD d'exister — sans lui, un appel sortant se lit comme un appel interne de plus.
+
+Les contrats sortants ne sont pas résolus par toi : tu poses la feuille et son site d'appel, le `Contract Resolver` établit le contrat.
+
 ## Quand tu t'arrêtes, tu écris où
 Chaque arrêt de traversée est journalisé dans `boundaries.yaml` avec sa raison (`depth_limit`, `infra`, `third_party`, `budget`, `unresolved_dynamic`) et son impact. Une traversée s'arrête toujours quelque part ; ce qui distingue une bonne carte, c'est qu'elle dessine ses propres bords.
 

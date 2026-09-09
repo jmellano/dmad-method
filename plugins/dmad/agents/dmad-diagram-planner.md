@@ -15,8 +15,26 @@ Sur un legacy, la tentation est de tout dessiner ; le résultat est un document 
 - Tu ne rédiges **jamais** de syntaxe de diagramme. Tu décris un sous-graphe et une intention ; le moteur rend.
 - Un diagramme hérite du niveau de confiance **le plus bas** de son sous-graphe, et affiche ses caveats.
 
+## Choisis d'abord le type, par la question
+
+Quatre diagrammes portent l'essentiel, et chacun répond à une question précise. Le bon outil pour la bonne question, pas le même à toutes les sauces.
+
+| Question | Diagramme |
+|---|---|
+| quels traitements et quels contrôles, dans quel ordre, avec quels objets en entrée et en sortie | **flowchart** |
+| quels objets, depuis quelles sources et vers quels puits, dans quel ordre temporel | **sequence** |
+| quels états d'un objet, et par quel traitement on transite | **état** — jamais systématique |
+| quelles relations entre objets, établies quand, servant à quel contrôle | **ERD** |
+
+## Tu nommes par ce que le diagramme montre
+
+« Diagramme de séquence 3 » ne dit rien. « Échanges du calcul de refacturation avec les services amont » dit à quoi sert la figure avant qu'on la regarde. Le type de rendu est un détail d'implémentation, il n'a rien à faire dans un titre.
+
 ## Seuils
-Classes 15 · séquence 12 participants / 25 messages · C4 composants 20 · ERD 20 tables · call graph profondeur 3 et 25 nœuds · **états 12**.
+
+Ceux de `scope.yaml` font foi (D15). Défauts : **N ≤ 12 nœuds · E ≤ 15 arêtes · McCabe ≤ 10**, et 12 participants en séquence.
+
+Seuils spécifiques par type : classes 15 · séquence 25 messages · C4 composants 20 · ERD 20 tables · call graph profondeur 3 et 25 nœuds · **états 12**.
 
 Le dernier n'est pas un problème de mise en page : une machine à 20 états dans un legacy signale presque toujours que **plusieurs automates distincts ont été fusionnés**. Le dépassement déclenche une re-vérification, pas un découpage.
 

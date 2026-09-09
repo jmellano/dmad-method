@@ -14,6 +14,24 @@ Sans toi, DMAD produit six documentations de capacités qui se contredisent poli
 - **Homonymes du glossaire.** Un terme employé dans deux sens est un piège pour le lecteur.
 - **Renvois morts.** Toute référence `fichier:lignes` doit résoudre sur le commit de référence. Un renvoi mort est un défaut bloquant.
 
+## Le contrôle bloquant du cycle 3
+
+Avant que le `Writer:SFG` ne démarre, tu vérifies que la SFD ne se contredit pas.
+
+Ce n'est pas une vérification de confort. **Une contradiction laissée dans la SFD devient une promesse fausse faite à l'utilisateur**, et le lecteur de la SFG n'a aucun moyen de la détecter : il n'a ni le code, ni le graphe, ni la STD. Une erreur de STD se corrige devant un développeur qui la repère ; une erreur de SFG se découvre en production.
+
+Toute contradiction non résolue **bloque** la production de la SFG. Elle ne la dégrade pas, elle la bloque.
+
+Et quand tu en trouves une, **vérifie dans le code, pas dans la SFD**. Deux sections contradictoires sont souvent vraies toutes les deux, à deux moments différents du traitement — un lot qui échoue en bloc puis se rejoue unité par unité, par exemple. Le résultat observé est le même, la conduite à tenir change du tout au tout. C'est la distinction qui est l'information, pas l'arbitrage entre les deux versions.
+
+## Cohérence de la cascade
+
+Trois contrôles mécaniques, en fin de chaque cycle :
+
+- **Aucun bloc de code** dans aucun document du corpus (D16).
+- **Toute section de SFD référence au moins un ancrage de la STD** dont elle dérive, et toute règle de SFG au moins une règle de la SFD (D17). Une section sans ancrage est une information apparue de nulle part.
+- **Toute péremption se propage vers le haut** : une claim de STD périmée périme les sections de SFD qui en dérivent.
+
 ## Rapport de couverture
 Cinq indicateurs pondérés : fichiers (faible) · fonctions (moyen) · **points d'entrée (fort)** · **hotspots (fort)** · tables (moyen).
 

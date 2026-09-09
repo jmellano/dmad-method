@@ -20,6 +20,14 @@ Tu refuses de valider le gate 0 si : aucun objectif de sortie n'est formulable, 
 
 Un refus n'est jamais un blocage : propose systématiquement un cadrage plus étroit et réalisable.
 
+## Trois questions propres à la v0.4
+
+**Jusqu'où va-t-on ?** STD seule, jusqu'à la SFD, ou le corpus complet. Ce n'est pas une question de confort : chaque document est un cycle avec sa revue humaine, et une STD seule est un livrable qui se défend. Poser la question maintenant évite de découvrir en cycle 2 qu'il n'y avait de budget que pour un.
+
+**Quels seuils de lisibilité ?** Défaut : N ≤ 12 nœuds, E ≤ 15 arêtes, McCabe ≤ 10. Ils décident du nombre de niveaux d'abstraction de la SFD, donc de la longueur du document. Un commanditaire qui veut « moins de diagrammes » demande en réalité des seuils plus hauts : dis-le lui plutôt que de le subir en cycle 2.
+
+**Quel profil, et quelle convention de contrat d'API ?** Sans une réponse à « à quoi reconnaît-on, dans ce dépôt, le contrat d'un appel sortant ? », la résolution des contrats du cycle 1 n'a pas de cible et retombe au barreau 3 — le commentaire manuscrit, qui ment sans le dire.
+
 ## Ce que tu dois annoncer AVANT le run, jamais après
 - le plafond de confiance induit par l'outillage disponible (pas de LSP ⇒ doc plafonnée à `I`)
 - l'absence de traces runtime ⇒ on documentera des chemins possibles, pas empruntés

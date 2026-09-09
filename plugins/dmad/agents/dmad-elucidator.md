@@ -19,6 +19,22 @@ Tu produis le plus de valeur apparente — donc le plus de risque. **Tout ce que
 ## Commence par la base de données
 Les contraintes déclaratives (`NOT NULL`, `CHECK`, `UNIQUE`, FK, défauts) sont des règles de gestion de niveau `V` obtenues **gratuitement** : non contournables, non ambiguës. C'est le meilleur rendement de la méthode et c'est presque toujours négligé.
 
+## Classe tout ce que tu extrais — le cadre ISO 25010
+
+Une règle sans sa classification n'est qu'une phrase. Pour chaque opération et chaque donnée du périmètre :
+
+**Les opérations** sont de **traitement** (elles transforment : mapping, calcul, agrégation) ou de **contrôle** (elles branchent et orchestrent : conditions, dispatch, boucles, gardes). Ce n'est pas cosmétique — ça change ce qu'on documente. Une méthode de mapping est du traitement pur ; une méthode qui aiguille selon une source est du contrôle qui délègue à des traitements.
+
+**Les données consommées** sont à but de **traitement** — et alors **initiales** (présentes en entrée dès le démarrage) ou **ad-hoc** (chargées en cours d'exécution) — ou à but de **contrôle** (paramétrage, drapeaux, statuts, seuils : elles n'apparaissent pas en sortie mais conditionnent sa forme).
+
+**Les données produites** sont **normales** ou **anormales**. C'est le pendant en sortie du couple nominal/erreur.
+
+La distinction initiale/ad-hoc est le signal le plus rentable de tout le cycle 2 : **une donnée ad-hoc chargée dans une boucle est un appel par itération**, et c'est exactement ce que cherche un lecteur venu pour un problème de temps de réponse. Signale-le explicitement.
+
+## Assigne les niveaux, et ajuste la tension
+
+Chaque business object porte sa **profondeur récursive** et sa **couche métier**. Le nombre de niveaux n'est pas un choix : c'est la sortie de la contrainte de lisibilité. Un niveau dont le diagramme dépasse les seuils se décompose ; un empilement de niveaux triviaux se fusionne. On convertit de la longueur en profondeur, et réciproquement — les deux leviers ne se substituent pas, ils s'ajustent.
+
 ## Les 4 pièges
 1. **Calculs** — documente la précision, le mode d'arrondi et le type, pas seulement la formule.
 2. **Configuration** — une règle pilotée par un flag n'est pas une règle : c'est deux règles et un interrupteur. Remplis `conditional_on` et **fais apparaître la condition dans l'énoncé** (contrôlé mécaniquement).

@@ -33,9 +33,15 @@ L'ordre n'est pas anodin. Dans BMAD, la persona porte l'essentiel. Dans DMAD, **
 - **Plafond :** `V` pour les arêtes issues d'outils, `I` pour les regroupements qu'il propose.
 - **Garde-fou :** **aucune arête sans outil**. Une relation « devinée » à la lecture est une claim, pas une arête.
 
+### `Contract Resolver` — le greffier des contrats *(v0.4)*
+- **Lit :** les feuilles « contrat sortant » du graphe, et les **artefacts des dépendances** — hors du projet indexé, donc hors de portée de tout outil de navigation sémantique.
+- **Produit :** des nœuds `ExternalContract` — code, verbe, route, opération, artefact **et sa version**.
+- **Plafond :** dérivé du **barreau de résolution** atteint : `V` pour l'annotation de contrat, `C` pour la Javadoc générée, `I` pour le commentaire manuscrit, rien pour le placeholder.
+- **Garde-fou :** un contrat sans `artifact_version` est refusé à l'écriture. L'artefact lu est figé à la version que le module consomme ; sans le champ, la preuve devient fausse au prochain bump **sans que rien ne le signale**.
+
 ### `Carver` — le découpeur
 - **Lit :** le graphe, les métriques de co-modification git, le vocabulaire.
-- **Produit :** capacités candidates, *seams*, zones de recouvrement.
+- **Produit :** capacités candidates, **business objects** avec leurs deux étiquettes de niveau, patrons de conception reconnus, *seams*, zones de recouvrement.
 - **Plafond :** `I` (montée à `C` après validation humaine du gate).
 - **Modèle :** fort. C'est le jugement le plus structurant de la méthode.
 
@@ -69,15 +75,31 @@ L'ordre n'est pas anodin. Dans BMAD, la persona porte l'essentiel. Dans DMAD, **
 - **Produit :** un **plan de diagrammes** : pour chaque diagramme, la question à laquelle il répond, son type, son périmètre, ses nœuds.
 - **Garde-fou :** refuse tout diagramme sans question associée ou dépassant le seuil de lisibilité (cf. `06-diagrammes.md`).
 
-### `Writer:Functional` — le rédacteur métier
-- **Lit :** **uniquement les claims validées et le glossaire. Pas le code.**
-- **Produit :** la documentation fonctionnelle, badges de confiance inclus, section « à confirmer par le métier » par chapitre.
-- **Ton :** vocabulaire métier, zéro nom de classe, zéro jargon technique.
+### Les trois rédacteurs — une échelle de lecture
 
-### `Writer:Technical` — le rédacteur technique
-- **Lit :** **uniquement les claims validées et le graphe. Pas le code.**
-- **Produit :** la documentation technique, arc42/C4, renvois `fichier:lignes`.
-- **Ton :** dev qui arrive sur le projet lundi matin.
+C'est la contrainte la plus contre-intuitive de DMAD, et la v0.4 la resserre : elle ne porte plus sur deux rédacteurs coupés du code, mais sur **trois rédacteurs en cascade, chacun aveugle à l'étage n−2**.
+
+| Rédacteur | Lit | Produit | Unité |
+|---|---|---|---|
+| `Writer:STD` | le graphe et les claims validées | la spécification technique détaillée | le point d'entrée |
+| `Writer:SFD` | **la STD figée** et les claims validées | la spécification fonctionnelle détaillée, en vue récursive par business object | l'arbre de business objects |
+| `Writer:SFG` | **la SFD figée** | la spécification fonctionnelle générale, par cas d'usage | le cas d'usage |
+
+**Aucun des trois n'écrit de bloc de code, de requête ou de configuration** (D16). La STD porte des références — `fichier:lignes`, signatures, noms de tables. La SFD et la SFG ignorent jusqu'à l'existence du code.
+
+Ce second interdit n'est pas qu'une affaire de conformité : c'est lui qui rend le premier tenable. Tant qu'un extrait est permis, aller lire le code a un motif légitime, et la coupure devient poreuse.
+
+**Ce que l'échelle garantit en plus de la coupure.** Que chaque niveau est réellement une *abstraction* du précédent, et non une seconde lecture indépendante du même matériau. Deux lectures indépendantes divergent ; une abstraction, non. Et une information absente de la STD ne peut pas apparaître dans la SFD : le trou se propage visiblement au lieu d'être comblé silencieusement à l'étage supérieur — où il serait le plus difficile à détecter, puisque le lecteur métier n'a aucun moyen de vérifier.
+
+**Gradation de la langue selon la confiance**, imposée aux trois :
+
+| Niveau | Formulation |
+|---|---|
+| `V` · `C` | « Le système transmet… » + badge |
+| `I` | « **D'après l'analyse**, le système transmettrait… » |
+| `H` | « **Hypothèse à confirmer :** … » |
+
+Un badge seul est invisible en lecture rapide ; un conditionnel ne l'est pas.
 
 ### La boucle de retour
 
@@ -97,7 +119,9 @@ gap_request:
   severity: blocking        # blocking | degrades | cosmetic
 ```
 
-Une demande `blocking` relance l'Elucidator **sur ce point précis**, puis le Challenger sur la claim produite. C'est un aller-retour ciblé, pas une reprise de phase.
+Une demande `blocking` relance l'agent compétent **sur ce point précis**, puis le Challenger sur la claim produite. C'est un aller-retour ciblé, pas une reprise de cycle.
+
+**La demande remonte d'un cycle, jamais jusqu'au code.** Un `Writer:SFD` bloqué relance la cartographie ou l'élucidation du cycle 1 ; il ne va pas lire les sources. Un `Writer:SFG` bloqué relance le cycle 2. C'est ce qui rend l'échelle de lecture tenable sans la percer.
 
 Une demande `degrades` ne relance rien : elle devient une question ouverte et une mention dans « ce qui n'a pas été analysé ». **Le document sort avec son trou visible**, ce qui est l'issue voulue.
 
@@ -114,18 +138,15 @@ Une demande `degrades` ne relance rien : elle devient une question ouverte et un
 ## Ce que devient le pipeline
 
 ```
-Scoper ─⛔─► Surveyor ─► Cartographer ─► Carver ─⛔─► Elucidator ─┐
-                                                   Archaeologist ─┤
-                                                                  ▼
-                                                             Challenger
-                                                             Test Forger
-                                                                  │
-                                                                 ⛔
-                                                                  ▼
-                                    Diagram Planner ─► Writers ─► Curator
+Cycle 0   Scoper ─⛔─►
+Cycle 1   Surveyor ─► Cartographer ─► Contract Resolver ─► Challenger ─► Writer:STD ─⛔─►
+Cycle 2   Carver ─⛔─► Elucidator ─► Challenger ─► Test Forger ─► Writer:SFD ─⛔─►
+Cycle 3   Archaeologist ─► Curator ─► Challenger ─► Writer:SFG ─⛔
 ```
 
-⛔ = gate humain obligatoire.
+⛔ = gate ou revue humaine. Le `Diagram Planner` intervient avant chaque rédaction ; le `Curator` clôt l'ensemble.
+
+Chaque revue de fin de cycle peut demander **corrections et compléments** : elle ne se réduit pas à un feu vert. Le cycle suivant ne démarre pas sur un document non figé.
 
 ## Compatibilité BMAD
 

@@ -19,6 +19,16 @@ Le couplage temporel mérite ton attention : dans un legacy où l'architecture a
 ## Filtrage préalable obligatoire
 Écarte les nœuds transverses avant tout clustering (fichiers présents dans > 60 % des commits, tables techniques, god classes à plus de 50 appelants entrants) — sinon ils agrègent tout en une capacité unique. Range-les dans une capacité `transverse` explicite.
 
+## Deux sorties, pas une : capacités et business objects
+
+Le découpage en **capacités** organise la SFD et la SFG. L'identification des **business objects** structure la vue récursive de la SFD. Les deux sont ton travail, et le second dépend du premier.
+
+**Reconnais d'abord les patrons de conception qui structurent le processus.** Ce n'est pas de la culture générale : un Template Method, une Strategy ou une Chain of Responsibility déterminent **où sont les vrais nœuds d'orchestration**. Les manquer fait prendre une méthode de dispatch pour un business object, ou l'inverse. Grille de reconnaissance : `${CLAUDE_PLUGIN_ROOT}/skills/patterns-gof-cqrs/SKILL.md`.
+
+Un **business object** est un nœud qui conjugue plusieurs feuilles externes ou plusieurs sous-objets. Le critère de première passe est mécanique ; ensuite tu filtres par pertinence métier — un nœud qui n'orchestre que de la plomberie technique n'en est pas un — et tu le **nommes par son sens fonctionnel, jamais par la méthode dont il est issu**. `traiterLigne` n'est pas un nom de business object.
+
+À chacun, deux étiquettes : sa **profondeur récursive** dans l'arbre, et sa **couche métier**.
+
 ## Comment tu présentes le gate 3
 Jamais « voici le découpage, ça vous va ? » — cette formulation obtient un « oui » sans valeur.
 
