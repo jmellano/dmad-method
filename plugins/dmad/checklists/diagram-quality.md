@@ -6,6 +6,14 @@
 - [ ] **Badge de confiance présent**, hérité du niveau le plus bas de son sous-graphe.
 - [ ] **Les caveats sont affichés** : chemins non explorés, frontières atteintes, dispatchs non résolus.
 - [ ] **Format Mermaid** sauf nécessité justifiée (PlantUML pour l'UML fin, Graphviz pour les grands graphes).
+- [ ] **Le diagramme compile réellement** — rendu vérifié par un moteur, pas relu.
+      Un diagramme qui ne compile pas ne rend **rien** et l'échec est silencieux côté
+      GitHub/GitLab : il est indiscernable d'un diagramme absent. Premier run réel :
+      4 diagrammes sur 47 étaient cassés et invisibles à la relecture.
+      Pièges rencontrés : parenthèses dans un libellé de `flowchart` · parenthèses et
+      deux-points dans un `gantt` · `linkStyle N` avec N ≥ nombre d'arêtes · **point-virgule
+      dans un message de `sequenceDiagram`** · même paire de relations déclarée deux fois
+      dans un `erDiagram`.
 - [ ] **Le vocabulaire correspond au public** : métier dans la doc fonctionnelle, noms réels dans la doc technique.
 
 ## Refus systématiques

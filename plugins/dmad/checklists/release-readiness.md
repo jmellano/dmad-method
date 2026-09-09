@@ -7,6 +7,17 @@
 - [ ] **Le rapport de couverture est publié**, même — et surtout — s'il est bas.
 - [ ] **Aucun renvoi mort** : toutes les références `fichier:lignes` résolvent sur le commit de référence.
 - [ ] **Les questions ouvertes sont priorisées** (P1–P4) et adressées à un public identifié.
+- [ ] **Au moins un diagramme par capacité documentée**, et chacun compile réellement
+      (cf. `diagram-quality.md`). La phase 6 est facile à sauter sans que rien ne le
+      signale : le résultat reste cohérent et bien sourcé, simplement dépourvu de toute
+      représentation. Sur un legacy, un schéma vaut trente pages — son absence est une
+      non-livraison, pas un manque de finition.
+- [ ] **Le registre d'intention est non vide** — REX, décisions structurantes, contraintes
+      externes. L'Archaeologist est l'autre phase qu'on saute sans s'en apercevoir. Repère
+      du premier run réel : le mot « pourquoi » apparaissait dans 18 fichiers de la
+      documentation d'origine contre 3 dans la production initiale, REX et leçons à zéro.
+      Un run sur un projet de plusieurs années qui ne produit aucun REX n'a pas terminé —
+      il a documenté le *quoi* en laissant le *pourquoi* dans les sources non lues.
 - [ ] **Chaque capacité a sa section « à confirmer »** et sa section « ce qui n'a pas été analysé », même vides — auquel cas elles affichent « aucune » explicitement.
 - [ ] **Le glossaire est unifié** : aucun terme employé dans deux sens.
 - [ ] **Les contradictions inter-capacités sont résolues** ou consignées.

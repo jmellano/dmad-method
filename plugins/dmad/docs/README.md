@@ -30,6 +30,7 @@ Les documents se lisent dans l'ordre, mais chacun est autonome.
 | [10 — Anti-patterns](10-antipatterns.md) | les 13 défaillances de la rétro-documentation par LLM, et leur parade |
 | [11 — Glossaire](11-glossaire.md) | le vocabulaire de la méthode, dont l'homonyme assumé « capability » |
 | [12 — État et suite](12-roadmap.md) | ce qui existe, ce qui manque, ce que DMAD ne deviendra pas |
+| [14 — Premier run réel](14-premier-run-reel.md) | les trois chiffres mesurés sur 88 kLOC, et six frictions rencontrées |
 
 ## Par où commencer
 

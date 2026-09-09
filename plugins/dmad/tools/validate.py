@@ -20,12 +20,17 @@ except ImportError:  # pragma: no cover
     sys.exit("dépendances manquantes : pip install pyyaml jsonschema")
 
 # Le nom du dossier détermine le schéma appliqué.
-ROUTES = {
+# Le routage se fait par nom de dossier. `07-livrables.md` place ces dossiers
+# sous `preuves/` ; les runs les créent parfois à la racine. Les deux sont
+# acceptés — sinon les artefacts sont ignorés SANS ERREUR, ce qui donne un faux
+# « 1 artefact validé » et masque des dizaines de fichiers non contrôlés.
+_KINDS = {
     "claims": "claim.schema.json",
     "challenges": "challenge.schema.json",
     "open-questions": "open-question.schema.json",
     "capabilities": "capability.schema.json",
 }
+ROUTES = {**_KINDS, **{f"preuves/{k}": v for k, v in _KINDS.items()}}
 SINGLE_FILES = {"scope.yaml": "scope.schema.json"}
 
 CONFIDENCE_ORDER = {"H": 0, "I": 1, "C": 2, "V": 3}
@@ -127,6 +132,15 @@ def main() -> int:
                 errors.append(f"{path}: {loc}: {err.message}")
 
     check_cross_rules(claims, errors)
+
+    # Un run sans aucun artefact reconnu est presque toujours une erreur
+    # d'arborescence, pas un run vide. Le signaler plutôt qu'afficher « 0 ».
+    if checked == 0:
+        print(
+            "✗ aucun artefact trouvé — vérifier l'arborescence du run "
+            "(claims/, open-questions/… à la racine ou sous preuves/)"
+        )
+        return 1
 
     if errors:
         print(f"✗ {len(errors)} erreur(s) sur {checked} artefact(s)\n")
