@@ -3,6 +3,8 @@
      dans six mois, une source de vérité qu'on cite sans la questionner. -->
 
 > **Documentation générée par DMAD** · run `{{run_id}}` · `{{timestamp}}` · commit `{{commit}}`
+> **Document :** {{kind}} — {{unit_label}}
+> **Dérive de :** {{derives_from}} · **Alimente :** {{feeds}}
 > **Périmètre :** {{mode}} « {{feature_label}} » — {{coverage_files}} % du code atteint, {{coverage_hotspots}} % des zones à risque
 > **Confiance globale : {{level}}** (minimum des chapitres) · {{open_questions_count}} questions ouvertes
 >

@@ -8,10 +8,32 @@
 ## Procédure par entrypoint
 
 1. `find_definition` du handler
-2. `find_callees` récursif, profondeur bornée (`scope.budget.max_traversal_depth`, défaut 5)
+2. `find_callees` **récursif**, profondeur bornée (`scope.budget.max_traversal_depth`, défaut 5)
 3. À chaque nœud : tables lues/écrites (résolution ORM + requêtes littérales)
 4. À chaque nœud : franchissement de frontière ? (HTTP sortant, file, disque, process, appel système)
-5. Arrêt et **journalisation** sur : profondeur max · frontière d'infrastructure · bibliothèque tierce · budget épuisé · dispatch non résolu
+5. **Typer chaque feuille** — voir ci-dessous
+6. Arrêt et **journalisation** sur : profondeur max · frontière d'infrastructure · bibliothèque tierce · budget épuisé · dispatch non résolu
+
+## La transitivité est un travail, pas un appel
+
+La plupart des outils de navigation ne rendent **qu'un niveau** : les appelants directs, les appelés directs. Une liste d'appelants directs n'est pas une carte.
+
+La remontée comme la descente se font **par itération** — appelant, puis appelants de cet appelant, et ainsi de suite jusqu'à la borne. Un nœud dont on n'a pas cherché les appelants est un nœud dont on ignore s'il est une racine, et le graphe s'en trouve amputé de ses vraies entrées.
+
+## Une feuille non typée est une traversée inachevée
+
+Chaque bout de branche porte sa famille :
+
+| Famille | Ce que c'est |
+|---|---|
+| `database` | lecture ou écriture persistante |
+| `event` | événement publié ou consommé |
+| `contract` | appel sortant vers un service tiers — **le contrat est résolu en task 13**, pas ici |
+| `file` | lecture ou écriture de fichier, dépôt distant |
+| `notification` | courriel, message, alerte |
+| `boundary` | arrêt journalisé, sans franchissement documenté |
+
+Le typage est ce qui permet aux tables de synthèse de la STD et de la SFD d'exister. Sans lui, un appel sortant se lit comme un appel interne de plus — et disparaît des entrées-sorties du système, qui sont précisément ce que le lecteur cherche.
 
 ## L'invariant
 
