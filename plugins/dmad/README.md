@@ -73,7 +73,12 @@ plugins/dmad/
 ├── checklists/     les gates et les definitions of done
 ├── workflows/      full-scan et feature-scan
 ├── schemas/        JSON Schema — l'application mécanique des principes
-├── tools/          validate.py, selftest.sh
+├── tools/          validate.py       artefacts contre schémas
+│                   check-corpus.py   documents contre invariants du corpus
+│                   diagram-engine.py rend, compte, et refuse au-delà du seuil
+│                   freshness.py      péremption, et sa propagation vers le haut
+│                   coverage.py       les chiffres ; l'interprétation reste écrite
+│                   selftest.sh       prouve que les garde-fous mordent
 └── examples/       run de référence + fixtures de violation
 ```
 
@@ -110,12 +115,10 @@ Projet Java ? Lis d'abord le [profil Java](docs/13-profil-java.md).
 ## Vérifier que les garde-fous mordent
 
 ```bash
-python3 tools/validate.py     examples/atlas-billing   # artefacts — doit passer
-python3 tools/check-corpus.py examples/atlas-billing   # documents — doit passer
-./tools/selftest.sh                                    # + les 25 violations refusées
+./tools/selftest.sh          # huit sections, tout doit passer
 ```
 
-Le selftest valide les schémas, vérifie que le run de référence passe, et surtout que **toutes les violations connues sont refusées** — quatorze sur les artefacts (claim sans preuve, auto-promotion en `V`, intention promue sans validation humaine, contrat sans version d'artefact, business object nommé d'après une méthode, SFD sans ancrage…) et onze sur les documents (bloc de code, section manquante, diagramme sans question, cas d'usage à six blocs, SFG produite malgré une contradiction non résolue…).
+Le selftest valide les schémas, vérifie que le run de référence passe, rend ses six diagrammes, propage une péremption, calcule sa couverture — et surtout vérifie que **toutes les violations connues sont refusées** : quinze sur les artefacts (claim sans preuve, auto-promotion en `V`, intention promue sans validation humaine, contrat sans version d'artefact, business object nommé d'après une méthode, SFD sans ancrage…) et treize sur les documents (bloc de code, section manquante, diagramme écrit à la main ou retouché après rendu, cas d'usage à six blocs, SFG produite malgré une contradiction non résolue…).
 
 Un principe qui n'est pas contraint par un outil est un vœu pieux. **Et chaque message d'erreur nomme la décision qu'il applique** : un message qui ne dit pas quelle règle il fait respecter se fait contourner, puis supprimer, au premier agacement.
 

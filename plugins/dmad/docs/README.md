@@ -41,6 +41,19 @@ Les documents se lisent dans l'ordre, mais chacun est autonome.
 
 **Pour l'utiliser** → [09 — Mettre en œuvre](09-usage.md), puis le [profil Java](13-profil-java.md) si c'est un projet JVM.
 
+## Les outils
+
+| | |
+|---|---|
+| `tools/validate.py` | les artefacts contre leurs schémas, plus les règles croisées |
+| `tools/check-corpus.py` | les documents contre D16, D17, D20, R1, R3 et les sept blocs |
+| `tools/diagram-engine.py` | rend un diagramme depuis son plan, le compte, et refuse au-delà du seuil |
+| `tools/freshness.py` | ce qui a péri, et la propagation vers le haut de la cascade |
+| `tools/coverage.py` | les chiffres du rapport de couverture ; l'interprétation reste écrite |
+| `tools/selftest.sh` | prouve que les garde-fous refusent bien ce qu'ils doivent refuser |
+
+> Un principe qui n'est pas contraint par un outil est un vœu pieux, et chaque message d'erreur nomme la décision qu'il applique — un message qui ne dit pas quelle règle il fait respecter se fait contourner, puis supprimer, au premier agacement.
+
 ## Les skills embarqués
 
 Deux prérequis, consommés par plusieurs agents, disponibles dans `../skills/` :
