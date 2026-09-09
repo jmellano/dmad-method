@@ -52,5 +52,43 @@ for e in "${expected[@]}"; do
 done
 
 echo
+echo "== 4. Le corpus : les invariants v0.4 mordent sur les documents"
+expected_corpus=(
+  "D16 : bloc \`\`\`java"
+  "D16 : bloc \`\`\`sql"
+  "R1 : diagramme sans question"
+  "sections manquantes : 8"
+  "D17 : une SFD sans derives_from"
+  "ne référence aucun ancrage"
+  "bloc « Ce qui n'est pas couvert » manquant"
+  "« Ce qui n'est pas couvert » est vide"
+  "sans ligne de traçabilité"
+  "index inverse incomplet"
+)
+out=$(python3 tools/check-corpus.py examples/violations/corpus 2>&1)
+for e in "${expected_corpus[@]}"; do
+  if grep -qE "$e" <<< "$out"; then
+    echo "   ok  refusé : $e"
+  else
+    echo "   ÉCHEC : violation de corpus non détectée : $e"; fail=1
+  fi
+done
+
+out=$(python3 tools/check-corpus.py examples/violations/corpus-bloque 2>&1)
+if grep -qE "contradiction non résolue" <<< "$out"; then
+  echo "   ok  refusé : SFG produite malgré une contradiction non résolue"
+else
+  echo "   ÉCHEC : la SFG aurait dû être bloquée"; fail=1
+fi
+
+echo
+echo "== 5. Le corpus du run de référence est conforme"
+if python3 tools/check-corpus.py examples/atlas-billing > /dev/null; then
+  echo "   ok  examples/atlas-billing"
+else
+  echo "   ÉCHEC : le corpus du run de référence devrait être conforme"; fail=1
+fi
+
+echo
 if [ "$fail" -eq 0 ]; then echo "✓ selftest OK"; else echo "✗ selftest en échec"; fi
 exit $fail

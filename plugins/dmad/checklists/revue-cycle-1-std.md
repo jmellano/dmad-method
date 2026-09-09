@@ -14,6 +14,15 @@ Dix minutes, et c'est le seul contrôle qui détecte l'erreur dominante des mod�
 
 ## Vérifications mécaniques
 
+**Elles se lancent avant la séance, pas pendant.**
+
+```bash
+python3 <plugin>/tools/validate.py     dmad-output/
+python3 <plugin>/tools/check-corpus.py dmad-output/
+```
+
+Une revue humaine ne doit pas servir à trouver ce qu'une machine trouve. Ce qui suit est ce que les outils vérifient — la liste est là pour dire au relecteur ce qu'il n'a **pas** à faire, et donc où porter son attention.
+
 - [ ] **Aucun bloc de code, de requête ou de configuration** dans le document (D16). Contrôlable par recherche des clôtures de bloc de langage.
 - [ ] Les **dix-sept sections sont présentes**, y compris celles sans objet, qui portent leur constat d'absence **et son périmètre**.
 - [ ] Chaque **référence `fichier:lignes` résout** sur le commit de référence.

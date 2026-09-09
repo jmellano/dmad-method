@@ -110,13 +110,14 @@ Projet Java ? Lis d'abord le [profil Java](docs/13-profil-java.md).
 ## Vérifier que les garde-fous mordent
 
 ```bash
-python3 tools/validate.py examples/atlas-billing   # doit passer
-./tools/selftest.sh                                # + les 6 violations refusées
+python3 tools/validate.py     examples/atlas-billing   # artefacts — doit passer
+python3 tools/check-corpus.py examples/atlas-billing   # documents — doit passer
+./tools/selftest.sh                                    # + les 25 violations refusées
 ```
 
-Valide les schémas, vérifie que le run de référence passe, et surtout que les **cinq violations connues sont toutes refusées** : claim sans preuve, auto-promotion en `V`, intention promue sans validation humaine, règle conditionnelle énoncée sans sa condition, dépassement du plafond d'une capability dégradée.
+Le selftest valide les schémas, vérifie que le run de référence passe, et surtout que **toutes les violations connues sont refusées** — quatorze sur les artefacts (claim sans preuve, auto-promotion en `V`, intention promue sans validation humaine, contrat sans version d'artefact, business object nommé d'après une méthode, SFD sans ancrage…) et onze sur les documents (bloc de code, section manquante, diagramme sans question, cas d'usage à six blocs, SFG produite malgré une contradiction non résolue…).
 
-Un principe qui n'est pas contraint par un schéma est un vœu pieux : `tools/validate.py` est le point d'application mécanique du manifeste.
+Un principe qui n'est pas contraint par un outil est un vœu pieux. **Et chaque message d'erreur nomme la décision qu'il applique** : un message qui ne dit pas quelle règle il fait respecter se fait contourner, puis supprimer, au premier agacement.
 
 ## Prérequis
 

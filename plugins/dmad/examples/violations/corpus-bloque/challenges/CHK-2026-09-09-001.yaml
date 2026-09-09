@@ -1,0 +1,17 @@
+# Support de la violation : une contradiction que personne n'a levée.
+# Ce n'est pas la fixture fautive — c'est la condition qui rend la SFG interdite.
+id: CHK-2026-09-09-001
+claim: BR-FACT-030
+challenged_at: "2026-09-09T09:00:00Z"
+angles_examined: [1, 5, 7]
+findings:
+  - angle: 5
+    severity: high
+    finding: >
+      La SFD annonce une portée « lot » pour l'échec de numérotation en § 4,
+      et une portée « facture » en § 7. Les deux sections se contredisent.
+    evidence: "sfd/refacturation.md § 4 et § 7"
+    consequence: >
+      Le support ne sait pas s'il doit rejouer le lot entier ou la facture
+      fautive. Les deux conduites sont incompatibles.
+outcome: contradicted

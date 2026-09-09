@@ -18,6 +18,15 @@ Un renvoi vers un autre cas d'usage est un échec de ce test. Le cas d'usage est
 
 ## Vérifications mécaniques
 
+**Elles se lancent avant la séance, pas pendant.**
+
+```bash
+python3 <plugin>/tools/validate.py     dmad-output/
+python3 <plugin>/tools/check-corpus.py dmad-output/
+```
+
+Une revue humaine ne doit pas servir à trouver ce qu'une machine trouve. Ce qui suit est ce que les outils vérifient — la liste est là pour dire au relecteur ce qu'il n'a **pas** à faire, et donc où porter son attention.
+
 - [ ] **Sept blocs par cas d'usage**, dont « Ce qui n'est pas couvert ». Aucune exception, et ce bloc-là ne peut pas être vide.
 - [ ] **Aucune règle sans ligne de traçabilité.** Une règle non sourcée est une invention jusqu'à preuve du contraire.
 - [ ] **Aucune intention sans marquage** tant qu'elle n'est pas validée, et le marquage est **visible sans dérouler le tableau**.

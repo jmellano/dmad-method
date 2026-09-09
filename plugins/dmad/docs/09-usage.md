@@ -116,8 +116,11 @@ Sur du code client, `scope.confidentiality` doit être **appliqué**, pas seulem
 ## Vérifier avant de livrer
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/tools/validate.py dmad-output/
+python3 ${CLAUDE_PLUGIN_ROOT}/tools/validate.py     dmad-output/   # artefacts contre schémas
+python3 ${CLAUDE_PLUGIN_ROOT}/tools/check-corpus.py dmad-output/   # documents contre invariants
 ```
+
+Deux outils parce que deux natures de vérification. `validate.py` route un artefact YAML vers son schéma et applique les règles croisées ; `check-corpus.py` lit les documents Markdown et vérifie D16, D17, D20, R1 et les sept blocs. Mélanger les deux produirait des messages d'erreur que personne ne sait interpréter.
 
 Puis le contrôle qui compte réellement : **tirer 5 claims au hasard, ouvrir le code aux lignes citées, vérifier que la phrase correspond.** Dix minutes. Un taux d'erreur supérieur à 1 sur 5 condamne le run.
 

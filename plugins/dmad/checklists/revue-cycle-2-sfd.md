@@ -14,6 +14,15 @@ Une SFD peut se contredire sans que ce soit une faute d'analyse — deux section
 
 ## Vérifications mécaniques
 
+**Elles se lancent avant la séance, pas pendant.**
+
+```bash
+python3 <plugin>/tools/validate.py     dmad-output/
+python3 <plugin>/tools/check-corpus.py dmad-output/
+```
+
+Une revue humaine ne doit pas servir à trouver ce qu'une machine trouve. Ce qui suit est ce que les outils vérifient — la liste est là pour dire au relecteur ce qu'il n'a **pas** à faire, et donc où porter son attention.
+
 - [ ] **Aucun bloc de code, aucun nom de classe, aucun nom de méthode, aucun nom de patron de conception** (D16).
 - [ ] **Chaque section de niveau référence au moins un ancrage de la STD** (D17). Une section sans ancrage est une information apparue de nulle part.
 - [ ] **Les six blocs ISO 25010 sont présents** à chaque section de niveau, un bloc vide portant son constat d'absence.
