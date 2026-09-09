@@ -1,0 +1,10 @@
+id: DIA-DRIFT-001
+kind: flowchart
+question: "quels composants ce batch mobilise-t-il ?"
+confidence: C
+direction: LR
+nodes:
+  - {id: A, label: BillingRun}
+  - {id: B, label: InvoiceDispatcher}
+edges:
+  - {from: A, to: B}

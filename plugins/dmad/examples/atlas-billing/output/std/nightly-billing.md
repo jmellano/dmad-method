@@ -43,17 +43,26 @@ frozen_at: "2026-09-07T16:20:00Z"
 Le batch est câblé en trois couches : un déclencheur planifié, un service d'orchestration, et deux ports sortants.
 
 > **Question :** quels composants ce batch mobilise-t-il, et lesquels franchissent une frontière ?
-> **Confiance : C** · deux dispatchs non résolus, cf. § 14
+> **Confiance : C — corroboré** · deux dispatchs non résolus, cf. § 14
 
+<!-- diagram: DIA-STD-001 · N=8 E=7 McCabe=1 -->
 ```mermaid
 flowchart LR
-  SCH[Planificateur] --> RUN[BillingRun]
-  RUN --> DISP[InvoiceDispatcher]
-  DISP --> CALC[AmountCalculator]
-  DISP --> ACC[[port AccountingGateway]]
-  CALC --> PRI[[port PricingClient]]
-  DISP --> DB[(invoices)]
-  CALC --> DBL[(invoice_lines)]
+  SCH(("Planificateur"))
+  RUN["BillingRun"]
+  DISP["InvoiceDispatcher"]
+  CALC["AmountCalculator"]
+  ACC[["port AccountingGateway"]]
+  PRI[["port PricingClient"]]
+  DB[("invoices")]
+  DBL[("invoice_lines")]
+  SCH --> RUN
+  RUN --> DISP
+  DISP --> CALC
+  DISP --> ACC
+  CALC --> PRI
+  DISP --> DB
+  CALC --> DBL
 ```
 
 `BillingRun` orchestre, `InvoiceDispatcher` décide et transmet, `AmountCalculator` valorise. Les deux ports sont les seules sorties du périmètre.
@@ -105,8 +114,9 @@ Chaque facture est traitée dans sa propre transaction : l'échec de l'une n'ann
 ## 6. Séquence technique   [C]
 
 > **Question :** dans quel ordre les composants s'appellent-ils pour une facture, et où sort-on du périmètre ?
-> **Confiance : C** · une frontière non franchie
+> **Confiance : C — corroboré** · une frontière non franchie en aval
 
+<!-- diagram: DIA-STD-002 · N=5 E=7 McCabe=4 -->
 ```mermaid
 sequenceDiagram
   autonumber
@@ -123,7 +133,7 @@ sequenceDiagram
   end
   alt montant nul et paramètre actif
     D->>D: markSkipped()
-  else
+  else 
     D->>A: transmettreFacture()
     A-->>D: accusé
   end
@@ -167,15 +177,23 @@ Aucun mapper généré dans ce chemin. Les transformations sont manuelles dans `
 
 ## 12. Gestion des erreurs   [C]
 
-> **Question :** que devient une facture selon l'endroit où l'exécution échoue, et ce que le support observe-t-il ?
-> **Confiance : C** · aucune trace d'exécution pour confirmer les fréquences
+> **Question :** que devient une facture selon l'endroit où l'exécution échoue, et que le support observe-t-il ?
+> **Confiance : C — corroboré** · aucune trace d'exécution pour confirmer les fréquences
 
+<!-- diagram: DIA-STD-003 · N=7 E=4 McCabe=1 -->
 ```mermaid
 flowchart TD
-  E1[Échec de valorisation] --> S1[Facture non créée · lot poursuivi]
-  E2[Échec de transmission] --> S2[Statut FAILED · reprise, 5 tentatives]
-  E3[Échec de tarification] --> S3[Exception non déclarée · lot interrompu]
-  S3 --> N[Aucune notification]
+  E1["Échec de valorisation"]
+  S1["Facture non créée · lot poursuivi"]
+  E2["Échec de transmission"]
+  S2["Statut FAILED · reprise, 5 tentatives"]
+  E3["Échec de tarification"]
+  S3["Exception non déclarée · lot interrompu"]
+  N["Aucune notification"]
+  E1 --> S1
+  E2 --> S2
+  E3 --> S3
+  S3 --> N
 ```
 
 **Site de levée et effet observable sont distincts, et il faut les lire séparément.** Un échec de tarification est levé sur **une ligne** ; son effet observable est l'interruption de **tout le lot**, parce que l'exception n'est pas déclarée et remonte jusqu'au gestionnaire de campagne. Les confondre produirait deux affirmations contradictoires dans la SFD.

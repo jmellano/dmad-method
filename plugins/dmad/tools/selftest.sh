@@ -65,6 +65,7 @@ expected_corpus=(
   "« Ce qui n'est pas couvert » est vide"
   "sans ligne de traçabilité"
   "index inverse incomplet"
+  "R3 : diagramme sans marqueur de rendu"
 )
 out=$(python3 tools/check-corpus.py examples/violations/corpus 2>&1)
 for e in "${expected_corpus[@]}"; do
@@ -82,8 +83,24 @@ else
   echo "   ÉCHEC : la SFG aurait dû être bloquée"; fail=1
 fi
 
+out=$(python3 tools/check-corpus.py examples/violations/corpus-derive 2>&1)
+if grep -qE "diverge de son plan" <<< "$out"; then
+  echo "   ok  refusé : diagramme retouché après rendu"
+else
+  echo "   ÉCHEC : la dérive du diagramme aurait dû être détectée"; fail=1
+fi
+
 echo
-echo "== 5. Le corpus du run de référence est conforme"
+echo "== 5. Les diagrammes du run de référence se rendent depuis leur plan"
+if python3 tools/diagram-engine.py --all examples/atlas-billing/output \
+     --thresholds examples/atlas-billing/scope.yaml > /dev/null; then
+  echo "   ok  6 plans rendus sous les seuils"
+else
+  echo "   ÉCHEC : un plan ne se rend pas ou dépasse les seuils"; fail=1
+fi
+
+echo
+echo "== 6. Le corpus du run de référence est conforme"
 if python3 tools/check-corpus.py examples/atlas-billing/output > /dev/null; then
   echo "   ok  examples/atlas-billing/output — STD, SFD, SFG"
 else

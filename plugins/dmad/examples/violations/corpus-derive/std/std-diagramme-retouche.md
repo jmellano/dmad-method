@@ -1,16 +1,30 @@
 ---
-title: "InvoiceDispatcher — spécification technique détaillée"
+title: "Fixture — diagramme retouché"
 type: STD
 unit: entrypoint
-unit_ref: InvoiceDispatcher
+unit_ref: Fixture
 generated_by: "modèle — fixture de non-régression"
 ---
 
-<!-- Violation R1 : un diagramme qu'aucune question n'introduit. -->
+<!-- Violation R3 : le diagramme a été retouché après rendu. Il peut désormais
+     contredire le graphe dont il est censé sortir. -->
 
 ## 1. Cartographie des composants
 
 Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
+
+> **Question :** quels composants ce batch mobilise-t-il ?
+> **Confiance : C — corroboré**
+
+<!-- diagram: DIA-DRIFT-001 · N=2 E=1 McCabe=1 -->
+```mermaid
+flowchart LR
+  A["BillingRun"]
+  B["InvoiceDispatcher"]
+  C["Ajouté à la main"]
+  A --> B
+  B --> C
+```
 
 ## 2. Configuration
 
@@ -31,12 +45,6 @@ Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
 ## 6. Séquence technique
 
 Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
-
-<!-- diagram: DIA-BAD-001 · N=2 E=1 McCabe=1 -->
-```mermaid
-sequenceDiagram
-  A->>B: dispatch
-```
 
 ## 7. Modèle de données
 

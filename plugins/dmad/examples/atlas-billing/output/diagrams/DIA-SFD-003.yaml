@@ -1,0 +1,23 @@
+id: DIA-SFD-003
+kind: sequence
+document: sfd/facturation.md
+question: "avec qui la constitution d'une facture dialogue-t-elle, et dans quel ordre ?"
+confidence: C
+caveats: "une frontière non franchie en aval"
+participants:
+  - {id: C, label: Campagne}
+  - {id: F, label: "Facture à émettre"}
+  - {id: L, label: "Statuts de litige"}
+  - {id: SC, label: "Service comptable"}
+steps:
+  - msg: {from: C, to: F, label: "constituer la facture d'une commande"}
+  - msg: {from: F, to: L, label: "le client est-il en litige ?"}
+  - msg: {from: L, to: F, label: "statut", reply: true}
+  - msg: {from: F, to: F, label: "totaliser les lignes valorisées"}
+  - alt: "montant nul et paramètre actif"
+  - msg: {from: F, to: F, label: "archiver sans transmettre"}
+  - else: ""
+  - msg: {from: F, to: SC, label: "transmettre"}
+  - msg: {from: SC, to: F, label: "accusé de réception", reply: true}
+  - end: true
+  - note: {over: SC, text: "traitement aval hors périmètre"}

@@ -6,7 +6,7 @@ unit_ref: InvoiceDispatcher
 generated_by: "modèle — fixture de non-régression"
 ---
 
-<!-- Violation R1 : un diagramme qu'aucune question n'introduit. -->
+<!-- Violation R3 : un diagramme écrit à la main, sans rendu depuis le graphe. -->
 
 ## 1. Cartographie des composants
 
@@ -32,7 +32,9 @@ Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
 
 Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
 
-<!-- diagram: DIA-BAD-001 · N=2 E=1 McCabe=1 -->
+> **Question :** dans quel ordre les composants s'appellent-ils ?
+> **Confiance : C — corroboré**
+
 ```mermaid
 sequenceDiagram
   A->>B: dispatch

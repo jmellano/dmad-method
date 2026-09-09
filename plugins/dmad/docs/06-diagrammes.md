@@ -29,7 +29,15 @@ Les seuils sont déclarés dans `scope.yaml` (D15). Valeurs par défaut, sur tro
 
 C'est l'arbitrage entre les deux leviers de décomposition. La **longueur** est la séquence d'opérations d'un niveau donné ; la **profondeur** est l'empilement des niveaux. Un diagramme trop long se répare en décomposant certaines étapes en sous-niveau — on convertit de la longueur en profondeur. Un empilement de sous-niveaux triviaux se répare en fusionnant — l'inverse. Les deux leviers ne se substituent pas : ils s'ajustent en tension.
 
-**R3 — Généré depuis le graphe, jamais rédigé.** Les agents décrivent un sous-graphe + une intention ; le `diagram-engine` rend. Un diagramme ne peut donc pas contredire la doc — les deux sortent de la même source. Et chaque diagramme hérite du **badge de confiance** de son sous-graphe.
+**R3 — Généré depuis le graphe, jamais rédigé.** Les agents décrivent un sous-graphe + une intention dans un **plan** ; `tools/diagram-engine.py` rend. Un diagramme ne peut donc pas contredire la doc — les deux sortent de la même source. Et chaque diagramme hérite du **badge de confiance** de son sous-graphe.
+
+La figure rendue porte un **marqueur** qui cite son plan et ses métriques :
+
+```
+<!-- diagram: DIA-STD-001 · N=8 E=7 McCabe=1 -->
+```
+
+`check-corpus.py` s'en sert pour deux contrôles : un diagramme sans marqueur a été écrit à la main, et un diagramme dont le contenu diverge de son plan a été retouché après rendu. **C'est ce qui rend R3 opposable** — sans quoi elle reste une consigne que rien ne vérifie.
 
 **R4 — Nommé par ce qu'il montre, jamais par son type.** « Diagramme de séquence 3 » ne dit rien ; « Échanges du calcul de refacturation avec les services amont » dit à quoi sert la figure avant qu'on la regarde. Le type de rendu est un détail d'implémentation qui n'a rien à faire dans un titre.
 

@@ -85,9 +85,17 @@ Réservé aux phases 3 et 5 (découpage, réfutation). Ailleurs c'est un luxe qu
 
 ### `diagram-engine`
 ```
-render(kind, subgraph, question) -> DiagramSource
+render(plan) -> (figure, metrics)      # tools/diagram-engine.py
 ```
-Prend un **sous-graphe** et une **question**, rend du Mermaid (défaut) ou du PlantUML. Les agents n'écrivent jamais de syntaxe de diagramme à la main : ils décrivent une intention, le moteur rend. Un diagramme incohérent avec le graphe devient ainsi impossible par construction.
+Prend un **plan** — un sous-graphe, un type et une question — et rend la figure complète : la question, le badge de confiance, un **marqueur de rendu**, et le bloc Mermaid.
+
+Les agents n'écrivent jamais de syntaxe de diagramme. Trois conséquences, et la troisième est celle qu'on oublie :
+
+1. Un diagramme **ne peut pas contredire** le graphe : les deux sortent de la même source.
+2. Le badge de confiance est **calculé** depuis le sous-graphe, pas recopié.
+3. **Les nœuds sont comptés.** Sans rendu, D15 serait un seuil que rien ne mesure — personne ne compte les arêtes d'un diagramme écrit à la main, ni l'auteur ni le relecteur.
+
+Le moteur **refuse** de rendre au-delà du seuil : la règle R2 est de découper, pas de simplifier. Et `check-corpus.py` re-rend chaque plan pour comparer : un diagramme retouché après coup est détecté.
 
 ### `evidence-store`
 ```

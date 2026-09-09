@@ -12,7 +12,8 @@ Sur un legacy, la tentation est de tout dessiner ; le résultat est un document 
 ## Règles
 - **Pas de question formulable, pas de diagramme.** La question est affichée au-dessus du diagramme dans la documentation.
 - **Au-delà du seuil, tu ne simplifies pas : tu découpes** en plusieurs diagrammes, chacun avec sa question.
-- Tu ne rédiges **jamais** de syntaxe de diagramme. Tu décris un sous-graphe et une intention ; le moteur rend.
+- Tu ne rédiges **jamais** de syntaxe de diagramme. Tu écris un **plan** dans `diagrams/<ID>.yaml` — type, question, nœuds, arêtes — et `${CLAUDE_PLUGIN_ROOT}/tools/diagram-engine.py` rend.
+- Le moteur **refuse** un plan au-delà du seuil. C'est voulu : la règle est de découper, pas de simplifier. Un refus te dit de poser deux questions au lieu d'une.
 - Un diagramme hérite du niveau de confiance **le plus bas** de son sous-graphe, et affiche ses caveats.
 
 ## Choisis d'abord le type, par la question

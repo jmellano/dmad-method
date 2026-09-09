@@ -13,6 +13,7 @@ puis supprimer, au premier agacement — et la règle disparaît avec lui.
     python3 tools/check-corpus.py <dossier-run>
 """
 import argparse
+import importlib.util
 import pathlib
 import re
 import sys
@@ -46,6 +47,19 @@ SFG_BLOCS = [
 ]
 
 RE_FENCE = re.compile(r"^\s*```([A-Za-z0-9_+-]+)\s*$", re.M)
+RE_MARQUEUR = re.compile(r"^<!-- diagram: ([A-Z0-9-]+) ·[^>]*-->$", re.M)
+RE_BLOC_MERMAID = re.compile(r"^```mermaid\n(.*?)^```$", re.M | re.S)
+
+
+def charger_moteur():
+    """Le moteur de rendu, chargé par chemin — son nom de fichier porte un tiret."""
+    chemin = pathlib.Path(__file__).with_name("diagram-engine.py")
+    if not chemin.exists():
+        return None
+    spec = importlib.util.spec_from_file_location("diagram_engine", chemin)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 RE_REGLE = re.compile(r"\b((?:RG|BR|INV)-[A-Z0-9]+(?:-[0-9]+)?)\b")
 # Une règle est DÉCLARÉE quand elle ouvre une ligne de tableau. Une règle
 # seulement citée dans le corps d'une autre — « sans appliquer RG-003 » — est
@@ -130,16 +144,62 @@ def check_cascade(rel, kind, fm, erreurs):
     return parents
 
 
-def check_diagrammes(rel, corps, erreurs):
-    """R1 — pas de question formulable, pas de diagramme."""
-    for m in re.finditer(r"^\s*```mermaid\s*$", corps, re.M):
-        amont = corps[:m.start()].splitlines()[-6:]
-        if not any("?" in l for l in amont):
-            ligne = corps[:m.start()].count("\n") + 1
+def check_diagrammes(rel, corps, erreurs, run, moteur, seuils):
+    """R1 et R3 — une question, et un rendu depuis le graphe plutôt qu'une main."""
+    dossier_plans = run / "diagrams"
+
+    for m in re.finditer(r"^```mermaid\s*$", corps, re.M):
+        amont = corps[:m.start()].splitlines()
+        ligne = len(amont) + 1
+        contexte = amont[-8:]
+
+        if not any("?" in l for l in contexte):
             erreurs.append(
                 f"{rel}:{ligne} — R1 : diagramme sans question. La question "
                 "s'affiche au-dessus du diagramme ; un diagramme qui ne répond à "
                 "rien occupe de la place, vieillit, et fait douter du reste"
+            )
+
+        marqueur = next((RE_MARQUEUR.match(l) for l in reversed(contexte)
+                         if RE_MARQUEUR.match(l)), None)
+        if marqueur is None:
+            erreurs.append(
+                f"{rel}:{ligne} — R3 : diagramme sans marqueur de rendu, donc écrit "
+                "à la main. Les agents décrivent un sous-graphe et une intention, le "
+                "moteur rend — c'est ce qui rend impossible qu'un diagramme contredise "
+                "le texte, et c'est ce qui fait que ses nœuds sont comptés"
+            )
+            continue
+
+        if not dossier_plans.is_dir():
+            continue
+        plan_id = marqueur.group(1)
+        plan_path = next((p for p in (dossier_plans / f"{plan_id}.yaml",
+                                      dossier_plans / f"{plan_id}.yml") if p.exists()), None)
+        if plan_path is None:
+            erreurs.append(
+                f"{rel}:{ligne} — R3 : le marqueur cite {plan_id}, dont le plan est "
+                "introuvable. Un diagramme sans plan ne peut pas être re-rendu, donc "
+                "pas vérifié"
+            )
+            continue
+
+        if moteur is None:
+            continue
+        try:
+            plan = yaml.safe_load(plan_path.read_text(encoding="utf-8"))
+            attendu, _ = moteur.rendre_figure(plan, seuils)
+        except (ValueError, yaml.YAMLError) as e:
+            erreurs.append(f"{rel}:{ligne} — R3 : le plan {plan_id} ne se rend pas : {e}")
+            continue
+
+        bloc = RE_BLOC_MERMAID.search(corps, m.start())
+        attendu_bloc = RE_BLOC_MERMAID.search(attendu)
+        if bloc and attendu_bloc and bloc.group(1).strip() != attendu_bloc.group(1).strip():
+            erreurs.append(
+                f"{rel}:{ligne} — R3 : le diagramme {plan_id} diverge de son plan. "
+                "Il a été retouché à la main après rendu — et il peut désormais "
+                "contredire le graphe dont il est censé sortir"
             )
 
 
@@ -266,6 +326,8 @@ def main() -> int:
 
     erreurs: list[str] = []
     docs: list[tuple[pathlib.Path, str, dict]] = []
+    moteur = charger_moteur()
+    seuils = moteur.charger_seuils(args.run / "scope.yaml") if moteur else {}
 
     for dossier, kind in (("std", "STD"), ("sfd", "SFD"), ("sfg", "SFG")):
         for path in sorted((args.run / dossier).glob("*.md")):
@@ -285,7 +347,7 @@ def main() -> int:
             docs.append((path, kind, fm))
 
             parents = check_cascade(rel, kind, fm, erreurs)
-            check_diagrammes(rel, corps, erreurs)
+            check_diagrammes(rel, corps, erreurs, args.run, moteur, seuils)
             if kind == "STD":
                 check_std(rel, corps, erreurs)
             elif kind == "SFD":

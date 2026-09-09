@@ -45,33 +45,51 @@ Trois niveaux suffisent ici. Un quatrième aurait été un empilement inutile ; 
 ## 2. Le processus vu comme une seule opération
 
 > **Question :** qu'entre-t-il et que sort-il de la facturation nocturne, vue de l'extérieur ?
-> **Confiance : C**
+> **Confiance : C — corroboré**
 
+<!-- diagram: DIA-SFD-001 · N=7 E=6 McCabe=1 -->
 ```mermaid
 flowchart LR
-  IN[Commandes livrées non facturées] --> P((Facturation nocturne))
-  BAR[Barèmes clients] --> P
-  LIT[Statuts de litige] --> P
-  P --> FAC[Factures transmises]
-  P --> ARC[Factures archivées sans envoi]
-  P --> CR[Compte-rendu de campagne]
+  IN["Commandes livrées non facturées"]
+  BAR["Barèmes clients"]
+  LIT["Statuts de litige"]
+  P(("Facturation nocturne"))
+  FAC["Factures transmises"]
+  ARC["Factures archivées sans envoi"]
+  CR["Compte-rendu de campagne"]
+  IN --> P
+  BAR --> P
+  LIT --> P
+  P --> FAC
+  P --> ARC
+  P --> CR
 ```
 
 ## 3. Arbre de composition
 
 > **Question :** comment le processus se décompose-t-il, et jusqu'où ?
-> **Confiance : I** · regroupements proposés par l'analyse, validés au gate de découpage
+> **Confiance : I — inféré** · regroupements proposés par l'analyse, validés au gate de découpage
 
+<!-- diagram: DIA-SFD-002 · N=9 E=8 McCabe=1 -->
 ```mermaid
 flowchart TD
-  N2[N2 — Campagne de facturation] --> N1[N1 — Facture à émettre]
-  N1 --> N0[N0 — Ligne valorisée]
-  N2 -.-> CR[(compte-rendu de campagne)]
-  N1 -.-> INV[(factures)]
-  N1 -.-> ACC[[service comptable]]
-  N1 -.-> LIT[(statuts de litige)]
-  N0 -.-> LIG[(lignes de facture)]
-  N0 -.-> TAR[[service de tarification]]
+  N2["N2 — Campagne de facturation"]
+  N1["N1 — Facture à émettre"]
+  N0["N0 — Ligne valorisée"]
+  CR[("compte-rendu de campagne")]
+  INV[("factures")]
+  ACC[["service comptable"]]
+  LIT[("statuts de litige")]
+  LIG[("lignes de facture")]
+  TAR[["service de tarification"]]
+  N2 --> N1
+  N1 --> N0
+  N2 -.-> CR
+  N1 -.-> INV
+  N1 -.-> ACC
+  N1 -.-> LIT
+  N0 -.-> LIG
+  N0 -.-> TAR
 ```
 
 ## 4. N2 — Campagne de facturation
@@ -102,8 +120,9 @@ L'heure de déclenchement, la taille de lot, le seuil de rejet au-delà duquel l
 Ancré dans [`std/nightly-billing.md`](../std/nightly-billing.md) § 5 et § 9.
 
 > **Question :** avec qui la constitution d'une facture dialogue-t-elle, et dans quel ordre ?
-> **Confiance : C** · une frontière non franchie en aval
+> **Confiance : C — corroboré** · une frontière non franchie en aval
 
+<!-- diagram: DIA-SFD-003 · N=4 E=7 McCabe=3 -->
 ```mermaid
 sequenceDiagram
   autonumber
@@ -117,7 +136,7 @@ sequenceDiagram
   F->>F: totaliser les lignes valorisées
   alt montant nul et paramètre actif
     F->>F: archiver sans transmettre
-  else
+  else 
     F->>SC: transmettre
     SC-->>F: accusé de réception
   end

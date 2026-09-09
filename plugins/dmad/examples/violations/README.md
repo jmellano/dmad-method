@@ -1,6 +1,6 @@
 # Violations — fixtures de non-régression
 
-Quinze artefacts volontairement fautifs. Chacun correspond à un **mode de défaillance réel** de la rétro-documentation par LLM, et chacun doit être refusé par `tools/validate.py`.
+Vingt-huit artefacts volontairement fautifs — quinze structurés, treize documentaires. Chacun correspond à un **mode de défaillance réel** de la rétro-documentation par LLM, et chacun doit être refusé par `tools/validate.py`.
 
 **Une fixture, une violation.** C'est la convention du dossier : une fixture qui en déclenche deux ne dit plus laquelle le garde-fou a attrapée.
 
@@ -46,9 +46,9 @@ Sans cette distinction, la règle stricte rejetterait les hotspots mesurés par
 git ; sans le garde-fou du second versant, « le modèle a trouvé que » se
 déguiserait en mesure.
 
-## Les onze fixtures de corpus
+## Les treize fixtures de corpus
 
-Sous `corpus/` et `corpus-bloque/`. Elles portent sur les **documents**, pas sur les artefacts, et c'est `check-corpus.py` qui les refuse.
+Sous `corpus/`, `corpus-bloque/` et `corpus-derive/`. Elles portent sur les **documents**, pas sur les artefacts, et c'est `check-corpus.py` qui les refuse.
 
 | Fixture | Défaillance simulée | Décision violée |
 |---|---|---|
@@ -62,9 +62,11 @@ Sous `corpus/` et `corpus-bloque/`. Elles portent sur les **documents**, pas sur
 | `sfg/sfg-frontiere-vide.md` | la frontière est un titre sans contenu | sept blocs |
 | `sfg/sfg-regle-sans-tracabilite.md` | une règle que rien ne source | traçabilité |
 | `sfg/sfg-index-incoherent.md` | un index inverse édité à la main | index généré |
+| `std/std-diagramme-a-la-main.md` | un diagramme sans marqueur de rendu | **R3** |
+| `corpus-derive/` | un diagramme retouché après rendu | **R3** |
 | `corpus-bloque/` | une SFG produite malgré une contradiction non levée | blocage du cycle 3 |
 
-Le dernier vit dans son propre dossier parce que sa condition est **le run**, pas un fichier : il faut un challenge non résolu et une SFG pour que la violation existe.
+Les deux derniers vivent dans leur propre dossier parce que leur condition est **le run**, pas un fichier : il faut un challenge non résolu et une SFG pour la première, un plan de diagramme et un document qui en diverge pour la seconde.
 
 ## Pourquoi ces fixtures existent
 
