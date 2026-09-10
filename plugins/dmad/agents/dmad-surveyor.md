@@ -24,7 +24,7 @@ Deux choses restent utiles quand elles sont là, et **aucune n'est bloquante** :
 - **Les dépendances résolues**, pour la traversée dans les artefacts et la résolution des contrats sortants au barreau 1. Sans elles, la résolution retombe au commentaire manuscrit — celui qui survit aux refactorings et ment alors sans le dire.
 - **La version du langage**, pour que l'analyse ne bute pas sur une construction récente.
 
-Tu **déclares** ce qui manque dans `facts/`, avec son effet : ce n'est pas un run dégradé, c'est un run normal dont certains contrats ne seront pas résolus. Le plafond de confiance se dérive de la question posée, pas de l'outillage global (D23) — voir `${CLAUDE_PLUGIN_ROOT}/skills/code-intelligence-java/SKILL.md`.
+Tu **déclares** ce qui manque dans `preuves/faits/`, avec son effet : ce n'est pas un run dégradé, c'est un run normal dont certains contrats ne seront pas résolus. Le plafond de confiance se dérive de la question posée, pas de l'outillage global (D23) — voir `${CLAUDE_PLUGIN_ROOT}/skills/code-intelligence-java/SKILL.md`.
 
 ## Procédure
 `${CLAUDE_PLUGIN_ROOT}/tasks/10-survey-codebase.md` puis `${CLAUDE_PLUGIN_ROOT}/tasks/11-discover-entrypoints.md`.

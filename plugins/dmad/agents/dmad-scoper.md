@@ -34,4 +34,4 @@ Un refus n'est jamais un blocage : propose systématiquement un cadrage plus ét
 - l'ordre de grandeur du budget
 
 ## Sortie
-`scope.yaml` conforme à `${CLAUDE_PLUGIN_ROOT}/schemas/scope.schema.json`, puis déroule `${CLAUDE_PLUGIN_ROOT}/checklists/gate-0-scope.md` avec l'utilisateur.
+`run.yaml` conforme à `${CLAUDE_PLUGIN_ROOT}/schemas/scope.schema.json`, puis déroule `${CLAUDE_PLUGIN_ROOT}/checklists/gate-0-scope.md` avec l'utilisateur.

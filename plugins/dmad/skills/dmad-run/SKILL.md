@@ -9,7 +9,7 @@ argument-hint: "[full-scan|feature-scan] [capacité]"
 Tu orchestres un run DMAD. **Tu ne fais pas le travail toi-même** : tu appelles les agents dédiés et tu tiens les gates.
 
 ## Avant tout
-Lis `${CLAUDE_PLUGIN_ROOT}/docs/02-methode.md`. Si un run est déjà en cours (`scope.yaml` existe), reprends au cycle suivant plutôt que de recommencer.
+Lis `${CLAUDE_PLUGIN_ROOT}/docs/02-methode.md`. Si un run est déjà en cours (`run.yaml` existe), reprends au cycle suivant plutôt que de recommencer.
 
 ## Le corpus
 
@@ -25,7 +25,7 @@ code ──► STD ──► SFD ──► SFG
 
 | Cycle | Agents | Sortie | Gate |
 |---|---|---|---|
-| **0** Cadrage | `dmad-scoper` | `scope.yaml` | ⛔ `gate-0-scope` |
+| **0** Cadrage | `dmad-scoper` | `run.yaml` | ⛔ `gate-0-scope` |
 | **1** STD | `dmad-surveyor` → `dmad-cartographer` → `dmad-contract-resolver` → `dmad-challenger` → `dmad-diagram-planner` → `dmad-writer-std` | `std/<point-d-entrée>.md` | ⛔ `revue-cycle-1-std` |
 | **2** SFD | `dmad-carver` ⛔ → `dmad-elucidator` → `dmad-challenger` → `dmad-test-forger` → `dmad-diagram-planner` → `dmad-writer-sfd` | `sfd/<processus>.md` | ⛔ `gate-3-capabilities` puis ⛔ `revue-cycle-2-sfd` |
 | **3** SFG | `dmad-archaeologist` → `dmad-curator` → `dmad-challenger` → `dmad-writer-sfg` | `sfg/<domaine>.md` | ⛔ `revue-cycle-3-sfg` |
@@ -59,12 +59,18 @@ On s'arrête sur **un document terminé**, jamais au milieu d'un cycle, et le ra
 
 ## À la fin de chaque cycle, et avant de livrer
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/tools/validate.py       dmad-output/   # les artefacts
-python3 ${CLAUDE_PLUGIN_ROOT}/tools/check-corpus.py   dmad-output/   # les documents
-python3 ${CLAUDE_PLUGIN_ROOT}/tools/diagram-engine.py --all dmad-output/
-python3 ${CLAUDE_PLUGIN_ROOT}/tools/coverage.py       dmad-output/ --out dmad-output/preuves/couverture.md
-python3 ${CLAUDE_PLUGIN_ROOT}/tools/okf-export.py     dmad-output/ --check
+T=${CLAUDE_PLUGIN_ROOT}/tools
+python3 $T/validate.py       dmad-output/ --code .      # artefacts, plages de lignes comprises
+python3 $T/diagram-engine.py --all dmad-output/
+python3 $T/okf-index.py      dmad-output/ --check       # navigation et conformité
+python3 $T/okf-compose.py    dmad-output/ --all dmad-output/
+python3 $T/check-corpus.py   dmad-output/               # les documents composés
+python3 $T/coverage.py       dmad-output/ --commentaire dmad-output/conduite/lecture.md \
+                                          --out dmad-output/conduite/couverture.md
+python3 $T/freshness.py      dmad-output/ --against . --strict
 ```
+
+**Dans cet ordre**, et **c'est toi qui les lances, jamais l'agent producteur.** Un agent qui atteste son propre travail produit une affirmation d'état vérifié, pas un état vérifié — le premier run réel l'a montré cinq fois, avec cinq agents différents.
 Les deux échouent pour des raisons différentes : le premier sur un schéma violé, le second sur un invariant du corpus — un bloc de code, une section sans ancrage, un cas d'usage à six blocs. **Les lancer avant la revue**, pas après : une revue humaine ne doit pas servir à trouver ce qu'une machine trouve.
 Puis rappelle à l'utilisateur le contrôle par échantillonnage : **tirer 5 claims au hasard, ouvrir le code aux lignes citées, vérifier que la phrase correspond.** Dix minutes, et c'est le seul contrôle qui détecte l'erreur dominante des LLM — citer du vrai code en lui faisant dire autre chose.
 

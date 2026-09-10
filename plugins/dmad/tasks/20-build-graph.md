@@ -1,6 +1,6 @@
 # Task 20 — Construire le Knowledge Graph
 
-**Agent :** `cartographer` · **Phase :** 2 · **Sortie :** `graph/`, `boundaries.yaml`
+**Agent :** `cartographer` · **Phase :** 2 · **Sortie :** `preuves/graphe/`, `boundaries.yaml`
 
 ## Principe
 **On part des points d'entrée, jamais de l'arborescence.** Un dossier `utils/` de 200 fichiers ne dit rien du métier ; une route `POST /invoices/{id}/dispatch` dit tout.

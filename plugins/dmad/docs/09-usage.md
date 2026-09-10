@@ -102,7 +102,7 @@ Les deux premiers niveaux sont des contraintes réelles. Ne compter que sur le t
 | `schema-intelligence` | migrations + client SQL via Bash |
 | `runtime-evidence` | rapports de couverture, logs — lecture de fichiers |
 | `diagram-engine` | `tools/diagram-engine.py` — Mermaid, aucune dépendance |
-| `evidence-store` | fichiers YAML versionnés |
+| `evidence-store` | concepts Markdown versionnés — le run est le bundle |
 
 **Aucun serveur MCP**, et c'est délibéré (D24). Les huit capabilities se satisfont d'outils déjà présents, d'un exécutable local ou du modèle lui-même.
 

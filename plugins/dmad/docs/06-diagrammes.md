@@ -17,7 +17,7 @@ DMAD garde donc l'ambition — **beaucoup de diagrammes** — mais l'encadre par
 
 **R2 — Seuil de lisibilité, paramétrable.** Au-delà du seuil, on ne simplifie pas : on **découpe en plusieurs diagrammes**, chacun avec sa propre question. Un diagramme illisible est une non-livraison.
 
-Les seuils sont déclarés dans `scope.yaml` (D15). Valeurs par défaut, sur trois indicateurs cumulés :
+Les seuils sont déclarés dans `run.yaml` (D15). Valeurs par défaut, sur trois indicateurs cumulés :
 
 | Indicateur | Défaut | Ce qu'il mesure |
 |---|---|---|

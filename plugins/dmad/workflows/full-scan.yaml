@@ -28,7 +28,7 @@ workflow:
     - id: 1-std
       label: "Spécification technique détaillée"
       unit: entrypoint
-      produces: "dmad-output/std/<point-d-entree>.md"
+      produces: "dmad-output/documents/<point-d-entree>.md"
       steps:
 
         - agent: surveyor
@@ -83,7 +83,7 @@ workflow:
       label: "Spécification fonctionnelle détaillée"
       unit: business_object_tree
       requires: "std figée"
-      produces: "dmad-output/sfd/<processus>.md"
+      produces: "dmad-output/documents/<processus>.md"
       steps:
 
         - agent: carver
@@ -133,7 +133,7 @@ workflow:
       label: "Spécification fonctionnelle générale"
       unit: use_case
       requires: "sfd figée"
-      produces: "dmad-output/sfg/<domaine>.md"
+      produces: "dmad-output/documents/<domaine>.md"
       steps:
 
         - agent: archaeologist

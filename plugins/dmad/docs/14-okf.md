@@ -1,16 +1,16 @@
-# DMAD — La couche de preuve en Open Knowledge Format
+# DMAD — Le run est un bundle Open Knowledge Format
 
-## Ce qui est dans le bundle, et ce qui reste dehors
+## Le run EST le bundle
 
-Le **graphe** est de la connaissance destinée à un agent : claims, contrats, business objects, questions ouvertes, réfutations, intentions, cartes d'identité des documents. C'est exactement ce qu'OKF normalise, et c'est le bundle.
-
-Les **trois documents** du corpus restent dehors. OKF pose lui-même la garde : *un bundle est fait pour la connaissance qu'un agent lit, pas pour de la prose humaine.* Une STD à dix-sept sections est lue par un développeur le lundi matin.
+Il n'y a **pas d'export** (D28). Les agents écrivent des concepts — du Markdown à frontmatter — et `dmad-output` est directement un bundle conformant. `tools/okf-index.py` ne produit rien de nouveau : il **maintient** la navigation, index par répertoire et bloc de liens de chaque concept, puis contrôle.
 
 ```bash
-python3 tools/okf-export.py <run> --check --at <horodatage>
+python3 tools/okf-index.py <run> --check
 ```
 
-L'export est **reproductible** quand on fixe `--at` : sans lui, un bundle versionné change à chaque passe et son diff devient illisible.
+**Deux zones sont hors bundle par convention.** `documents/` porte les fichiers composés, qui sont de la prose destinée à des humains — c'est la garde d'OKF, et une STD se lit le lundi matin. `conduite/` porte ce qui parle du run et non du système.
+
+**Ce qui reste de la donnée reste de la donnée.** Faits, graphe, frontières, plans de diagrammes et figures rendues sont lus par des outils. Ils gardent leur format, et une figure rendue porte l'extension `.txt` — sans quoi un validateur y verrait un concept sans frontmatter, ce qui est arrivé.
 
 ## Pourquoi OKF plutôt qu'un format maison
 
@@ -63,7 +63,7 @@ Ce n'est pas forcément une faute — la cible peut être hors périmètre — m
 
 ## Vérifier
 
-L'exportateur porte ses propres contrôles : la règle dure d'OKF (tout concept porte un `type` non vide), les orphelins et les liens morts. Ils suffisent au selftest et ne demandent rien d'autre que Python.
+L'indexeur porte ses propres contrôles : la règle dure d'OKF (tout concept porte un `type` non vide), les orphelins et les liens morts. Ils suffisent au selftest et ne demandent rien d'autre que Python.
 
 Quand le validateur officiel est disponible, il tranche :
 
@@ -72,6 +72,14 @@ node okf-validate.mjs <bundle> --strict
 ```
 
 Le bundle du run de référence passe les deux : *18 concepts, 0 erreur, 0 avertissement, 0 lien mort, 0 orphelin.*
+
+## Deux collisions de vocabulaire, et la règle qui les tranche
+
+**Quand la spécification définit une propriété pour un besoin, elle garde son sens** — même si nos artefacts la nommaient autrement. Une extension ne se justifie que par l'absence d'équivalent officiel, jamais par une habitude de nommage.
+
+`status` en est le cas d'école : OKF y met le cycle de vie du concept (`draft` / `stable` / `deprecated`), DMAD y mettait l'arbitrage d'une claim (`draft` / `challenged` / `validated` / `retired`) et l'état d'une question (`open` / `answered`…). Trois sens pour un nom. L'officiel garde le sien ; les nôtres deviennent `claim_status` et `answer_status`.
+
+Le renommage est le prix de la portabilité : un consommateur OKF quelconque sait lire `status`, il ne saura jamais deviner lequel de nos trois sens il lit.
 
 ## Ce qui reste ouvert
 

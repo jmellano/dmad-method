@@ -33,7 +33,7 @@ Quatre diagrammes portent l'essentiel, et chacun répond à une question précis
 
 ## Seuils
 
-Ceux de `scope.yaml` font foi (D15). Défauts : **N ≤ 12 nœuds · E ≤ 15 arêtes · McCabe ≤ 10**, et 12 participants en séquence.
+Ceux de `run.yaml` font foi (D15). Défauts : **N ≤ 12 nœuds · E ≤ 15 arêtes · McCabe ≤ 10**, et 12 participants en séquence.
 
 Seuils spécifiques par type : classes 15 · séquence 25 messages · C4 composants 20 · ERD 20 tables · call graph profondeur 3 et 25 nœuds · **états 12**.
 

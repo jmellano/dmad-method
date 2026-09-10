@@ -1,6 +1,6 @@
 # Task 31 — Identifier les business objects
 
-**Agent :** `carver` · **Cycle :** 2 · **Sortie :** `business-objects/`
+**Agent :** `carver` · **Cycle :** 2 · **Sortie :** `preuves/business-objects/`
 
 ## Principe
 
@@ -27,7 +27,7 @@ Le patron reconnu est enregistré sur le nœud. Il n'apparaîtra **pas** dans la
 
 ## Ajuster la tension longueur / profondeur
 
-Le nombre de niveaux n'est pas un choix, c'est la **sortie** de la contrainte de lisibilité (`scope.yaml`, défaut N ≤ 12, E ≤ 15, McCabe ≤ 10).
+Le nombre de niveaux n'est pas un choix, c'est la **sortie** de la contrainte de lisibilité (`run.yaml`, défaut N ≤ 12, E ≤ 15, McCabe ≤ 10).
 
 - Un niveau dont le diagramme dépasse les seuils : **décomposer** certaines étapes en sous-niveau. On convertit de la longueur en profondeur.
 - Un empilement de sous-niveaux triviaux : **fusionner**. L'inverse.

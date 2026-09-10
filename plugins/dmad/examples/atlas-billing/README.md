@@ -24,7 +24,7 @@ C'est un `objective.kind: evolve`, et vu la taille du dépôt, un `feature-scan`
 
 ## Le déroulé
 
-### Phase 0 — Cadrage → [`scope.yaml`](scope.yaml)
+### Phase 0 — Cadrage → [`run.yaml`](run.yaml)
 
 Le vocabulaire d'amorce fourni par le responsable comptable — *facture, avoir, échéance, relance, barème, campagne de facturation* — est ce qui rend le feature-scan possible.
 
@@ -34,23 +34,23 @@ Trois exclusions justifiées, une confidentialité tranchée (`local_only: true`
 
 51 points d'entrée recensés sur tout le dépôt, 8 retenus pour la facturation après le gate de localisation. 17 frontières de traversée journalisées, dont **2 dispatchs dynamiques non résolus** — enregistrés comme tels plutôt que devinés.
 
-### Phase 3 — Découpage → [`capabilities/facturation.yaml`](capabilities/facturation.yaml)
+### Phase 3 — Découpage → [`capabilities/facturation.yaml`](socle/capacites/facturation.md)
 
 Le Carver propose 6 capacités, dont une ambiguïté qu'il expose au lieu de la trancher : *Recouvrement* est-elle autonome ou une étape de *Facturation* ? Les données sont partagées, mais l'historique git les sépare depuis 2021.
 
 **Le gate 3 est instructif** : l'expert métier confirme le découpage proposé, mais **pour une raison que le code ne pouvait pas donner** — le recouvrement a ses propres indicateurs et son propre pilotage. Cette raison est conservée dans `gate_3.corrections`, et elle vaudra pour le prochain arbitrage.
 
-### Phase 4 — Élucidation → [`claims/`](claims/)
+### Phase 4 — Élucidation → [`claims/`](processus/facturation/preuves/claims/)
 
 Deux claims illustrent les deux régimes de la méthode :
 
-**[`BR-FACT-021`](claims/BR-FACT-021.yaml)** — l'arrondi des montants. Quatre preuves convergentes dont un type `DECIMAL(12,4)` en base et un test qui passe. C'est le cœur de l'objectif du run.
+**[`BR-FACT-021`](processus/facturation/preuves/claims/BR-FACT-021.md)** — l'arrondi des montants. Quatre preuves convergentes dont un type `DECIMAL(12,4)` en base et un test qui passe. C'est le cœur de l'objectif du run.
 
-**[`BR-FACT-014`](claims/BR-FACT-014.yaml)** — les factures à montant nul. Énoncée d'abord sans condition, en `C`.
+**[`BR-FACT-014`](processus/facturation/preuves/claims/BR-FACT-014.md)** — les factures à montant nul. Énoncée d'abord sans condition, en `C`.
 
-### Phase 5 — Challenge → [`challenges/`](challenges/)
+### Phase 5 — Challenge → [`challenges/`](processus/facturation/preuves/challenges/)
 
-**[`CHK-2026-09-07-031`](challenges/CHK-2026-09-07-031.yaml)** est l'artefact le plus démonstratif du run. Le Challenger examine 8 angles sur 9 (le 9e, la concurrence, est écarté avec justification écrite) et trouve **deux défauts que personne n'aurait vus en relecture** :
+**[`CHK-2026-09-07-031`](processus/facturation/preuves/challenges/CHK-2026-09-07-031.md)** est l'artefact le plus démonstratif du run. Le Challenger examine 8 angles sur 9 (le 9e, la concurrence, est écarté avec justification écrite) et trouve **deux défauts que personne n'aurait vus en relecture** :
 
 - **Angle 3 — configuration.** La règle est pilotée par un flag actif en production mais **inactif par défaut dans le dépôt**. Formulée sans condition, elle est vraie pour qui observe la production et fausse pour un développeur qui lance le projet en local. C'est le type d'erreur qui, découvert plus tard, fait perdre confiance dans toute la documentation.
 
@@ -119,7 +119,7 @@ Aucune de ces quatre choses ne serait sortie d'un « résume-moi ce repo ».
 
 ## Vérifier
 
-### Le bundle OKF → [`okf/`](okf/)
+### Le bundle OKF → [`okf/`](socle/capacites/facturation.md)
 
 L'evidence store exporté en Open Knowledge Format : 18 concepts, aucun orphelin, aucun lien mort. Il montre les deux choix de conception de la couche — **l'intention y est un concept propre**, parce que `verified` vouche pour le concept entier et qu'une intention validée ne prouve pas le fait ; et `confidence_reason` y survit en clé d'extension, parce que c'est le champ qui force à écrire ce qui manque pour monter d'un niveau.
 
@@ -128,11 +128,11 @@ L'export signale au passage **cinq liens vers des artefacts absents** : ce dossi
 ## Vérifier
 
 ```bash
-python3 ../../tools/validate.py     .                    # 17 artefacts valides
-python3 ../../tools/check-corpus.py output/              # 3 documents conformes
-python3 ../../tools/coverage.py     . --commentaire output/preuves/lecture.md
+python3 ../../tools/validate.py     .                    # 14 artefacts valides
+python3 ../../tools/check-corpus.py .                    # 3 documents conformes
+python3 ../../tools/coverage.py     . --commentaire conduite/lecture.md
 python3 ../../tools/okf-export.py   . --check            # bundle conformant
-../../tools/selftest.sh                                  # les neuf sections
+../../tools/selftest.sh                                  # les dix sections
 ```
 
 # Liens

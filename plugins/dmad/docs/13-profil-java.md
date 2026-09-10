@@ -22,9 +22,9 @@ java -version                              # la version du JDK doit correspondre
 |---|---|---|
 | Le projet ne compile pas | l'analyse fonctionne | rien de bloquant ; les contrats sortants retomberont au barreau 3 ou 4 |
 | Dépendances non résolues | pas de traversée dans les artefacts | tenter `dependency:go-offline` ; sinon **le déclarer**, et accepter des contrats non résolus |
-| Version du langage inconnue | l'analyse peut buter sur une construction récente | renseigner `profile.jdk_version` dans `scope.yaml` |
+| Version du langage inconnue | l'analyse peut buter sur une construction récente | renseigner `profile.jdk_version` dans `run.yaml` |
 
-**Règle :** ce qui n'a pas pu être résolu s'écrit dans `scope.yaml` et s'affiche dans le bandeau. Un contrat non résolu porte un placeholder visible — **jamais un code plausible**.
+**Règle :** ce qui n'a pas pu être résolu s'écrit dans `run.yaml` et s'affiche dans le bandeau. Un contrat non résolu porte un placeholder visible — **jamais un code plausible**.
 
 ## Les points d'entrée Java
 
@@ -104,7 +104,7 @@ Un appel HTTP sortant vers un autre module d'un même système d'information por
 | 3 | un commentaire manuscrit dans le code appelant | `I` |
 | 4 | le placeholder | — |
 
-**Le chemin d'accès est le point délicat.** Le code appelant n'importe pas l'interface annotée : il importe une interface de service applicatif qui ne porte aucune annotation. La chaîne générée typique compte trois ou quatre maillons entre l'import et l'annotation. Le motif de nommage se déclare dans `scope.yaml` au gate 0 — sans lui, la résolution retombe au barreau 3.
+**Le chemin d'accès est le point délicat.** Le code appelant n'importe pas l'interface annotée : il importe une interface de service applicatif qui ne porte aucune annotation. La chaîne générée typique compte trois ou quatre maillons entre l'import et l'annotation. Le motif de nommage se déclare dans `run.yaml` au gate 0 — sans lui, la résolution retombe au barreau 3.
 
 **Ce qu'aucune navigation de symboles ne fait ici.** L'annotation vit dans un `-sources.jar` du dépôt Maven local, **hors du périmètre analysé**. C'est de la lecture d'archive, pas de la navigation.
 

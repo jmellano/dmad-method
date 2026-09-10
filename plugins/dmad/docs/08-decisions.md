@@ -134,7 +134,7 @@ lecture sur trois.
 ---
 
 ## D15 — Les seuils de lisibilité sont paramétrables
-**Décision.** Les seuils qui déclenchent le découpage d'un diagramme sont déclarés dans `scope.yaml`. Valeurs par défaut : **N ≤ 12 nœuds, E ≤ 15 arêtes, McCabe ≤ 10**, et ~12 participants pour une séquence.
+**Décision.** Les seuils qui déclenchent le découpage d'un diagramme sont déclarés dans `run.yaml`. Valeurs par défaut : **N ≤ 12 nœuds, E ≤ 15 arêtes, McCabe ≤ 10**, et ~12 participants pour une séquence.
 
 **Pourquoi.** La v0.3 posait ~20 nœuds, le corpus `skills-doc` pose 10-12 avec deux indicateurs supplémentaires. Aucun des deux chiffres n'est mesuré : ce sont des conventions de lisibilité, et une convention se paramètre. Les valeurs `skills-doc` deviennent le défaut parce qu'elles sont les seules à avoir été éprouvées sur des livrables réels, et parce qu'un seuil trop bas coûte un titre de section tandis qu'un seuil trop haut coûte un diagramme que personne ne rouvre.
 
@@ -214,7 +214,7 @@ lecture sur trois.
 
 **Pourquoi le plafond par question est plus juste que le plafond par outil.** Parce que c'est le principe P3 appliqué jusqu'au bout : la confiance se dérive de **la nature de la preuve**. Un plafond unique par implémentation traitait « je sais lire la hiérarchie de types de ce fichier » et « je ne sais pas quelle implémentation est injectée ici » comme la même chose. Elles ne le sont pas, et les confondre pénalisait tout un run pour un dispatch non résolu — ou, pire dans l'autre sens, laissait passer en `V` une exhaustivité que rien ne fondait.
 
-**Ce que ça change concrètement.** Le plafond s'applique **par arête du graphe** et non plus globalement au run. `scope.yaml` déclare donc un plafond maximal *et* le détail par type de question.
+**Ce que ça change concrètement.** Le plafond s'applique **par arête du graphe** et non plus globalement au run. `run.yaml` déclare donc un plafond maximal *et* le détail par type de question.
 
 **Ce que ça ne change pas.** La règle qui fait tenir l'édifice : une réponse dégradée plafonne les affirmations qui en dépendent, et la dégradation reste **visible dans le document produit**.
 
@@ -252,6 +252,32 @@ lecture sur trois.
 **Le composeur refuse plutôt que d'approximer** : un concept du plan introuvable, un concept du bundle absent du plan — du contenu écrit que personne ne lira —, une section imposée sans concept ni sous-section, un saut de niveau de titre, un lien ou une ancre morts.
 
 **Le niveau de titre se déduit du numéro** — profondeur + 1. Le § 3.2.1 est un `h4` des deux côtés, et l'export a le même sommaire que son plan sans avoir à le retranscrire.
+
+---
+
+## D27 — L'arborescence de sortie est ordonnée par sujet
+**Décision.** `dmad-output` se découpe en `processus/<p>/`, `socle/`, `conduite/` et `documents/`. La nature d'un artefact vient **après** son sujet : `processus/facturation/preuves/claims/` et non `claims/`.
+
+**Pourquoi.** Le premier run réel a produit cent fichiers dans sept dossiers plats. Avec un seul processus documenté, `claims/` était déjà difficile à parcourir ; avec deux, le chemin ne dit plus rien du tout. Un chemin doit dire de quoi parle le fichier **avant qu'on l'ouvre**.
+
+**Les trois règles de placement.** Un artefact vit avec le sujet qui le produit — s'il disparaîtrait avec le processus, il est dedans. Ce qui parle du **run** — gate, incident, quarantaine, reçu de contrôle — n'est pas ce qui parle du **système**, et va dans `conduite/`. Et le test de duplication : si deux processus décrivent le même concept avec deux définitions, ce n'est pas une divergence à arbitrer plus tard, c'est un concept qui aurait dû être dans `socle/`.
+
+**Ce que ça coûte.** Des chemins plus longs, et un niveau de plus à traverser pour un run mono-processus. C'est le prix d'une arborescence qui tient au deuxième.
+
+---
+
+## D28 — Une seule représentation : les agents écrivent des concepts
+**Décision.** Les artefacts de connaissance sont des **concepts** — du Markdown à frontmatter — et `dmad-output` **est** le bundle Open Knowledge Format. Plus de YAML dérivé en concepts par un export, plus de dossier `okf/`, plus d'étape d'export.
+
+**Pourquoi.** Deux représentations de la même preuve, c'est deux endroits où chercher et une question récurrente : laquelle fait foi ? La v0.4 avait un store YAML et un bundle exporté qui en dérivait — le doublon était visible dans l'arborescence, et il aurait grandi.
+
+**Ce qu'on ne perd pas.** La validation par JSON Schema, `additionalProperties: false` compris : un frontmatter se valide exactement comme un YAML. Le garde-fou qui refuse un agent inventant son propre format de claim reste entier — et le premier run a montré qu'il est nécessaire.
+
+**Ce qu'on gagne.** La conformité OKF se vérifie en continu au lieu d'être un état d'un export. `okf-export.py` devient `okf-index.py` : il **maintient** la navigation — index par répertoire, bloc de liens de chaque concept — au lieu de dupliquer. Un concept qu'aucun lien n'atteint est détecté à chaque passe.
+
+**Corollaire sur le vocabulaire.** Quand OKF définit une propriété pour un besoin, elle garde son sens : `status` est le cycle de vie du concept. L'arbitrage d'une claim devient `claim_status`, l'état d'une question `answer_status`. **Une extension ne se justifie que par l'absence d'équivalent officiel, jamais par une habitude de nommage** — règle reprise du profil OKF qui a servi de modèle.
+
+**Ce qui reste de la donnée reste de la donnée.** Faits, graphe, frontières, plans et figures rendues sont lus par des outils, pas par des lecteurs. Ils gardent leur format, et une figure rendue porte l'extension `.txt` pour ne pas être prise pour un concept.
 
 ---
 

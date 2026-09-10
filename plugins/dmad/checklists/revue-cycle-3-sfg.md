@@ -21,9 +21,12 @@ Un renvoi vers un autre cas d'usage est un échec de ce test. Le cas d'usage est
 **Elles se lancent avant la séance, pas pendant.**
 
 ```bash
-python3 <plugin>/tools/validate.py     dmad-output/
+python3 <plugin>/tools/validate.py     dmad-output/ --code .
+python3 <plugin>/tools/okf-index.py    dmad-output/ --check
 python3 <plugin>/tools/check-corpus.py dmad-output/
 ```
+
+**C'est le relecteur ou l'orchestrateur qui les lance, jamais l'agent producteur.** Un agent qui atteste son propre travail rend une affirmation d'état vérifié, pas un état vérifié.
 
 Une revue humaine ne doit pas servir à trouver ce qu'une machine trouve. Ce qui suit est ce que les outils vérifient — la liste est là pour dire au relecteur ce qu'il n'a **pas** à faire, et donc où porter son attention.
 

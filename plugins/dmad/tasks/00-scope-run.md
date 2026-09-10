@@ -1,6 +1,6 @@
 # Task 00 — Cadrer le run
 
-**Agent :** `scoper` · **Phase :** 0 · **Sortie :** `scope.yaml`, `glossary-seed.md`
+**Agent :** `scoper` · **Phase :** 0 · **Sortie :** `run.yaml`, `glossary-seed.md`
 
 ## Objectif
 Produire un cadrage assez précis pour qu'un run soit **utile et fini**. La majorité des runs DMAD qui coûtent cher pour rien sont des runs mal cadrés, pas des runs mal exécutés.

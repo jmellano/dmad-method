@@ -23,16 +23,29 @@ Trois raisons, dans l'ordre où elles comptent.
 ## Avant de lancer
 
 ```bash
-java -version                                  # doit correspondre au projet
-mvn -q -DskipTests dependency:go-offline       # décide du plafond de confiance
-python3 <plugin>/tools/validate.py .           # le scope est-il conforme
+java -version                                  # renseigne profile.jdk_version
+mvn -q -DskipTests dependency:go-offline       # optionnel : résout les contrats au barreau 1
+python3 <plugin>/tools/validate.py .           # le cadrage est-il conforme
 ```
 
 Un projet dont les dépendances ne résolvent pas n'est pas un échec : c'est un run plafonné à `I`, à condition que le plafond soit écrit dans `capabilities_available` et affiché dans le bandeau du document.
 
+## L'arborescence que le run produira
+
+```
+dmad-output/
+├── run.yaml · PERIMETRE.txt · index.md
+├── conduite/          gates, contrôles, incidents, quarantaine, couverture
+├── socle/             ce qui survivrait à ce processus
+├── processus/<p>/     preuves/, diagrammes/, std/, plan-std.yaml
+└── documents/         STD-<processus>.md
+```
+
+Le sujet vient avant la nature (D27) : `processus/<p>/preuves/claims/`, pas `claims/`. Sur un run mono-processus c'est un niveau de plus ; c'est ce qui rend le deuxième processus lisible.
+
 ## Ce qu'on obtient
 
-Une STD : dix-sept sections, aucune omise, aucun bloc de code — des références `fichier:lignes`, des signatures, des noms de tables. Plus le graphe, les contrats résolus avec leur barreau, les questions ouvertes et le rapport de couverture.
+Une STD : onze chapitres, aucun omis, aucun bloc de code — des références `fichier:lignes`, des signatures, des noms de tables. Plus le graphe, les contrats résolus avec leur barreau, les questions ouvertes et le rapport de couverture.
 
 ## Ce qu'on n'obtient pas
 

@@ -118,6 +118,8 @@ Ce que ni un LLM libre ni un lecteur pressé ne feraient spontanément — et c'
 
 ## Stockage
 
-Fichiers plats YAML versionnés dans git, un fichier par claim, indexés par un `index.json` généré.
+**Un concept par claim** — du Markdown à frontmatter, versionné dans git, rangé sous le processus qui le produit : `processus/<p>/preuves/claims/BR-014.md` (D27, D28).
+
+Le frontmatter porte les champs structurés et se valide contre un JSON Schema comme un YAML ; **le corps EST l'énoncé**, pour qu'un même texte ne vive pas à deux endroits. Les index sont générés par `okf-index.py`, jamais écrits à la main.
 
 Raisons : diffable en revue, corrigeable à la main par un expert métier, aucune infrastructure à déployer, et l'historique des corrections devient lui-même une source de connaissance. Une base graphe n'apporterait rien à cette échelle et ajouterait une dépendance à installer chez le client.

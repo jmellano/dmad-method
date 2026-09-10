@@ -120,6 +120,11 @@ def indexer(run):
         "agent lit, et la garde d'OKF les laisse dehors.\n\n# Sections\n\n"
         + "\n".join(f"- [{TITRES.get(s, s)}]({s}/)" for s in sections) + "\n",
         encoding="utf-8")
+    # Un index qui survit à ses concepts pointe dans le vide : on le retire.
+    for index in run.rglob("index.md"):
+        if index.parent != run and index.parent not in par_dossier:
+            index.unlink()
+
     for d, fichiers in sorted(par_dossier.items()):
         titre = TITRES.get(d.name, d.name.replace("-", " ").capitalize())
         lignes = [f"# {titre}", ""]

@@ -1,7 +1,7 @@
 kind: STD
 unit: process
 unit_ref: '{{processus}}'
-output: dmad-output/STD-{{slug}}.md
+output: documents/STD-{{slug}}.md
 title: '{{CODE}} — Spécification Technique Détaillée'
 derives_from: []
 sections:

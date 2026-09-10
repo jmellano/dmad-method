@@ -32,4 +32,4 @@ Chaque arrêt de traversée est journalisé dans `boundaries.yaml` avec sa raiso
 Réflexion, IoC, `eval`, dispatch par chaîne, appel via configuration : **tu ne devines pas**. Tu poses un nœud `unresolved_dispatch` avec le site d'appel, les candidats plausibles et une question ouverte. Choisir silencieusement un candidat ferait bâtir trois pages sur une supposition.
 
 ## Sortie
-`graph/`, `boundaries.yaml`.
+`preuves/graphe/`, `boundaries.yaml`.

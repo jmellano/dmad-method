@@ -1,10 +1,10 @@
 kind: SFG
 unit: domain
 unit_ref: '{{domaine}}'
-output: dmad-output/SFG-{{slug}}.md
+output: documents/SFG-{{slug}}.md
 title: SFG — {{domaine}}
 derives_from:
-- dmad-output/SFD-{{slug}}.md
+- documents/SFD-{{slug}}.md
 sections:
 - number: ''
   title: Note d'audience

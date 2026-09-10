@@ -55,7 +55,7 @@
 
 **Le nom.** « DMAD » se lit *mad* en anglais et sonne comme une parodie de BMAD. Assumé comme clin d'œil, ou à retravailler avant publication ? À trancher avant, pas après.
 
-**La confidentialité.** Analyser du code client avec des agents implique des règles explicites : ce qui sort de la machine, ce qui reste local, ce qui est caviardé. Le champ existe dans `scope.yaml`, mais **le mécanisme d'application n'est pas spécifié**. C'est bloquant pour tout usage en prestation.
+**La confidentialité.** Analyser du code client avec des agents implique des règles explicites : ce qui sort de la machine, ce qui reste local, ce qui est caviardé. Le champ existe dans `run.yaml`, mais **le mécanisme d'application n'est pas spécifié**. C'est bloquant pour tout usage en prestation.
 
 **Les capacités sans code.** Une procédure manuelle, un Excel parallèle, un traitement chez un prestataire : invisibles pour DMAD, souvent critiques. Le gate 3 pose la question à l'expert (« il en manque une ? »), mais la méthode n'a aucun moyen de les détecter seule. C'est une limite structurelle à assumer, pas un défaut à corriger.
 

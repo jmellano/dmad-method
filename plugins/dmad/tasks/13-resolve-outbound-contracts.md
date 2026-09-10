@@ -1,6 +1,6 @@
 # Task 13 — Résoudre les contrats des appels sortants
 
-**Agent :** `contract-resolver` · **Cycle :** 1 · **Sortie :** `contracts/`
+**Agent :** `contract-resolver` · **Cycle :** 1 · **Sortie :** `preuves/contrats/`
 
 ## Principe
 
@@ -22,7 +22,7 @@ Un appel sortant sans son code de contrat est une frontière anonyme. Avec son c
 ## Procédure par appel sortant
 
 1. **Partir du site d'appel** posé par le Cartographer, et résoudre le type du champ injecté jusqu'à l'interface importée. C'est le point de départ, et un outil de navigation sémantique le fait bien.
-2. **Remonter la chaîne générée** jusqu'à l'interface qui porte l'annotation. Le code appelant n'importe presque jamais celle-ci : il importe une interface de service applicatif, qui n'en porte aucune. Le motif de nommage de la chaîne est déclaré dans `scope.yaml`.
+2. **Remonter la chaîne générée** jusqu'à l'interface qui porte l'annotation. Le code appelant n'importe presque jamais celle-ci : il importe une interface de service applicatif, qui n'en porte aucune. Le motif de nommage de la chaîne est déclaré dans `run.yaml`.
 3. **Ouvrir l'artefact de la dépendance.** Il vit hors du projet indexé : **aucun outil de navigation sémantique ne le voit**. C'est de la lecture d'archive. La recette est dans `${CLAUDE_PLUGIN_ROOT}/docs/13-profil-java.md`.
 4. **Relever le bloc d'annotations complet** — il donne d'un coup le code, le verbe, la route et le nom d'opération. Quatre attributs pour une seule lecture, c'est ce qui rend le barreau 1 rentable même quand un commentaire donne déjà le code.
 5. **Confirmer l'invocation depuis le chemin cible.** Une classe utilitaire peut porter un contrat annoté sans être invoquée depuis le périmètre étudié. Sans cette confirmation, on documente des appels qui n'ont pas lieu.

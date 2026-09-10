@@ -13,7 +13,7 @@
 - [ ] En `feature-scan` : **au moins 3 termes de vocabulaire métier** fournis par le commanditaire lui-même.
 - [ ] **La confidentialité est tranchée** : ce qui peut sortir de la machine, ce qui reste local. Avant le premier appel d'outil, jamais après.
 - [ ] **Le budget est accepté** en ordre de grandeur (temps, coût).
-- [ ] `scope.yaml` valide contre `scope.schema.json`.
+- [ ] `run.yaml` valide contre `scope.schema.json`.
 
 ## Avertissements — le run peut démarrer, mais le commanditaire doit avoir entendu
 

@@ -53,7 +53,7 @@ Les documents se lisent dans l'ordre, mais chacun est autonome.
 | `tools/coverage.py` | les chiffres du rapport de couverture ; l'interprétation reste écrite |
 | `tools/scaffold.py` | matérialise, depuis un plan, les concepts vides et leur consigne |
 | `tools/okf-compose.py` | bundle + plan → le document composé ; refuse plutôt que d'approximer |
-| `tools/okf-export.py` | l'evidence store en bundle Open Knowledge Format conformant |
+| `tools/okf-index.py` | l'evidence store en bundle Open Knowledge Format conformant |
 | `tools/selftest.sh` | prouve que les garde-fous refusent bien ce qu'ils doivent refuser |
 
 > Un principe qui n'est pas contraint par un outil est un vœu pieux, et chaque message d'erreur nomme la décision qu'il applique — un message qui ne dit pas quelle règle il fait respecter se fait contourner, puis supprimer, au premier agacement.

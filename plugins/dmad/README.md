@@ -55,7 +55,7 @@ Cycle 3   Archaeologist ─► Curator ─► Challenger ─► Writer:SFG ─�
 
 **→ [Run de référence : Atlas ERP, capacité Facturation](examples/atlas-billing/)**
 
-Un run complet déroulé de bout en bout : le cadrage, le découpage validé par un expert, deux claims aux régimes opposés, un challenge qui trouve deux défauts invisibles en relecture, et le corpus qui en sort — [STD](examples/atlas-billing/output/STD-facturation.md), [SFD](examples/atlas-billing/output/SFD-facturation.md), [SFG](examples/atlas-billing/output/SFG-facturation.md).
+Un run complet déroulé de bout en bout : le cadrage, le découpage validé par un expert, deux claims aux régimes opposés, un challenge qui trouve deux défauts invisibles en relecture, et le corpus qui en sort — [STD](examples/atlas-billing/documents/STD-facturation.md), [SFD](examples/atlas-billing/documents/SFD-facturation.md), [SFG](examples/atlas-billing/documents/SFG-facturation.md).
 
 ## Structure du dépôt
 
@@ -77,7 +77,7 @@ plugins/dmad/
 │                   diagram-engine.py rend, compte, et refuse au-delà du seuil
 │                   freshness.py      péremption, et sa propagation vers le haut
 │                   coverage.py       les chiffres ; l'interprétation reste écrite
-│                   okf-export.py     le graphe en bundle Open Knowledge Format
+│                   okf-index.py      maintient la navigation du bundle, et contrôle
 │                   okf-compose.py    bundle + plan → STD, SFD, SFG composées
 │                   scaffold.py       les concepts à remplir, depuis le plan
 │                   selftest.sh       prouve que les garde-fous mordent

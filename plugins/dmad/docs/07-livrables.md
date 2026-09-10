@@ -23,28 +23,48 @@ Depuis la v0.4, DMAD produit un **corpus à trois documents en cascade d'abstrac
 
 ```
 dmad-output/
-├── 00-index.md                    # portail, périmètre, couverture, mode d'emploi des badges
+├── index.md                      portail du run — déclare okf_version
+├── run.yaml                      cadrage validé au gate 0
+├── PERIMETRE.txt                 liste fermée des fichiers suivis
 │
-├── std/                           # cycle 1 — un document par point d'entrée
-│   └── <point-d-entree>.md
+├── conduite/                     ← le RUN, pas le système
+│   ├── gates/                    les décisions humaines, tracées
+│   ├── controles/                les reçus des outils
+│   ├── incidents/                ce qui a mal tourné, et ce qu'on en a tiré
+│   ├── quarantaine/              les artefacts écartés, avec leur motif
+│   ├── log.md                    journal du run
+│   ├── couverture.md             les chiffres, calculés
+│   └── lecture.md                leur interprétation, écrite
 │
-├── sfd/                           # cycle 2 — un document par arbre de business objects
-│   └── <processus>.md
+├── socle/                        ← ce qui existerait sans ce processus
+│   ├── capacites/
+│   ├── metier/
+│   └── technique/
 │
-├── sfg/                           # cycle 3 — un document par domaine, découpé par cas d'usage
-│   └── <domaine>.md
+├── processus/<processus>/
+│   ├── preuves/
+│   │   ├── faits/                mécanique, V, cycle 1
+│   │   ├── graphe/               graphe et frontières
+│   │   ├── claims/
+│   │   ├── contrats/
+│   │   ├── business-objects/
+│   │   ├── challenges/
+│   │   └── questions/
+│   ├── diagrammes/               plans, figures rendues, journal des refus
+│   ├── std/  sfd/  sfg/          les concepts de chaque strate
+│   └── plan-std.yaml  plan-sfd.yaml  plan-sfg.yaml
 │
-├── preuves/
-│   ├── claims/                    # une claim = un fichier
-│   ├── contracts/                 # les contrats sortants résolus, avec leur barreau et leur version
-│   ├── business-objects/          # les BO, leurs niveaux, leurs feuilles propres
-│   ├── index.json
-│   ├── open-questions.md          # registre consolidé, priorisé
-│   ├── challenges.md              # journal des réfutations du Challenger
-│   └── couverture.md              # ⚠️ quelle part du code a été atteinte
-│
-└── tests/characterization/        # les tests forgés qui prouvent les règles
+├── documents/                    ← les fichiers composés, seuls artefacts à diffuser
+└── tests/characterization/
 ```
+
+**Le sujet vient avant la nature** (D27). Un chemin doit dire de quoi parle le fichier avant qu'on l'ouvre : `processus/facturation/preuves/claims/BR-014.md`, pas `claims/BR-014.md`. Le premier run réel a produit cent fichiers dans sept dossiers plats, et le chemin ne disait rien.
+
+**`conduite/` isole ce qui parle du run** — gates, contrôles, incidents, quarantaine — de ce qui parle du système. Les mélanger est ce qui rend une racine illisible.
+
+**`socle/` existe dès le premier processus**, presque vide. C'est le seul moyen d'éviter qu'un concept partagé naisse dans le premier et soit recopié dans le second. Le test qui décide : *si deux processus le décrivent différemment, ce n'est pas une divergence à arbitrer plus tard, c'est un concept qui aurait dû être là.*
+
+**`dmad-output` est un bundle Open Knowledge Format** (D28). Les agents écrivent des concepts ; il n'y a pas d'export. `documents/` et `conduite/` en sont exclus par convention : les documents composés et la conduite du run ne sont pas de la connaissance qu'un agent lit.
 
 ## Les trois documents
 
@@ -187,7 +207,7 @@ C'est **l'ordre du jour de l'atelier métier** — souvent le livrable le plus i
 **Corpus produit :** STD ✅ (12 points d'entrée) · SFD ✅ (4 processus) · SFG ⏸️ (budget)
 
 **Non couvert :** modules `legacy-import`, `reporting-v1`, `admin-tools`
-(hors périmètre — cf. `scope.yaml`).
+(hors périmètre — cf. `run.yaml`).
 
 **Répartition des affirmations :** V 34 % · C 41 % · I 21 % · H 4 %
 ```

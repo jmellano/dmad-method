@@ -62,7 +62,7 @@ On ne lance rien avant d'avoir répondu à :
 - Quelles **sources non-code** disponibles ? (git complet ou tronqué, Jira/Redmine, wiki, ADR, anciens cahiers des charges, humains encore joignables)
 - Quel **vocabulaire métier d'amorce** ? (5–20 termes que le commanditaire utilise : « dossier », « adhérent », « lot », « avoir »…) — c'est la clé d'entrée du `feature-scan`.
 
-**Sortie :** `scope.yaml` + glossaire d'amorce.
+**Sortie :** `run.yaml` + glossaire d'amorce.
 **⛔ Gate humain.** Un périmètre mal cadré fait exploser le coût sans rien produire.
 
 ---
@@ -99,7 +99,7 @@ Construction du **Knowledge Graph** :
 
 Le LLM intervient ici pour **nommer et regrouper**, jamais pour inventer une arête. **Une arête du graphe vient d'un outil, pas d'une intuition.**
 
-**Sortie :** `graph/`, `boundaries.yaml`.
+**Sortie :** `preuves/graphe/`, `boundaries.yaml`.
 
 ### 1.3 Résolution des contrats sortants
 Agent `Contract Resolver`. **Nouveau en v0.4.**
@@ -119,7 +119,7 @@ Le code se lit à quatre endroits de fiabilité très inégale, et **la confianc
 
 Chaque contrat résolu devient un nœud `ExternalContract`, feuille du graphe au même titre qu'un accès base de données, portant **obligatoirement la version de l'artefact** où le contrat a été lu (D18) — le contrat décrit ce que le module consomme, pas ce que le module appelé publie aujourd'hui.
 
-**Sortie :** `contracts/`.
+**Sortie :** `preuves/contrats/`.
 
 ### 1.4 Challenge technique
 Agent `Challenger`, angles du registre mécanique :
@@ -154,7 +154,7 @@ Agent `Carver`. Modèle fort : c'est un travail de jugement.
 
 **⛔ Gate humain — `gate-3-capabilities`, le plus important de la méthode.** C'est ici qu'un métier corrige en 20 minutes ce que quatre heures d'agents auraient mal deviné. Le découpage proposé est faux quelque part : autant le savoir avant de documenter dessus. Depuis la v0.4 il se tient **après** la revue de la STD (D21), donc devant un expert qui vient de lire la carte technique.
 
-**Sortie :** `capabilities.yaml` (validé), `business-objects/`.
+**Sortie :** `capabilities.yaml` (validé), `preuves/business-objects/`.
 
 ### 2.2 Élucidation
 Agents `Elucidator` et, en parallèle, préparation de l'`Archaeologist` pour le cycle 3.

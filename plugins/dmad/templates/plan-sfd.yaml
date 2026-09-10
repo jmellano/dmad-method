@@ -1,10 +1,10 @@
 kind: SFD
 unit: process
 unit_ref: '{{processus}}'
-output: dmad-output/SFD-{{slug}}.md
+output: documents/SFD-{{slug}}.md
 title: '{{CODE}} — Spécification Fonctionnelle Détaillée'
 derives_from:
-- dmad-output/STD-{{slug}}.md
+- documents/STD-{{slug}}.md
 sections:
 - number: ''
   title: Chapeau — audience, périmètre, prérequis lecteur

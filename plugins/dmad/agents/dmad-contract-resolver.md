@@ -58,6 +58,6 @@ confidence: V
 **Un code trouvé n'est pas un appel confirmé.** Une classe utilitaire peut porter un contrat annoté sans jamais être invoquée depuis le chemin étudié. Confirme l'invocation par une recherche de références avant de rattacher le contrat au périmètre — sinon tu documentes des appels qui n'ont pas lieu.
 
 ## Sortie
-`contracts/`. Et pour chaque appel sortant non résolu : un placeholder, une question ouverte, et une ligne dans les points d'attention de la STD.
+`preuves/contrats/`. Et pour chaque appel sortant non résolu : un placeholder, une question ouverte, et une ligne dans les points d'attention de la STD.
 
 Procédure : `${CLAUDE_PLUGIN_ROOT}/tasks/13-resolve-outbound-contracts.md`.

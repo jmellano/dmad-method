@@ -67,4 +67,4 @@ Deux choses restent utiles quand elles sont disponibles, et **aucune n'est bloqu
 - **Les dépendances résolues**, pour la traversée vers l'intérieur des artefacts et la résolution des contrats sortants au barreau 1. Sans elles, la résolution retombe au barreau du commentaire manuscrit, celui qui survit aux refactorings et ment alors sans le dire.
 - **La version du langage**, pour que l'analyse syntaxique ne bute pas sur une construction récente.
 
-Ce qui manque se déclare dans `scope.yaml` et s'affiche dans le bandeau. Un projet qui ne compile pas n'est plus un run dégradé : c'est un run normal dont certains contrats ne seront pas résolus, et qui le dit.
+Ce qui manque se déclare dans `run.yaml` et s'affiche dans le bandeau. Un projet qui ne compile pas n'est plus un run dégradé : c'est un run normal dont certains contrats ne seront pas résolus, et qui le dit.

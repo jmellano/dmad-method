@@ -17,7 +17,7 @@ L'ordre n'est pas anodin. Dans BMAD, la persona porte l'essentiel. Dans DMAD, **
 
 ### `Scoper` — le facilitateur
 - **Lit :** rien du code. Dialogue avec l'humain.
-- **Produit :** `scope.yaml`, glossaire d'amorce, budget.
+- **Produit :** `run.yaml`, glossaire d'amorce, budget.
 - **Plafond :** n/a
 - **Rôle :** poser les questions de cadrage, refuser de lancer un run mal borné. Seul agent réellement conversationnel.
 
