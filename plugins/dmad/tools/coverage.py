@@ -41,29 +41,40 @@ LIBELLES = {
 DEGRADE = {"confirmed": 0, "demoted": 1, "contradicted": 1, "split": 1, "reformulate": 1}
 
 
-def charger(dossier):
-    if not dossier.is_dir():
-        return []
+def charger(racine, *sous):
+    """Cherche dans chaque processus, puis à la racine. Le sujet avant la nature."""
     out = []
-    for path in sorted(dossier.glob("*.y*ml")):
-        try:
-            out.append(yaml.safe_load(path.read_text(encoding="utf-8")) or {})
-        except yaml.YAMLError:
-            pass
+    for chemin in sous:
+        for d in list((racine / "processus").glob(f"*/{chemin}")) + [racine / chemin]:
+            if not d.is_dir():
+                continue
+            for path in sorted(list(d.glob("*.y*ml")) + list(d.glob("*.md"))):
+                txt = path.read_text(encoding="utf-8")
+                if path.suffix == ".md":
+                    if not txt.startswith("---"):
+                        continue
+                    fin = txt.find("\n---", 3)
+                    txt = txt[3:fin] if fin != -1 else ""
+                try:
+                    doc = yaml.safe_load(txt) or {}
+                except yaml.YAMLError:
+                    continue
+                if isinstance(doc, dict):
+                    out.append(doc)
     return out
 
 
 def rendre(run, commentaire=None):
-    claims = charger(run / "claims")
-    contrats = charger(run / "contracts")
-    challenges = charger(run / "challenges")
-    documents = charger(run / "documents")
-    questions = charger(run / "open-questions")
+    claims = charger(run, "preuves/claims")
+    contrats = charger(run, "preuves/contrats")
+    challenges = charger(run, "preuves/challenges")
+    documents = []
+    questions = charger(run, "preuves/questions")
 
     l = [f"# Couverture de l'analyse — {run.name}", ""]
 
     # --- ce qui vient des faits, ou rien
-    faits = run / "facts" / "coverage.json"
+    faits = next(iter(sorted(run.rglob("faits/coverage.json"))), run / "_absent")
     l += ["## Ce qui a été atteint", "", "| Indicateur | Valeur | Poids |", "|---|---|---|"]
     if faits.exists():
         mesures = json.loads(faits.read_text(encoding="utf-8"))

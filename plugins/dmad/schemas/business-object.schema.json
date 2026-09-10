@@ -4,25 +4,42 @@
   "title": "DMAD Business Object",
   "description": "Un nœud d'orchestration qui conjugue plusieurs feuilles externes ou plusieurs sous-objets. Ossature de la vue récursive de la SFD. Nommé par son sens fonctionnel, jamais par la méthode dont il est issu.",
   "type": "object",
-  "required": ["id", "functional_name", "recursive_depth", "business_layer", "produced_by", "confidence"],
+  "required": [
+    "id",
+    "functional_name",
+    "recursive_depth",
+    "business_layer",
+    "produced_by",
+    "confidence",
+    "type"
+  ],
   "additionalProperties": false,
   "properties": {
-    "id": { "type": "string", "pattern": "^BO-[A-Z0-9]+-[0-9]{3}$" },
+    "id": {
+      "type": "string",
+      "pattern": "^BO-[A-Z0-9]+-[0-9]{3}$"
+    },
     "functional_name": {
       "type": "string",
       "minLength": 3,
       "description": "Ce que l'objet EST pour le métier. Un nom qu'un analyste ne reconnaîtrait pas signale un filtre de pertinence trop laxiste. Contrôlé : un nom qui ressemble à un identifiant de code est refusé."
     },
-    "capability": { "type": "string" },
+    "capability": {
+      "type": "string"
+    },
     "recursive_depth": {
       "type": "integer",
       "minimum": 0,
       "description": "Profondeur dans l'arbre. 0 = n'invoque que des feuilles externes."
     },
-    "business_layer": { "type": "string" },
+    "business_layer": {
+      "type": "string"
+    },
     "patterns": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Patrons reconnus. Conditionnent le découpage et le choix du diagramme, apparaissent en STD, et le Writer:SFD a l'interdiction de les écrire."
     },
     "own_leaves": {
@@ -30,57 +47,172 @@
       "description": "Une feuille non typée est une traversée inachevée.",
       "items": {
         "type": "object",
-        "required": ["kind", "ref", "role"],
+        "required": [
+          "kind",
+          "ref",
+          "role"
+        ],
         "additionalProperties": false,
         "properties": {
-          "kind": { "enum": ["database", "event", "contract", "file", "notification", "boundary"] },
-          "ref": { "type": "string" },
+          "kind": {
+            "enum": [
+              "database",
+              "event",
+              "contract",
+              "file",
+              "notification",
+              "boundary"
+            ]
+          },
+          "ref": {
+            "type": "string"
+          },
           "role": {
-            "enum": ["traitement", "controle"],
+            "enum": [
+              "traitement",
+              "controle"
+            ],
             "description": "Traitement = transforme. Contrôle = branche et orchestre."
           },
           "availability": {
-            "enum": ["initiale", "ad-hoc"],
+            "enum": [
+              "initiale",
+              "ad-hoc"
+            ],
             "description": "Ad-hoc = chargée en cours d'exécution. Signal le plus rentable du cycle 2 : une donnée ad-hoc dans une boucle est un appel par itération."
           },
-          "in_loop": { "type": "boolean" },
-          "cardinality": { "type": "string" }
+          "in_loop": {
+            "type": "boolean"
+          },
+          "cardinality": {
+            "type": "string"
+          }
         }
       }
     },
     "sub_objects": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^BO-[A-Z0-9]+-[0-9]{3}$" }
+      "items": {
+        "type": "string",
+        "pattern": "^BO-[A-Z0-9]+-[0-9]{3}$"
+      }
     },
-    "confidence": { "enum": ["V", "C", "I", "H"] },
-    "confidence_reason": { "type": "string", "minLength": 20 },
-    "evidence": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidence" } },
-    "produced_by": { "type": "string" },
-    "open_questions": { "type": "array", "items": { "type": "string", "pattern": "^OQ-[0-9]{3}$" } },
-    "freshness": { "$ref": "#/$defs/freshness" }
+    "confidence": {
+      "enum": [
+        "V",
+        "C",
+        "I",
+        "H"
+      ]
+    },
+    "confidence_reason": {
+      "type": "string",
+      "minLength": 20
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "produced_by": {
+      "type": "string"
+    },
+    "open_questions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^OQ-[0-9]{3}$"
+      }
+    },
+    "freshness": {
+      "$ref": "#/$defs/freshness"
+    },
+    "type": {
+      "type": "string",
+      "minLength": 2,
+      "description": "Nature du concept. Requise par OKF — c'est sa seule règle dure."
+    },
+    "title": {
+      "type": "string",
+      "description": "Nom d'affichage du concept (OKF §4.1)."
+    },
+    "description": {
+      "type": "string",
+      "description": "Une phrase. Reprise telle quelle par les index."
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
   },
   "$defs": {
     "evidence": {
       "type": "object",
-      "required": ["kind", "ref"],
+      "required": [
+        "kind",
+        "ref"
+      ],
       "additionalProperties": false,
       "properties": {
-        "kind": { "enum": ["code", "test", "schema", "migration", "commit", "ticket", "runtime", "config", "contract", "absence"] },
-        "ref": { "type": "string" },
-        "commit": { "type": "string" },
-        "tool": { "type": "string" },
-        "note": { "type": "string" }
+        "kind": {
+          "enum": [
+            "code",
+            "test",
+            "schema",
+            "migration",
+            "commit",
+            "ticket",
+            "runtime",
+            "config",
+            "contract",
+            "absence"
+          ]
+        },
+        "ref": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "tool": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
       }
     },
     "freshness": {
       "type": "object",
-      "required": ["verified_at_commit", "status"],
+      "required": [
+        "verified_at_commit",
+        "status"
+      ],
       "additionalProperties": false,
       "properties": {
-        "verified_at_commit": { "type": "string" },
-        "verified_at": { "type": "string", "format": "date-time" },
-        "status": { "enum": ["fresh", "shifted", "stale", "broken"] },
-        "last_checked": { "type": "string", "format": "date-time" }
+        "verified_at_commit": {
+          "type": "string"
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "enum": [
+            "fresh",
+            "shifted",
+            "stale",
+            "broken"
+          ]
+        },
+        "last_checked": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
     }
   }

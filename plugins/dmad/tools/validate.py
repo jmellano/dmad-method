@@ -6,6 +6,16 @@ des principes du manifeste. Une claim sans preuve, une exclusion sans
 justification ou une question sans destinataire sont refusées ici, pas
 signalées en relecture.
 
+**Les artefacts de connaissance sont des concepts** — du Markdown à frontmatter
+(D27). Le frontmatter se valide contre les mêmes schémas qu'un YAML,
+`additionalProperties: false` compris : le garde-fou qui refuse un agent
+inventant son propre format reste entier. **Le corps du concept EST son
+énoncé** : il est injecté comme `statement` avant validation, pour qu'un même
+texte ne vive pas à deux endroits.
+
+Ce qui reste de la donnée reste de la donnée : faits, graphe, frontières et
+plans sont lus par des outils, pas par des lecteurs, et gardent leur format.
+
     python3 tools/validate.py <dossier-run> [--schemas dmad/schemas]
 """
 import argparse
@@ -21,16 +31,31 @@ except ImportError:  # pragma: no cover
     sys.exit("dépendances manquantes : pip install pyyaml jsonschema")
 
 # Le nom du dossier détermine le schéma appliqué.
+# Chemins relatifs à un processus. Le sujet vient avant la nature : un chemin
+# doit dire de quoi parle le fichier avant qu'on l'ouvre (D27).
 ROUTES = {
-    "claims": "claim.schema.json",
-    "challenges": "challenge.schema.json",
-    "open-questions": "open-question.schema.json",
-    "capabilities": "capability.schema.json",
-    "contracts": "external-contract.schema.json",
-    "business-objects": "business-object.schema.json",
-    "documents": "document.schema.json",
+    "preuves/claims": "claim.schema.json",
+    "preuves/challenges": "challenge.schema.json",
+    "preuves/questions": "open-question.schema.json",
+    "preuves/contrats": "external-contract.schema.json",
+    "preuves/business-objects": "business-object.schema.json",
 }
-SINGLE_FILES = {"scope.yaml": "scope.schema.json"}
+# Routes de racine, hors processus.
+ROUTES_RACINE = {
+    "socle/capacites": "capability.schema.json",
+    "socle/metier": "claim.schema.json",
+    "socle/technique": "claim.schema.json",
+}
+SINGLE_FILES = {"run.yaml": "scope.schema.json", "scope.yaml": "scope.schema.json"}
+
+# Un dossier routé ne contient QUE des concepts. Un artefact ignoré doit être
+# aussi bruyant qu'un artefact invalide : c'est ainsi que neuf claims écrites
+# en .json ont traversé un run sans être regardées.
+EXTENSIONS_CONCEPT = {".md"}
+# Le corps d'un concept EST son énoncé — mais toutes les natures ne l'appellent
+# pas « statement » : une question ouverte est une question.
+CHAMP_CORPS = {"preuves/questions": "question"}
+TOLERES = {"index.md", "log.md", "README.md"}
 
 CONFIDENCE_ORDER = {"H": 0, "I": 1, "C": 2, "V": 3}
 
@@ -49,7 +74,140 @@ DOCUMENT_UNIT = {"STD": "entrypoint", "SFD": "business_object_tree", "SFG": "use
 
 def load(path: pathlib.Path):
     text = path.read_text(encoding="utf-8")
-    return yaml.safe_load(text) if path.suffix in (".yaml", ".yml") else json.loads(text)
+    if path.suffix in (".yaml", ".yml"):
+        return yaml.safe_load(text)
+    if path.suffix == ".json":
+        return json.loads(text)
+    return load_concept(text)
+
+
+def load_concept(text: str, champ: str = "statement"):
+    """Un concept : frontmatter YAML, puis un corps qui EST l'énoncé."""
+    if not text.startswith("---"):
+        raise ValueError("concept sans frontmatter — la règle dure d'OKF")
+    fin = text.find("\n---", 3)
+    if fin == -1:
+        raise ValueError("frontmatter non refermé")
+    doc = yaml.safe_load(text[3:fin]) or {}
+    if not isinstance(doc, dict):
+        raise ValueError("frontmatter qui n'est pas un mapping")
+    corps = text[fin + 4:]
+    corps = re.split(r"^# Liens\s*$", corps, maxsplit=1, flags=re.M)[0]
+    corps = re.sub(r"^\[\^[^\]]+\]:.*$", "", corps, flags=re.M).strip()
+    if corps and champ not in doc:
+        doc[champ] = corps
+    return doc
+
+
+RE_REF = re.compile(r"^(?P<file>[^#\s]+)#L(?P<start>\d+)(?:-L?(?P<end>\d+))?$")
+
+
+def check_refs(artefacts, racine_code, errors):
+    """Toute plage de lignes citée tient dans son fichier.
+
+    C'est le contrôle qui manquait, et celui qui aurait attrapé une cartographie
+    faite dans une copie hors périmètre sans lire une ligne de code : une preuve
+    `fichier#L325-333` sur un fichier de 106 lignes passait au vert.
+
+    Il attrape le symptôme, pas la cause : une copie de MÊME longueur passerait.
+    C'est la liste fermée du périmètre qui ferme la porte.
+    """
+    if racine_code is None:
+        return
+    for chemin, doc in artefacts:
+        pile = [doc]
+        while pile:
+            n = pile.pop()
+            if isinstance(n, dict):
+                ref = n.get("ref")
+                if isinstance(ref, str) and "#L" in ref:
+                    m = RE_REF.match(ref.strip())
+                    if not m:
+                        errors.append(f"{chemin}: référence illisible — {ref}")
+                    else:
+                        cible = racine_code / m.group("file")
+                        if not cible.exists():
+                            errors.append(
+                                f"{chemin}: fichier inexistant dans le périmètre — {m.group('file')}"
+                            )
+                        else:
+                            total = len(cible.read_text(errors="replace").splitlines())
+                            dernier = int(m.group("end") or m.group("start"))
+                            if dernier > total:
+                                errors.append(
+                                    f"{chemin}: {m.group('file')} fait {total} lignes, la preuve "
+                                    f"cite jusqu'à L{dernier}. Soit la référence est fausse, soit "
+                                    "elle vise une autre arborescence que le périmètre"
+                                )
+                pile.extend(n.values())
+            elif isinstance(n, list):
+                pile.extend(n)
+
+
+# Une note qui ressemble à du code EST du code. Fermer `excerpt` sans fermer
+# `note` déplace la porte : les rédacteurs lisent les claims.
+RE_NOTE_CODE = re.compile(r"[;{}]|\w+\.\w+\s*\(|->|=>|::|\bif\s*\(|\breturn\b|SELECT\s|INSERT\s|UPDATE\s")
+
+
+def agents_connus():
+    d = pathlib.Path(__file__).parent.parent / "agents"
+    return {f.stem.replace("dmad-", "").lower() for f in d.glob("*.md")} if d.is_dir() else set()
+
+
+def check_notes(artefacts, errors):
+    for chemin, doc in artefacts:
+        for ev in doc.get("evidence") or []:
+            note = (ev or {}).get("note")
+            if isinstance(note, str) and RE_NOTE_CODE.search(note):
+                errors.append(
+                    f"{chemin}: evidence.note contient du code — « {note[:60]}… ». "
+                    "Une note dit en français ce que la preuve montre ; le code y "
+                    "transite vers les rédacteurs, qui n'y ont pas droit"
+                )
+
+
+def ancres_de(chemin):
+    """Les ancres qu'un titre Markdown produit, façon GitHub."""
+    import unicodedata
+    out = set()
+    for m in re.finditer(r"^#{1,6}\s+(.+?)\s*$", chemin.read_text(encoding="utf-8"), re.M):
+        s = unicodedata.normalize("NFKD", m.group(1))
+        s = "".join(c for c in s if not unicodedata.combining(c)).lower()
+        out.add(re.sub(r"[\s_]+", "-", re.sub(r"[^\w\s-]", "", s).strip()))
+    return out
+
+
+def check_validations(claims, run, errors):
+    """Une validation humaine s'adosse à une décision tracée, ou elle n'existe pas."""
+    agents = agents_connus()
+    for chemin, claim in claims:
+        intent = claim.get("intent")
+        if not isinstance(intent, dict):
+            continue
+        vb = intent.get("validated_by")
+        if not isinstance(vb, dict):
+            continue
+        who = str(vb.get("who", ""))
+        mots = set(re.findall(r"[a-z-]+", who.lower().replace("dmad-", "")))
+        if mots & agents or "agent" in who.lower():
+            errors.append(
+                f"{chemin}: intent.validated_by.who = « {who} » désigne un agent. "
+                "Un agent ne valide pas une intention — c'est ce que P5 exclut, et "
+                "c'est le seul levier de promotion qui existe"
+            )
+        gate = vb.get("gate", "")
+        fichier, _, ancre = str(gate).partition("#")
+        cible = run / fichier
+        if not cible.exists():
+            errors.append(
+                f"{chemin}: intent.validated_by.gate pointe {fichier}, qui n'existe pas. "
+                "Une validation sans trace de décision est une attestation fabriquée"
+            )
+        elif ancre and ancre.lower() not in ancres_de(cible):
+            errors.append(
+                f"{chemin}: {fichier} ne porte pas « {ancre} ». La décision citée "
+                "n'est pas dans le compte rendu du gate"
+            )
 
 
 def check_cross_rules(claims, errors):
@@ -57,6 +215,9 @@ def check_cross_rules(claims, errors):
     for path, claim in claims:
         # P5 : l'intention ne peut sortir de H que par une validation humaine tracée.
         intent = claim.get("intent") or {}
+        if not isinstance(intent, dict):
+            errors.append(f"{path}: intent doit être un objet, pas {type(intent).__name__}")
+            continue
         if intent.get("confidence") == "C" and not intent.get("validated_by"):
             errors.append(f"{path}: intent en C sans validated_by (principe P5)")
 
@@ -227,27 +388,61 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("run", type=pathlib.Path)
     ap.add_argument("--schemas", type=pathlib.Path, default=pathlib.Path(__file__).parent.parent / "schemas")
+    ap.add_argument("--code", type=pathlib.Path, help="racine du code analysé, pour contrôler les plages de lignes")
     args = ap.parse_args()
 
     validators = {
         name: Draft202012Validator(json.loads((args.schemas / name).read_text()))
-        for name in set(ROUTES.values()) | set(SINGLE_FILES.values())
+        for name in set(ROUTES.values()) | set(ROUTES_RACINE.values()) | set(SINGLE_FILES.values())
     }
 
     errors: list[str] = []
     checked = 0
-    collected: dict[str, list[tuple[str, dict]]] = {folder: [] for folder in ROUTES}
+    collected: dict[str, list[tuple[str, dict]]] = {r: [] for r in ROUTES}
 
-    for folder, schema in ROUTES.items():
-        for path in sorted((args.run / folder).glob("*.y*ml")):
+    # Un dossier par processus, puis les routes de racine. Le sujet avant la nature.
+    dossiers: list[tuple[pathlib.Path, str, str]] = []
+    for proc in sorted((args.run / "processus").glob("*")) if (args.run / "processus").is_dir() else []:
+        if proc.is_dir():
+            for route, schema in ROUTES.items():
+                dossiers.append((proc / route, route, schema))
+    for route, schema in ROUTES_RACINE.items():
+        dossiers.append((args.run / route, route, schema))
+
+    for chemin_dossier, route, schema in dossiers:
+        if not chemin_dossier.is_dir():
+            continue
+        for path in sorted(chemin_dossier.iterdir()):
+            if path.is_dir() or path.name in TOLERES or path.name.startswith("."):
+                continue
+            if path.suffix not in EXTENSIONS_CONCEPT:
+                # Un artefact ignoré doit être aussi bruyant qu'un artefact invalide.
+                errors.append(
+                    f"{path}: fichier non-concept dans un dossier routé. Un concept est "
+                    "du Markdown à frontmatter ; ce fichier ne serait pas contrôlé, et "
+                    "personne ne remarque un compteur bas"
+                )
+                continue
             checked += 1
-            doc = load(path)
-            for err in validators[schema].iter_errors(doc):
+            try:
+                doc = (load_concept(path.read_text(encoding="utf-8"),
+                                    CHAMP_CORPS.get(route, "statement"))
+                       if path.suffix == ".md" else load(path))
+            except (ValueError, yaml.YAMLError) as e:
+                errors.append(f"{path}: illisible — {e}")
+                continue
+            errs = list(validators[schema].iter_errors(doc))
+            for err in errs:
                 loc = "/".join(str(p) for p in err.path) or "<racine>"
                 errors.append(f"{path}: {loc}: {err.message}")
-            collected[folder].append((str(path), doc))
+            # Les règles croisées ne tournent que sur ce qui a passé le schéma.
+            # Sinon un `intent` écrit en chaîne fait tomber le validateur en
+            # traceback — et un traceback se lit « souci d'outillage », pas
+            # « mon artefact est invalide ».
+            if not errs and route in collected:
+                collected[route].append((str(path), doc))
 
-    claims = collected["claims"]
+    claims = collected.get("preuves/claims", [])
 
     for filename, schema in SINGLE_FILES.items():
         path = args.run / filename
@@ -257,10 +452,13 @@ def main() -> int:
                 loc = "/".join(str(p) for p in err.path) or "<racine>"
                 errors.append(f"{path}: {loc}: {err.message}")
 
+    tous = [x for lot in collected.values() for x in lot]
+    check_refs(tous, args.code, errors)
     check_cross_rules(claims, errors)
-    check_contracts(collected["contracts"], errors)
-    check_business_objects(collected["business-objects"], errors)
-    check_documents(collected["documents"], errors)
+    check_notes(tous, errors)
+    check_validations(claims, args.run, errors)
+    check_contracts(collected.get("preuves/contrats", []), errors)
+    check_business_objects(collected.get("preuves/business-objects", []), errors)
 
     if errors:
         print(f"✗ {len(errors)} erreur(s) sur {checked} artefact(s)\n")

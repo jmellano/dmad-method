@@ -155,14 +155,37 @@
     "freshness": {
       "$ref": "#/$defs/freshness"
     },
-    "status": {
+    "title": {
+      "type": "string",
+      "description": "Nom d'affichage du concept (OKF §4.1)."
+    },
+    "description": {
+      "type": "string",
+      "description": "Une phrase. Reprise telle quelle par les index."
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "claim_status": {
       "enum": [
         "draft",
         "challenged",
         "validated",
         "retired"
       ],
-      "default": "draft"
+      "default": "draft",
+      "description": "Où en est l'arbitrage de la claim. Renommé depuis `status` : OKF réserve ce nom au cycle de vie du concept. Quand la spécification définit une propriété pour un besoin, on lui laisse son sens — une extension ne se justifie que par l'absence d'équivalent officiel, jamais par une habitude."
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "stable",
+        "deprecated"
+      ],
+      "description": "Cycle de vie du concept, au sens OKF."
     }
   },
   "$defs": {
@@ -209,7 +232,9 @@
           ]
         },
         "note": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 200,
+          "description": "Ce que la preuve montre, DIT EN FRANÇAIS. Jamais le code lui-même : fermer `excerpt` sans fermer `note` déplace la porte, puisque les rédacteurs lisent les claims. Contrôlé mécaniquement."
         }
       },
       "description": "Ce qui fonde une claim. Une preuve est un POINTEUR — fichier:lignes, commit, table, ticket — jamais un extrait. D16 interdit le code dans le corpus ; le laisser transiter par une claim rouvrirait le canal, puisque les rédacteurs lisent les claims."
@@ -255,15 +280,23 @@
               "type": "object",
               "required": [
                 "who",
-                "when"
+                "when",
+                "gate"
               ],
+              "additionalProperties": false,
               "properties": {
                 "who": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Qui a validé. Un humain. Le nom d'un agent DMAD y est refusé — un agent ne valide pas sa propre intention, c'est précisément ce que P5 exclut."
                 },
                 "when": {
                   "type": "string",
                   "format": "date-time"
+                },
+                "gate": {
+                  "type": "string",
+                  "pattern": "^conduite/gates/[^#]+\\.md#.+$",
+                  "description": "Renvoi vers la décision tracée : `conduite/gates/<gate>.md#<ancre>`. Le fichier doit exister et porter l'ancre. Sans ce champ, rien ne distingue une validation réelle d'une validation inventée — et six attestations fabriquées sont passées au vert sur le premier run réel."
                 },
                 "note": {
                   "type": "string"

@@ -1,0 +1,14 @@
+kind: SFD
+id: DOC-SFD-PROP-001
+unit: business_object_tree
+unit_ref: BO-PROP-001
+output: documents/SFD-exemple.md
+title: SFD exemple
+derives_from:
+- DOC-STD-PROP-001
+claims_rendered:
+- BR-PROP-002
+frozen_at: '2026-09-08T12:00:00Z'
+sections:
+- number: '1'
+  title: Exemple

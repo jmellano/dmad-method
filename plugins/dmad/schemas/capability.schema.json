@@ -4,39 +4,108 @@
   "title": "DMAD Capability",
   "description": "Une capacité métier candidate proposée par le Carver. Validée au gate 3.",
   "type": "object",
-  "required": ["id", "label", "hypothesis_strength", "signals", "entrypoints", "modules"],
+  "required": [
+    "id",
+    "label",
+    "hypothesis_strength",
+    "signals",
+    "entrypoints",
+    "modules",
+    "type"
+  ],
   "additionalProperties": false,
   "properties": {
-    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
-    "label": { "type": "string", "description": "Nom dans le vocabulaire du métier, jamais celui des packages." },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "label": {
+      "type": "string",
+      "description": "Nom dans le vocabulaire du métier, jamais celui des packages."
+    },
     "hypothesis_strength": {
-      "enum": ["strong", "moderate", "weak"],
+      "enum": [
+        "strong",
+        "moderate",
+        "weak"
+      ],
       "description": "strong = 3+ signaux convergents sur 4."
     },
     "signals": {
       "type": "object",
       "description": "Les 4 signaux indépendants. Une capacité soutenue par un seul signal est fragile.",
       "properties": {
-        "call_cohesion": { "type": "number", "minimum": 0, "maximum": 1 },
-        "data_sharing": { "type": "array", "items": { "type": "string" } },
-        "git_coupling": { "type": "number", "minimum": 0, "maximum": 1 },
-        "vocabulary": { "type": "array", "items": { "type": "string" } }
+        "call_cohesion": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "data_sharing": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "git_coupling": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "vocabulary": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
-    "entrypoints": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-    "modules": { "type": "array", "items": { "type": "string" } },
-    "tables": { "type": "array", "items": { "type": "string" } },
-    "external_services": { "type": "array", "items": { "type": "string" } },
+    "entrypoints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tables": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "external_services": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "overlaps_with": {
       "type": "array",
       "description": "Un recouvrement est une information, pas un défaut de méthode.",
       "items": {
         "type": "object",
-        "required": ["capability", "shared"],
+        "required": [
+          "capability",
+          "shared"
+        ],
         "properties": {
-          "capability": { "type": "string" },
-          "shared": { "type": "array", "items": { "type": "string" } },
-          "note": { "type": "string" }
+          "capability": {
+            "type": "string"
+          },
+          "shared": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "note": {
+            "type": "string"
+          }
         }
       }
     },
@@ -44,32 +113,97 @@
       "type": "object",
       "description": "Découpage concurrent proposé quand le signal est ambigu.",
       "properties": {
-        "description": { "type": "string" },
-        "rationale": { "type": "string" }
+        "description": {
+          "type": "string"
+        },
+        "rationale": {
+          "type": "string"
+        }
       }
     },
     "seams": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["at", "isolates"],
+        "required": [
+          "at",
+          "isolates"
+        ],
         "properties": {
-          "at": { "type": "string" },
-          "isolates": { "type": "string" },
-          "crossed_by": { "type": "integer" },
-          "estimated_effort": { "enum": ["low", "medium", "high", "unknown"] },
-          "blocking_tests_needed": { "type": "array", "items": { "type": "string" } }
+          "at": {
+            "type": "string"
+          },
+          "isolates": {
+            "type": "string"
+          },
+          "crossed_by": {
+            "type": "integer"
+          },
+          "estimated_effort": {
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "unknown"
+            ]
+          },
+          "blocking_tests_needed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         }
       }
     },
-    "hotspot_rank": { "type": ["integer", "null"] },
-    "open_questions": { "type": "array", "items": { "type": "string" } },
+    "hotspot_rank": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "open_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "gate_3": {
       "type": "object",
       "properties": {
-        "approved_by": { "type": "string" },
-        "approved_at": { "type": "string", "format": "date-time" },
-        "corrections": { "type": "array", "items": { "type": "string" }, "description": "Ce que l'humain a corrigé. Source de connaissance en soi." }
+        "approved_by": {
+          "type": "string"
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "corrections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Ce que l'humain a corrigé. Source de connaissance en soi."
+        }
+      }
+    },
+    "type": {
+      "type": "string",
+      "minLength": 2,
+      "description": "Nature du concept. Requise par OKF — c'est sa seule règle dure."
+    },
+    "title": {
+      "type": "string",
+      "description": "Nom d'affichage du concept (OKF §4.1)."
+    },
+    "description": {
+      "type": "string",
+      "description": "Une phrase. Reprise telle quelle par les index."
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
       }
     }
   }

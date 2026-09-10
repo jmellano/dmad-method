@@ -1,0 +1,23 @@
+---
+type: BusinessObject
+title: traiterLigne
+id: BO-BAD-001
+functional_name: traiterLigne
+capability: facturation
+recursive_depth: 0
+business_layer: préparation
+own_leaves:
+- kind: database
+  ref: TBL-lignes
+  role: traitement
+confidence: I
+confidence_reason: Lecture du code par le modèle, source unique, non challengée.
+evidence:
+- kind: code
+  ref: src/billing/LineProcessor.java#L44-L91
+  tool: jcallgraph.definition
+produced_by: carver
+---
+
+
+[^ev-1]: src/billing/LineProcessor.java#L44-L91

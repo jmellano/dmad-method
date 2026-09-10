@@ -31,18 +31,25 @@ except ImportError:  # pragma: no cover
 ORDRE = ["fresh", "shifted", "stale", "broken"]
 PIRE = {s: i for i, s in enumerate(ORDRE)}
 
-SOURCES = ("claims", "contracts", "business-objects")
+SOURCES = ("preuves/claims", "preuves/contrats", "preuves/business-objects")
 
 
 def charger(dossier):
     out = []
-    for path in sorted(dossier.glob("*.y*ml")):
+    for path in sorted(list(dossier.glob("*.y*ml")) + list(dossier.glob("*.md"))):
+        txt = path.read_text(encoding="utf-8")
+        if path.suffix == ".md":
+            if not txt.startswith("---"):
+                continue
+            fin = txt.find("\n---", 3)
+            txt = txt[3:fin] if fin != -1 else ""
         try:
-            doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+            doc = yaml.safe_load(txt) or {}
         except yaml.YAMLError as e:
             print(f"  ⚠ {path} illisible : {e}")
             continue
-        out.append((path, doc))
+        if isinstance(doc, dict):
+            out.append((path, doc))
     return out
 
 
@@ -126,10 +133,13 @@ def main() -> int:
     args = ap.parse_args()
 
     statut_claim, sources = {}, []
-    for dossier in SOURCES:
-        d = args.run / dossier
-        if d.is_dir():
-            sources += charger(d)
+    for proc in sorted((args.run / "processus").glob("*")) if (args.run / "processus").is_dir() else []:
+        for dossier in SOURCES:
+            if (proc / dossier).is_dir():
+                sources += charger(proc / dossier)
+    for socle in ("socle/capacites", "socle/metier", "socle/technique"):
+        if (args.run / socle).is_dir():
+            sources += charger(args.run / socle)
 
     commit_courant = None
     if args.against:
@@ -165,7 +175,15 @@ def main() -> int:
                 pire = s
         statut_claim[aid] = pire
 
-    documents = charger(args.run / "documents") if (args.run / "documents").is_dir() else []
+    # Le plan porte l'identité du document : plus de carte séparée à maintenir.
+    documents = []
+    for chemin in sorted(args.run.rglob("plan-*.y*ml")):
+        try:
+            plan = yaml.safe_load(chemin.read_text(encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            continue
+        if plan.get("id"):
+            documents.append((str(chemin), plan))
     statut_doc, par_id = propager(documents, statut_claim)
 
     perimes = {k: v for k, v in statut_claim.items() if v != "fresh"}

@@ -24,7 +24,7 @@ else
 fi
 
 echo
-echo "== 3. Les violations connues sont TOUTES refusées (6 v0.3 + 9 v0.4)"
+echo "== 3. Les violations connues sont TOUTES refusées (6 v0.3 + 10 v0.4)"
 expected=(
   "evidence: \[\] should be non-empty"
   "confidence V sur une claim BusinessRule sans preuve exécutée"
@@ -39,9 +39,10 @@ expected=(
   "ressemble à un identifiant de code"
   "sub_objects référence BO-FANTOME-999"
   "recursive_depth 0 avec des sous-objets"
-  "D17 — une SFD sans derives_from"
-  "D19 — dérive de DOC-STD-FACT-001, qui n'est pas figé"
-  "D20 — une SFG a pour unité"
+  "fichier non-concept dans un dossier routé"
+  "evidence.note contient du code"
+  "désigne un agent"
+  "attestation fabriquée"
 )
 out=$(python3 tools/validate.py examples/violations 2>&1)
 for e in "${expected[@]}"; do
@@ -51,6 +52,16 @@ for e in "${expected[@]}"; do
     echo "   ÉCHEC : violation non détectée : $e"; fail=1
   fi
 done
+
+echo
+echo "== 3b. La plage de lignes d'une preuve tient dans son fichier"
+out=$(python3 tools/validate.py examples/violations/refs-hors-perimetre \
+        --code examples/violations/refs-hors-perimetre 2>&1)
+if grep -qE "la preuve cite jusqu" <<< "$out"; then
+  echo "   ok  refusé : une preuve qui déborde de son fichier"
+else
+  echo "   ÉCHEC : la plage hors fichier n'a pas été détectée"; fail=1
+fi
 
 echo
 echo "== 4. Le corpus : les invariants v0.4 mordent sur les documents"
@@ -102,7 +113,7 @@ fi
 
 echo
 echo "== 6a. Le corpus se compose depuis le bundle, et le bundle seul"
-if python3 tools/okf-compose.py examples/atlas-billing/okf --all examples/atlas-billing \
+if python3 tools/okf-compose.py examples/atlas-billing --all examples/atlas-billing \
      --check-only > /dev/null; then
   echo "   ok  3 documents composables, aucun concept orphelin du plan"
 else
@@ -140,12 +151,11 @@ else
 fi
 
 echo
-echo "== 9. L'evidence store s'exporte en bundle OKF conformant"
-if python3 tools/okf-export.py examples/atlas-billing --out "$(mktemp -d)/okf" --check \
-     --at "2026-09-08T17:00:00Z" 2>&1 | grep -q "conformant"; then
+echo "== 9. Le run est un bundle OKF conformant"
+if python3 tools/okf-index.py examples/atlas-billing --check 2>&1 | grep -q "conformant"; then
   echo "   ok  type non vide partout, aucun orphelin, aucun lien mort"
 else
-  echo "   ÉCHEC : le bundle exporté n'est pas conformant"; fail=1
+  echo "   ÉCHEC : le run n'est pas un bundle conformant"; fail=1
 fi
 
 echo

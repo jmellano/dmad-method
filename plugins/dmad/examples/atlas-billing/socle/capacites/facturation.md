@@ -1,0 +1,72 @@
+---
+type: Capability
+title: facturation
+id: facturation
+label: Facturation
+hypothesis_strength: strong
+signals:
+  call_cohesion: 0.81
+  data_sharing:
+  - invoices
+  - invoice_lines
+  - billing_runs
+  git_coupling: 0.74
+  vocabulary:
+  - facture
+  - avoir
+  - échéance
+  - barème
+entrypoints:
+- POST /invoices
+- JOB nightly-billing
+- CLI reinvoice
+modules:
+- src/billing
+- src/accounting/export
+tables:
+- invoices
+- invoice_lines
+- billing_runs
+external_services:
+- SI comptable (HTTP)
+overlaps_with:
+- capability: recouvrement
+  shared:
+  - src/billing/DunningService.java
+  note: 'Les relances sont à cheval. Données partagées, mais l''historique git les
+    sépare nettement depuis 2021 (équipes distinctes). Signal contradictoire : arbitrage
+    humain requis au gate 3.
+
+    '
+alternative_carving:
+  description: Recouvrement fusionné dans Facturation (une seule capacité)
+  rationale: 'Défendable si le métier considère la relance comme une étape du cycle
+    de facturation plutôt que comme un processus autonome.
+
+    '
+seams:
+- at: src/billing/ports/AccountingGateway.java
+  isolates: export vers le SI comptable
+  crossed_by: 3
+  estimated_effort: low
+  blocking_tests_needed:
+  - BR-FACT-014
+- at: src/billing/AmountCalculator.java
+  isolates: calcul des montants
+  crossed_by: 7
+  estimated_effort: medium
+  blocking_tests_needed:
+  - BR-FACT-021
+hotspot_rank: 3
+open_questions:
+- OQ-004
+gate_3:
+  approved_by: Responsable comptable
+  approved_at: '2026-09-07T11:15:00Z'
+  corrections:
+  - 'Recouvrement maintenu comme capacité distincte : le métier le pilote séparément,
+    avec ses propres indicateurs. Le découpage proposé était le bon, mais pour une
+    raison que le code ne pouvait pas donner.
+
+    '
+---

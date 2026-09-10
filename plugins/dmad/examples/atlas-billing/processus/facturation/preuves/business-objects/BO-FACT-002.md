@@ -1,0 +1,47 @@
+---
+type: BusinessObject
+title: Facture à émettre
+id: BO-FACT-002
+functional_name: Facture à émettre
+capability: facturation
+recursive_depth: 1
+business_layer: préparation
+own_leaves:
+- kind: database
+  ref: invoices
+  role: traitement
+  availability: initiale
+- kind: contract
+  ref: CTR-FACT-001
+  role: traitement
+- kind: database
+  ref: customers.dispute_status
+  role: controle
+  availability: ad-hoc
+  in_loop: true
+  cardinality: un appel par commande éligible — ~1 400 par campagne
+sub_objects:
+- BO-FACT-003
+confidence: I
+confidence_reason: 'Nœud d''orchestration confirmé par la traversée, mais le statut
+  de litige est lu à la demande dans une boucle : le coût réel n''a pas été mesuré.
+
+  '
+evidence:
+- kind: code
+  ref: src/billing/InvoiceDispatcher.java#L180-L280
+  tool: jcallgraph.definition
+produced_by: carver
+freshness:
+  verified_at_commit: a1b2c3d
+  status: fresh
+---
+
+
+[^ev-1]: src/billing/InvoiceDispatcher.java#L180-L280
+
+# Liens
+
+- compose : [BO-FACT-003](BO-FACT-003.md)
+- appelle le contrat : [CTR-FACT-001](../contrats/CTR-FACT-001.md)
+- relève de : [facturation](../../../../socle/capacites/facturation.md)

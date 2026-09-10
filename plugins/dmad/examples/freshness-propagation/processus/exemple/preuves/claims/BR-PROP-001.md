@@ -1,0 +1,22 @@
+---
+type: BusinessRule
+title: BR-PROP-001
+id: BR-PROP-001
+capability: propagation
+confidence: C
+confidence_reason: 'Deux preuves convergentes au moment de l''analyse. Le code a changé
+  depuis.
+
+  '
+evidence:
+- kind: code
+  ref: src/example/Rule.java#L10-L20
+  commit: aaa1111
+  tool: jcallgraph.definition
+produced_by: elucidator
+freshness:
+  verified_at_commit: aaa1111
+  status: stale
+---
+
+La règle publiée par la STD, et dont le code a bougé depuis la dernière vérification. C'est le seul artefact périmé de cette fixture.

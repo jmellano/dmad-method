@@ -4,22 +4,46 @@
   "title": "DMAD Open Question",
   "description": "L'inconnu est un livrable de première classe (principe P4). Une question ouverte est formulée COMME UNE QUESTION À UN HUMAIN, pas comme une lacune de l'analyse.",
   "type": "object",
-  "required": ["id", "question", "priority", "audience", "why_it_matters", "raised_by"],
+  "required": [
+    "id",
+    "question",
+    "priority",
+    "audience",
+    "why_it_matters",
+    "raised_by",
+    "type"
+  ],
   "additionalProperties": false,
   "properties": {
-    "id": { "type": "string", "pattern": "^OQ-[0-9]{3}$" },
+    "id": {
+      "type": "string",
+      "pattern": "^OQ-[0-9]{3}$"
+    },
     "question": {
       "type": "string",
       "minLength": 20,
       "description": "Formulée à la deuxième personne, répondable en une réunion. Pas 'le comportement X est indéterminé' mais 'est-ce que X est voulu ?'"
     },
-    "context": { "type": "string", "description": "Ce que le code fait, factuellement, pour que l'humain puisse répondre sans lire le code." },
+    "context": {
+      "type": "string",
+      "description": "Ce que le code fait, factuellement, pour que l'humain puisse répondre sans lire le code."
+    },
     "priority": {
-      "enum": ["P1", "P2", "P3", "P4"],
+      "enum": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
       "description": "P1 impact réglementaire/financier ET confiance H | P2 bloque une capacité entière | P3 règle isolée | P4 curiosité historique"
     },
     "audience": {
-      "enum": ["business", "tech", "both", "management"],
+      "enum": [
+        "business",
+        "tech",
+        "both",
+        "management"
+      ],
       "description": "Qui peut répondre. Une question posée au mauvais public ne reçoit jamais de réponse."
     },
     "why_it_matters": {
@@ -29,25 +53,84 @@
     "options": {
       "type": "array",
       "description": "Réponses plausibles proposées. Une question fermée obtient une réponse ; une question ouverte obtient un silence.",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
-    "raised_by": { "type": "string" },
-    "raised_at": { "type": "string", "format": "date-time" },
-    "related_claims": { "type": "array", "items": { "type": "string" } },
-    "capability": { "type": "string" },
-    "status": { "enum": ["open", "answered", "wont_answer", "obsolete"], "default": "open" },
+    "raised_by": {
+      "type": "string"
+    },
+    "raised_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "related_claims": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "capability": {
+      "type": "string"
+    },
     "answer": {
       "type": "object",
       "properties": {
-        "text": { "type": "string" },
-        "by": { "type": "string" },
-        "at": { "type": "string", "format": "date-time" },
+        "text": {
+          "type": "string"
+        },
+        "by": {
+          "type": "string"
+        },
+        "at": {
+          "type": "string",
+          "format": "date-time"
+        },
         "promotes_claims": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Claims dont l'intent passe de H à C grâce à cette réponse."
         }
       }
+    },
+    "type": {
+      "type": "string",
+      "minLength": 2,
+      "description": "Nature du concept. Requise par OKF — c'est sa seule règle dure."
+    },
+    "title": {
+      "type": "string",
+      "description": "Nom d'affichage du concept (OKF §4.1)."
+    },
+    "description": {
+      "type": "string",
+      "description": "Une phrase. Reprise telle quelle par les index."
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "answer_status": {
+      "enum": [
+        "open",
+        "answered",
+        "wont_answer",
+        "obsolete"
+      ],
+      "default": "open",
+      "description": "Où en est la question. Renommé depuis `status` : OKF réserve ce nom au cycle de vie du concept (draft/stable/deprecated). Quand la spécification définit une propriété pour un besoin, on lui laisse son sens."
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "stable",
+        "deprecated"
+      ],
+      "description": "Cycle de vie du concept, au sens OKF."
     }
   }
 }

@@ -1,0 +1,14 @@
+kind: SFG
+id: DOC-SFG-PROP-001
+unit: use_case
+unit_ref: CU-01
+output: documents/SFG-exemple.md
+title: SFG exemple
+derives_from:
+- DOC-SFD-PROP-001
+claims_rendered:
+- BR-PROP-002
+frozen_at: '2026-09-08T14:00:00Z'
+sections:
+- number: '1'
+  title: Exemple

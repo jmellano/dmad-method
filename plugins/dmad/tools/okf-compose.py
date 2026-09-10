@@ -217,14 +217,14 @@ def main() -> int:
     ap.add_argument("bundle", type=pathlib.Path)
     ap.add_argument("plan", nargs="?", type=pathlib.Path)
     ap.add_argument("--all", type=pathlib.Path, metavar="RUN",
-                    help="composer tous les plan-*.yaml du run. Les documents du corpus se citent "
+                    help="composer tous les plan-*.yaml du run, à n'importe quelle profondeur. Les documents du corpus se citent "
                          "mutuellement : ils ne se composent correctement qu'ensemble")
     ap.add_argument("--out", type=pathlib.Path)
     ap.add_argument("--check-only", action="store_true")
     args = ap.parse_args()
 
     if args.all:
-        chemins = sorted((args.all).glob("plan-*.y*ml"))
+        chemins = sorted(args.all.rglob("plan-*.y*ml"))
         if not chemins:
             print("aucun plan dans ce run"); return 0
         plans = [(c, yaml.safe_load(c.read_text(encoding="utf-8"))) for c in chemins]

@@ -1,0 +1,14 @@
+kind: STD
+id: DOC-STD-PROP-001
+unit: entrypoint
+unit_ref: JOB example
+output: documents/STD-exemple.md
+title: STD exemple
+derives_from: []
+claims_rendered:
+- BR-PROP-001
+- BR-PROP-002
+frozen_at: '2026-09-08T10:00:00Z'
+sections:
+- number: '1'
+  title: Exemple

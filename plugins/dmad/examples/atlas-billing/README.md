@@ -1,3 +1,9 @@
+---
+type: "Run Guide"
+title: "Run de référence — Atlas ERP, capacité Facturation"
+description: "Un run DMAD complet et fictif, déroulé de bout en bout : ce qu'il montre, ce qu'il sert de fixture, et comment le vérifier."
+---
+
 # Run de référence — Atlas ERP, capacité « Facturation »
 
 Un run DMAD complet et fictif, déroulé de bout en bout. Il sert trois usages :
@@ -54,7 +60,7 @@ Résultat : `demoted` de `C` à `I`, reformulation exigée, et une question ouve
 
 En parallèle, le Test Forger écrit `AmountCalculatorCharacterizationTest`. Le test passe → **`BR-FACT-021` est promue en `V`**. C'est le seul mécanisme qui atteint le niveau maximal, et il produit au passage un filet de sécurité réutilisable pour le changement de barème.
 
-### Cycle 1 — la STD → [`output/STD-facturation.md`](output/STD-facturation.md)
+### Cycle 1 — la STD → [`documents/STD-facturation.md`](documents/STD-facturation.md)
 
 Dix-sept sections, **aucune omise** : la section « Événements » porte son constat d'absence plutôt que de disparaître, et la section « Requêtes clés » signale que les requêtes de `reporting` portent sur les mêmes tables **sans appartenir à ce batch** — le piège d'attribution le plus probable ici.
 
@@ -64,7 +70,7 @@ La section 9 montre **les deux bouts de l'échelle des contrats** : un contrat r
 
 La revue de cycle 1 a produit une **correction factuelle** : le document annonçait une reprise indéfinie de la transmission ; elle s'arrête à cinq campagnes. Le développeur l'a vue, la traversée l'avait manquée.
 
-### Cycle 2 — la SFD → [`output/SFD-facturation.md`](output/SFD-facturation.md)
+### Cycle 2 — la SFD → [`documents/SFD-facturation.md`](documents/SFD-facturation.md)
 
 Vue récursive à trois niveaux, chacun avec ses six blocs. **Analysée bas → haut, rédigée haut → bas.**
 
@@ -72,7 +78,7 @@ Ce que la classification ISO 25010 fait apparaître et qu'une rédaction libre a
 
 Le document ne contient **aucun nom de classe et aucun nom de patron** : le Template Method reconnu par le Carver a servi au découpage, il n'apparaît pas.
 
-### Cycle 3 — la SFG → [`output/SFG-facturation.md`](output/SFG-facturation.md)
+### Cycle 3 — la SFG → [`documents/SFG-facturation.md`](documents/SFG-facturation.md)
 
 Deux cas d'usage, sept blocs chacun, dont « ce qui n'est pas couvert » — le bloc qu'on oublie, et le plus structurant.
 
@@ -80,7 +86,7 @@ Deux cas d'usage, sept blocs chacun, dont « ce qui n'est pas couvert » — le 
 
 Et une **correction factuelle** consignée dans l'historique, avec ce qui était écrit et pourquoi c'était faux : la version 1.0 présentait la reprise comme une garantie de non-perte. La SFD disait « reprise à la campagne suivante » sans dire jusqu'à quand ; la dérivation avait comblé le silence par une promesse. **C'est exactement le risque propre au troisième document** — le lecteur de la SFG n'a aucun moyen de le détecter.
 
-### Le rapport de couverture → [`output/preuves/couverture.md`](output/preuves/couverture.md)
+### Le rapport de couverture → [`conduite/couverture.md`](conduite/couverture.md)
 
 22 % du code, 90 % des hotspots, 100 % des points d'entrée de la capacité — et la ligne nouvelle en v0.4 : **un contrat résolu sur deux, avec la répartition par barreau**. Elle mesure la qualité des sources, pas seulement le nombre de contrats trouvés.
 
@@ -128,3 +134,8 @@ python3 ../../tools/coverage.py     . --commentaire output/preuves/lecture.md
 python3 ../../tools/okf-export.py   . --check            # bundle conformant
 ../../tools/selftest.sh                                  # les neuf sections
 ```
+
+# Liens
+
+- couverture du run : [couverture](conduite/couverture.md)
+- sa lecture : [lecture](conduite/lecture.md)

@@ -1,0 +1,25 @@
+# Strate STD
+
+- [Annexes](annexes-chapeau.md) — Ce que contient le chapitre d'annexes de ce document : légendes des notations employées, puis limites de l'analyse.
+- [Appels externes](appels-externes.md) — Code Barreau Artefact:version Interface Méthode Contexte Comportement d'échec --------------------- ACC_INV_TRANSMIT_001 1 acme/atlas/accounting-api:
+- [Architecture du flux](architecture-flux.md) — Trois étapes séquentielles : sélection des commandes éligibles, traitement par lot, clôture de campagne. Une seule branche conditionnelle, sur le mont
+- [Cartographie des composants](cartographie-composants.md) — Le batch est câblé en trois couches : un déclencheur planifié, un service d'orchestration, et deux ports sortants. Question : quels composants ce batc
+- [Cas de test](cas-de-test.md) — Étape Description ------ Pré-condition une commande livrée, non facturée, client sans litige, une ligne à 3 unités Action exécuter BillingRun.execute
+- [Cohésion et couplage des composants](cohesion-couplage-composants.md) — Application de la matrice de cohésion et de couplage aux composants du chemin de facturation : ce qui est validé, ce qui est dette.
+- [Configuration](configuration-batch.md) — Propriété Valeur ------ Nom du job nightly-billing Déclenchement cron 0 2 Taille de lot 200 factures Politique de rejet skip-limit 10, puis échec de
+- [Dépendances](dependances.md) — Non standard : accounting-api:4.7.2, dont la version fige le contrat du § 9.
+- [Détail par étape](detail-par-etape.md) — Sélection — BillingRun.selectEligible() src/billing/BillingRun.java:52-78. Retient les commandes livrées, non facturées, dont le client n'est pas en l
+- [Événements](evenements.md) — Aucun événement émis ni consommé. Le batch est entièrement synchrone, et sa seule sortie asynchrone potentielle — la notification d'échec — passe par
+- [Gestion des erreurs](gestion-erreurs.md) — Question : que devient une facture selon l'endroit où l'exécution échoue, et que le support observe-t-il ? Confiance : C — corroboré · aucune trace d
+- [Historique](historique.md) — Version Date Auteur Description ------------ 1.0 2026-09-07 DMAD (sonnet) Rendu initial depuis le graphe 1.1 2026-09-07 revue de cycle 1 Correction f
+- [Légende — diagramme d'activité](legende-activite.md) — Conventions de lecture des diagrammes de activite employés dans ce document.
+- [Légende — diagramme de séquence](legende-sequence.md) — Conventions de lecture des diagrammes de sequence employés dans ce document.
+- [Limites de cette analyse](limites-analyse.md) — - Profondeur de traversée : 5. 17 frontières atteintes sur l'ensemble du run. - Deux dispatchs dynamiques non résolus — les implémentations réellement
+- [Mapping et transformations](mapping-transformations.md) — Aucun mapper généré dans ce chemin. Les transformations sont manuelles dans InvoiceAssembler.java:33-70. Le seul mapper du module concerne l'export CS
+- [Modèle de données](modele-donnees.md) — Tables lues — orders, order_lines, customers (colonne dispute_status), pricing_scales Tables écrites — invoices, invoice_lines, billing_runs Colonnes
+- [STD nightly-billing — audience et périmètre](note-audience.md) — À qui s'adresse la STD du processus de facturation nocturne, ce qu'elle couvre et ce qu'elle exclut.
+- [Points d'attention pour le développeur](points-attention.md) — 1. AmountCalculator arrondit au demi-supérieur sur quatre décimales ; l'affichage et l'export en montrent deux. Écarts possibles sur les cumuls. → BR-
+- [Références](references-croisees.md) — SFD associée : Facturation(../sfd/facturation.md) · SFG : Facturation(../sfg/facturation.md) · Objets métier : BO-FACT-001 à BO-FACT-003
+- [Requêtes clés](requetes-cles.md) — Référence Tables Colonnes Intention ------------ OrderRepository.java:88 orders, order_lines delivered_at, invoiced_at sélection des commandes livrée
+- [Séquence technique](sequence-technique.md) — Question : dans quel ordre les composants s'appellent-ils pour une facture, et où sort-on du périmètre ? Confiance : C — corroboré · une frontière no
+- [Traitement unitaire](traitement-unitaire.md) — Par facture : valorisation des lignes, puis garde sur le montant nul, puis transmission. La garde est en src/billing/InvoiceDispatcher.java:212. Elle

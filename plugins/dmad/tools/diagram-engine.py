@@ -190,17 +190,25 @@ def main() -> int:
             print("aucun plan de diagramme")
             return 0
         erreurs = []
+        ignores = []
         for chemin in plans:
             plan = yaml.safe_load(chemin.read_text(encoding="utf-8"))
+            # Le journal des refus est un livrable légitime et vit au même endroit :
+            # un fichier sans `kind` n'est pas un plan, il n'est pas une erreur.
+            if not isinstance(plan, dict) or "kind" not in plan:
+                ignores.append(chemin.name)
+                continue
             try:
                 figure, m = rendre_figure(plan, seuils)
             except ValueError as e:
                 erreurs.append(f"{chemin.name} — {e}")
                 continue
-            cible = chemin.with_suffix(".figure.md")
+            cible = chemin.with_suffix(".figure.txt")
             cible.write_text(figure, encoding="utf-8")
             print(f'  ✓ {plan["id"]:<16} N={m["noeuds"]:<3} E={m["aretes"]:<3} '
                   f'McCabe={m["mccabe"]:<3} → {cible.name}')
+        if ignores:
+            print(f"  ({len(ignores)} fichier(s) sans `kind` ignoré(s) : {', '.join(ignores)})")
         if erreurs:
             print(f"\n✗ {len(erreurs)} plan(s) refusé(s)\n")
             for e in erreurs:

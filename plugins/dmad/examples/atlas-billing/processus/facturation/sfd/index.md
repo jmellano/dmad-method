@@ -1,0 +1,21 @@
+# Strate SFD
+
+- [À confirmer par le métier](a-confirmer.md) — Les cinq points que le code ne peut pas trancher, formulés comme des questions à un humain.
+- [Annexes](annexes-chapeau.md) — Ce que contient le chapitre d'annexes de ce document : légendes des notations employées, puis limites de l'analyse.
+- [Cas de test](cas-de-test.md) — Sans objet en SFD : les cas de test de ce processus sont décrits en STD.
+- [Gestion des erreurs du processus](gestion-erreurs.md) — Les trois sorties anormales du processus, et la distinction entre le site de levée et l'effet observable.
+- [Historique du document](historique.md) — Les versions successives de la SFD, dont les corrections factuelles avec ce qui était écrit et pourquoi c'était faux.
+- [Légende — diagramme d'activité](legende-activite.md) — Conventions de lecture des diagrammes de activite employés dans ce document.
+- [Légende — diagramme de séquence](legende-sequence.md) — Conventions de lecture des diagrammes de sequence employés dans ce document.
+- [Ce qui n'a pas été analysé](limites-analyse.md) — Les frontières atteintes et non franchies par l'analyse de ce processus.
+- [Le problème que ce traitement résout](niveau-1-2.md) — Le cadre de lecture de la SFD : opérations nominales et en erreur, sources et puits, lecture par niveaux.
+- [Étapes de transformation du traitement](niveau-2-3.md) — L'arbre de composition : la décomposition complète du processus en trois niveaux, sans détail.
+- [Processus général du système d'information](niveau-2.md) — Le processus vu comme une seule opération, avec ses entrées et ses sorties externes.
+- [N2 — Campagne de facturation](niveau-3-1.md) — Le niveau d'orchestration : sélection des commandes éligibles, itération, compte-rendu de campagne.
+- [N1 — Facture à émettre](niveau-3-2.md) — La constitution d'une facture, ses deux gardes, et le statut de litige lu à la demande dans une boucle.
+- [N0 — Ligne valorisée](niveau-3-3.md) — L'objet atomique : valorisation d'une ligne au dix-millième, et le barème demandé une fois par ligne.
+- [Synthèse des niveaux](niveau-3-4.md) — La table récapitulative : business objects, feuilles propres, sous-objets, profondeur, couche métier.
+- [SFD Facturation — audience et périmètre](note-audience.md) — À qui s'adresse la SFD du processus de facturation, ce qu'elle couvre et ce qu'elle exclut.
+- [Références croisées](references-croisees.md) — Les documents du corpus dont cette SFD dérive et qu'elle alimente.
+- [Règles de gestion du processus](regles-de-gestion.md) — Les deux règles de gestion établies sur ce processus, avec leur niveau de preuve.
+- [Services externes sollicités](services-externes.md) — Les deux services externes du processus : le service comptable en sortie, le service de tarification en cours de calcul.

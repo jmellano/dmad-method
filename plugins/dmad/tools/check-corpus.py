@@ -191,7 +191,8 @@ def check_cascade(rel, kind, fm, erreurs):
 
 def check_diagrammes(rel, corps, erreurs, run, moteur, seuils):
     """R1 et R3 — une question, et un rendu depuis le graphe plutôt qu'une main."""
-    dossier_plans = run / "diagrams"
+    dossier_plans = next((d for d in run.rglob("diagrammes") if d.is_dir()),
+                         run / "diagrammes")
 
     for m in re.finditer(r"^```mermaid\s*$", corps, re.M):
         amont = corps[:m.start()].splitlines()
@@ -436,9 +437,9 @@ def main() -> int:
     erreurs: list[str] = []
     docs: list[tuple[pathlib.Path, str, dict]] = []
     moteur = charger_moteur()
-    seuils = moteur.charger_seuils(args.run / "scope.yaml") if moteur else {}
+    seuils = moteur.charger_seuils(args.run / "run.yaml") if moteur else {}
 
-    plans = sorted(args.run.glob("plan-*.y*ml"))
+    plans = sorted(args.run.rglob("plan-*.y*ml"))
     if not plans:
         print("aucun plan de document (plan-*.yaml) — rien à contrôler")
         return 0

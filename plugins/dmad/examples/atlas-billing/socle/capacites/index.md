@@ -1,0 +1,3 @@
+# Capacités
+
+- [facturation](facturation.md)

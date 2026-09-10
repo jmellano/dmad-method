@@ -1,7 +1,0 @@
-# Support de la violation DOC-BAD-002 : une STD valide, mais NON figée.
-id: DOC-STD-FACT-001
-kind: STD
-unit: entrypoint
-unit_ref: "InvoiceDispatcher"
-path: "dmad-output/std/invoice-dispatcher.md"
-produced_by: writer-std

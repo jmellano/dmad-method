@@ -9,7 +9,8 @@
     "claim",
     "angles_examined",
     "outcome",
-    "challenged_at"
+    "challenged_at",
+    "type"
   ],
   "additionalProperties": false,
   "properties": {
@@ -156,6 +157,25 @@
     "resolution": {
       "type": "string",
       "description": "Comment. Le plus souvent, la résolution n'est pas « l'une des deux est fausse » mais « il manquait la distinction entre deux temps du traitement » — et c'est cette distinction qui est l'information."
+    },
+    "type": {
+      "type": "string",
+      "minLength": 2,
+      "description": "Nature du concept. Requise par OKF — c'est sa seule règle dure."
+    },
+    "title": {
+      "type": "string",
+      "description": "Nom d'affichage du concept (OKF §4.1)."
+    },
+    "description": {
+      "type": "string",
+      "description": "Une phrase. Reprise telle quelle par les index."
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "allOf": [
