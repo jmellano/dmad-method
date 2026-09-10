@@ -231,6 +231,30 @@ lecture sur trois.
 
 ---
 
+## D25 — L'unité de la STD et de la SFD est le processus, pas le point d'entrée
+**Décision.** Une STD et une SFD documentent **un processus**, et cataloguent ses points d'entrée dans leur premier chapitre. La SFG documente un domaine, découpée par cas d'usage. D20 est révisée sur ses deux premières lignes.
+
+**Pourquoi.** **Un processus a rarement un seul point d'entrée.** Le corpus de référence FEF l'a établi par l'échec : sur son document témoin, `entry_point_type: BATCH` était faux alors qu'une section décrivait déjà un sous-processus événementiel. Le périmètre déclaré dans le frontmatter doit se vérifier contre le sommaire du document lui-même, et c'est ce que le chapitre 1 permet.
+
+**Ce que ça simplifie.** STD et SFD partagent désormais l'unité et le périmètre, et ne diffèrent que par l'audience et le registre. La cascade s'en trouve plus nette : une STD, une SFD, même processus, deux lectures.
+
+**Ce que ça coûte.** Rien de ce que D20 protégeait : l'unité reste déclarée, vérifiée mécaniquement, et un document plié dans le découpage d'un autre reste refusé.
+
+---
+
+## D26 — Le bundle est la sortie primaire, le document en est dérivé
+**Décision.** Les rédacteurs écrivent des **concepts** dans le bundle OKF. Un **plan** — donnée du run, pas code — dit quel concept occupe quel numéro de section. `tools/okf-compose.py` assemble. **Une correction se fait dans le concept, jamais dans le fichier composé** : une édition faite là est perdue à la régénération.
+
+**Pourquoi cet ordre-là.** Un concept est réutilisable entre documents et entre audiences ; une section de document ne l'est pas. Écrire le document d'abord oblige à le redécouper ensuite — et un concept partagé finit par exister en deux versions, une par document, qui divergent. C'est le test de duplication : *si deux documents décrivent le même concept avec deux définitions, ce n'est pas une divergence à arbitrer plus tard, c'est un concept qui aurait dû être partagé.*
+
+**Ce que le plan porte, et pourquoi il est une donnée.** Le plan de niveau 1 est **imposé par le gabarit** — onze chapitres en STD, dix en SFD, six en SFG. Les sous-sections sont un **résultat de l'analyse**, pas une décision de mise en page : le nombre de niveaux d'une vue récursive, le nombre de cas d'usage d'une SFG. Coder le plan dans le générateur, comme le fait le corpus dont celui-ci s'inspire, oblige à éditer l'outil pour chaque nouveau processus — inacceptable pour une méthode qui doit tourner sur n'importe quel legacy.
+
+**Le composeur refuse plutôt que d'approximer** : un concept du plan introuvable, un concept du bundle absent du plan — du contenu écrit que personne ne lira —, une section imposée sans concept ni sous-section, un saut de niveau de titre, un lien ou une ancre morts.
+
+**Le niveau de titre se déduit du numéro** — profondeur + 1. Le § 3.2.1 est un `h4` des deux côtés, et l'export a le même sommaire que son plan sans avoir à le retranscrire.
+
+---
+
 ## Questions encore ouvertes
 
 1. **Calibration.** L'échelle `V/C/I/H` et le mapping en pourcentage doivent être éprouvés sur un vrai legacy. Tant que ce n'est pas fait, ce sont des conventions, pas des mesures.

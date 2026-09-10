@@ -78,6 +78,7 @@ plugins/dmad/
 │                   freshness.py      péremption, et sa propagation vers le haut
 │                   coverage.py       les chiffres ; l'interprétation reste écrite
 │                   okf-export.py     le graphe en bundle Open Knowledge Format
+│                   okf-compose.py    bundle + plan → STD, SFD, SFG composées
 │                   selftest.sh       prouve que les garde-fous mordent
 └── examples/       run de référence + fixtures de violation
 ```

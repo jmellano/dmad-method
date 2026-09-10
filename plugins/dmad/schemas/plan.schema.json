@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dmad.dev/schemas/plan.schema.json",
+  "title": "DMAD Document Plan",
+  "description": "Le plan numéroté d'un document du corpus : quel concept du bundle occupe quel numéro de section. C'est LUI qui décide du contenu et de l'ordre du fichier composé, et le niveau de titre se déduit du numéro — profondeur + 1. Le plan de niveau 1 est imposé par le gabarit ; les sous-sections sont un résultat de l'analyse (D26).",
+  "type": "object",
+  "required": [
+    "kind",
+    "unit",
+    "unit_ref",
+    "output",
+    "sections"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "kind": {
+      "enum": [
+        "STD",
+        "SFD",
+        "SFG"
+      ]
+    },
+    "unit": {
+      "enum": [
+        "process",
+        "domain"
+      ],
+      "description": "D25 — STD et SFD documentent un PROCESSUS, qui a rarement un seul point d'entrée. La SFG documente un domaine, découpé par cas d'usage."
+    },
+    "unit_ref": {
+      "type": "string"
+    },
+    "output": {
+      "type": "string",
+      "description": "Chemin du fichier composé."
+    },
+    "title": {
+      "type": "string"
+    },
+    "derives_from": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "number",
+          "title"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "number": {
+            "type": "string",
+            "pattern": "^$|^[0-9]+(\\.[0-9]+)*(bis|ter|quater)?$",
+            "description": "Numéro de section. La chaîne vide désigne le chapeau, placé entre le titre et la première section numérotée. Le niveau de titre est la profondeur du numéro + 1."
+          },
+          "title": {
+            "type": "string",
+            "minLength": 2
+          },
+          "concept": {
+            "type": "string",
+            "description": "Chemin du concept dans le bundle. Absent = section de structure, dont le corps vient des sous-sections."
+          },
+          "required": {
+            "type": "boolean",
+            "default": true,
+            "description": "Une section imposée ne se supprime pas : sans objet, elle porte son constat d'absence et son périmètre."
+          },
+          "free_subsections": {
+            "type": "boolean",
+            "default": false,
+            "description": "Le nombre de sous-sections est un RÉSULTAT de l'analyse, pas une décision de mise en page. Le composeur ne vérifie alors que leur cohérence de numérotation."
+          }
+        }
+      }
+    },
+    "frontmatter": {
+      "type": "object",
+      "description": "Frontmatter du fichier composé. Le frontmatter EST du contenu : l'interdit d'audience s'y applique — une SFG ne porte pas de point d'entrée, un lecteur métier n'a pas à lire un nom de job sur son premier écran.",
+      "additionalProperties": true
+    }
+  }
+}

@@ -58,9 +58,7 @@ expected_corpus=(
   "D16 : bloc \`\`\`java"
   "D16 : bloc \`\`\`sql"
   "R1 : diagramme sans question"
-  "sections manquantes : 8"
-  "D17 : une SFD sans derives_from"
-  "ne référence aucun ancrage"
+  "chapitres manquants : 5"
   "bloc « Ce qui n'est pas couvert » manquant"
   "« Ce qui n'est pas couvert » est vide"
   "sans ligne de traçabilité"
@@ -100,9 +98,18 @@ else
 fi
 
 echo
+echo "== 6a. Le corpus se compose depuis le bundle, et le bundle seul"
+if python3 tools/okf-compose.py examples/atlas-billing/okf --all examples/atlas-billing \
+     --check-only > /dev/null; then
+  echo "   ok  3 documents composables, aucun concept orphelin du plan"
+else
+  echo "   ÉCHEC : la composition est refusée"; fail=1
+fi
+
+echo
 echo "== 6. Le corpus du run de référence est conforme"
-if python3 tools/check-corpus.py examples/atlas-billing/output > /dev/null; then
-  echo "   ok  examples/atlas-billing/output — STD, SFD, SFG"
+if python3 tools/check-corpus.py examples/atlas-billing > /dev/null; then
+  echo "   ok  examples/atlas-billing — STD, SFD, SFG composées"
 else
   echo "   ÉCHEC : le corpus du run de référence devrait être conforme"; fail=1
 fi

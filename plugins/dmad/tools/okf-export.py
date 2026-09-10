@@ -134,7 +134,11 @@ class Bundle:
         titres["intents"] = "Intentions"
         # Tout répertoire du bundle reçoit son index : sans lui, la divulgation
         # progressive s'arrête, et un agent qui descend ne trouve plus rien.
-        dossiers = sorted({c.parent.name for c in self.fichiers})
+        # Tous les répertoires du bundle, y compris les strates documentaires
+        # écrites par les rédacteurs : l'index racine ne doit pas les effacer.
+        dossiers = sorted({c.parent.name for c in self.fichiers} |
+                          {d.name for d in self.racine.iterdir()
+                           if d.is_dir() and not d.name.startswith(".")})
         for dossier in dossiers:
             titre = titres.get(dossier, dossier.replace("-", " ").capitalize())
             d = self.racine / dossier
@@ -161,16 +165,31 @@ class Bundle:
             "# Sections\n\n" + "\n".join(sections) + "\n", encoding="utf-8")
 
     def journal(self, run):
+        """Append-only, plus récent en tête, une seule rubrique par date.
+
+        Deux rubriques portant la même date sont un artefact de fusion : un
+        consommateur ne sait plus laquelle fait foi.
+        """
         f = self.racine / "log.md"
-        entree = (f"## {self.at[:10]}\n\n"
-                  f"- Export du run `{run.name}` — {len(self.concepts)} concepts "
-                  f"(dmad-okf-export/{VERSION_PRODUCTEUR})\n")
+        jour = self.at[:10]
+        puce = (f"- Export du run `{run.name}` — {len(self.concepts)} concepts "
+                f"(dmad-okf-export/{VERSION_PRODUCTEUR})")
+        rubriques, ordre = {}, []
         if f.exists():
-            ancien = f.read_text(encoding="utf-8")
-            corps = ancien.split("\n", 2)[2] if ancien.startswith("#") else ancien
-            f.write_text("# Journal du bundle\n\n" + entree + "\n" + corps.lstrip(), encoding="utf-8")
-        else:
-            f.write_text("# Journal du bundle\n\n" + entree, encoding="utf-8")
+            for bloc in re.split(r"^## ", f.read_text(encoding="utf-8"), flags=re.M)[1:]:
+                date, _, reste = bloc.partition("\n")
+                date = date.strip()
+                if date not in rubriques:
+                    rubriques[date] = []; ordre.append(date)
+                rubriques[date] += [l for l in reste.splitlines() if l.strip()]
+        if jour not in rubriques:
+            rubriques[jour] = []; ordre.insert(0, jour)
+        if puce not in rubriques[jour]:
+            rubriques[jour].insert(0, puce)
+        out = ["# Journal du bundle", ""]
+        for date in sorted(set(ordre), reverse=True):
+            out += [f"## {date}", ""] + rubriques[date] + [""]
+        f.write_text("\n".join(out), encoding="utf-8")
 
 
 def premiere_phrase(txt, defaut=""):

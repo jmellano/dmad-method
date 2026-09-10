@@ -10,6 +10,9 @@ Chaque message nomme la décision qu'il applique. Ce n'est pas de la cosmétique
 un message qui ne dit pas quelle règle il fait respecter se fait contourner,
 puis supprimer, au premier agacement — et la règle disparaît avec lui.
 
+Les documents contrôlés sont ceux que déclarent les `plan-*.yaml` du run : le
+bundle est la source, le document composé en est la dérivation (D26).
+
     python3 tools/check-corpus.py <dossier-run>
 """
 import argparse
@@ -27,12 +30,14 @@ except ImportError:  # pragma: no cover
 # du code : c'est le rendu d'un sous-graphe, et il reste autorisé.
 FENCES_AUTORISEES = {"mermaid"}
 
-# D20 — chaque document a son unité, et une seule.
-UNITE_ATTENDUE = {"STD": "entrypoint", "SFD": "business_object_tree", "SFG": "use_case"}
+# D20, révisé par D25 — chaque document a son unité, et une seule.
+# Un processus a rarement un seul point d'entrée : la STD et la SFD en documentent
+# un, et cataloguent ses points d'entrée. La SFG documente un domaine.
+UNITE_ATTENDUE = {"STD": "process", "SFD": "process", "SFG": "domain"}
 
-# Les dix-sept sections de la STD ne s'omettent jamais : une section sans objet
-# porte son constat d'absence et son périmètre.
-STD_SECTIONS = 17
+# Le plan de niveau 1 est imposé par le gabarit et déclaré dans plan-*.yaml.
+# Une section sans objet ne se supprime pas : elle porte son constat d'absence
+# et son périmètre (D26).
 
 # Les sept blocs d'un cas d'usage de SFG. Reconnus par mot-clé, pour tolérer
 # les variantes de formulation d'un titre.
@@ -84,12 +89,24 @@ def lire(path):
 
 
 def sections(corps, niveau="##"):
-    """Découpe un corps en (titre, texte) sur les titres du niveau demandé."""
-    motif = re.compile(rf"^{re.escape(niveau)} +(.+)$", re.M)
-    bornes = [(m.start(), m.group(1).strip()) for m in motif.finditer(corps)]
+    """Découpe un corps en (titre, texte) sur les titres du niveau demandé.
+
+    Une section s'arrête au prochain titre de niveau ÉGAL OU SUPÉRIEUR — sinon
+    un cas d'usage avale tout ce qui le suit, et les contrôles portent sur le
+    mauvais texte.
+    """
+    n = len(niveau)
+    tous = [(m.start(), len(m.group(1)), m.group(2).strip())
+            for m in re.finditer(r"^(#{1,6}) +(.+)$", corps, re.M)]
     out = []
-    for i, (debut, titre) in enumerate(bornes):
-        fin = bornes[i + 1][0] if i + 1 < len(bornes) else len(corps)
+    for i, (debut, lvl, titre) in enumerate(tous):
+        if lvl != n:
+            continue
+        fin = len(corps)
+        for suivant, lvl2, _ in tous[i + 1:]:
+            if lvl2 <= n:
+                fin = suivant
+                break
         out.append((titre, corps[debut:fin]))
     return out
 
@@ -203,21 +220,35 @@ def check_diagrammes(rel, corps, erreurs, run, moteur, seuils):
             )
 
 
-def check_std(rel, corps, erreurs):
-    """Les dix-sept sections ne s'omettent jamais."""
-    numeros = set()
+def check_plan(rel, corps, plan, erreurs):
+    """Le plan de niveau 1 est imposé : mêmes numéros, mêmes titres, même ordre."""
+    attendu = [(s["number"], s["title"]) for s in plan["sections"]
+               if s["number"] and "." not in s["number"]]
+    trouve = []
     for titre, _ in sections(corps):
-        m = re.match(r"^(\d{1,2})[.)]", titre.strip())
+        m = re.match(r"^(\d+)\.? +(.+)$", titre.strip())
         if m:
-            numeros.add(int(m.group(1)))
-    manquantes = [n for n in range(1, STD_SECTIONS + 1) if n not in numeros]
-    if manquantes:
+            trouve.append((m.group(1), m.group(2).strip()))
+
+    manquants = [n for n, _ in attendu if n not in {x for x, _ in trouve}]
+    if manquants:
         erreurs.append(
-            f"{rel} — sections manquantes : {', '.join(map(str, manquantes))}. "
-            "Une section sans objet ne se supprime pas : elle porte son constat "
-            "d'absence et son périmètre. Une section absente se lit « oubliée » "
-            "et pousse le lecteur à chercher lui-même"
+            f"{rel} — chapitres manquants : {', '.join(manquants)}. Une section sans "
+            "objet ne se supprime pas : elle porte son constat d'absence et son "
+            "périmètre. Une section absente se lit « oubliée » et pousse le lecteur "
+            "à chercher lui-même"
         )
+    # L'ordre ne se contrôle que si rien ne manque : sinon un chapitre absent
+    # produirait deux erreurs pour un seul défaut.
+    if not manquants and [n for n, _ in trouve] != [n for n, _ in attendu[:len(trouve)]]:
+        erreurs.append(
+            f"{rel} — l'ordre des chapitres s'écarte du plan. Le plan de niveau 1 est "
+            "ce qui rend la décomposition en concepts possible : un document qui s'en "
+            "écarte se décompose mal"
+        )
+    for (na, ta), (nt, tt) in zip(attendu, trouve):
+        if na == nt and ta.lower() != tt.lower():
+            erreurs.append(f"{rel} — § {na} : titre « {tt} », le plan dit « {ta} »")
 
 
 def check_sfd(rel, corps, parents, erreurs):
@@ -241,14 +272,19 @@ def check_sfd(rel, corps, parents, erreurs):
 
 def check_sfg(rel, corps, erreurs):
     """Les sept blocs, la traçabilité, et l'index inverse."""
-    cas = [(t, x) for t, x in sections(corps) if re.match(r"^CU-", t.strip())]
+    niveau_cu = "###"
+    cas = [(t, x) for t, x in sections(corps, niveau_cu) if "CU-" in t]
+    if not cas:
+        niveau_cu = "##"
+        cas = [(t, x) for t, x in sections(corps, niveau_cu) if "CU-" in t]
+    sous = "#" * (len(niveau_cu) + 1)
     if not cas:
         return
 
     toutes_regles = set()
 
     for titre, texte in cas:
-        blocs = [b.lower() for b, _ in sections(texte, "###")]
+        blocs = [b.lower() for b, _ in sections(texte, sous)]
         for cle, nom in SFG_BLOCS:
             if not any(cle in b for b in blocs):
                 erreurs.append(
@@ -256,9 +292,9 @@ def check_sfg(rel, corps, erreurs):
                     "Sept blocs par cas d'usage, sans exception"
                 )
 
-        for bloc_titre, bloc_texte in sections(texte, "###"):
+        for bloc_titre, bloc_texte in sections(texte, sous):
             if "n'est pas couvert" in bloc_titre.lower():
-                contenu = re.sub(r"^###.*$", "", bloc_texte, flags=re.M).strip()
+                contenu = re.sub(r"^#+ .*$", "", bloc_texte, flags=re.M).strip()
                 if not contenu:
                     erreurs.append(
                         f"{rel} — « {titre} » : « Ce qui n'est pas couvert » est vide. "
@@ -268,7 +304,7 @@ def check_sfg(rel, corps, erreurs):
                     )
 
         corps_regles, tracabilite = set(), set()
-        for bloc_titre, bloc_texte in sections(texte, "###"):
+        for bloc_titre, bloc_texte in sections(texte, sous):
             if "traçabilité" in bloc_titre.lower():
                 tracabilite.update(RE_REGLE.findall(bloc_texte))
             else:
@@ -329,37 +365,42 @@ def main() -> int:
     moteur = charger_moteur()
     seuils = moteur.charger_seuils(args.run / "scope.yaml") if moteur else {}
 
-    for dossier, kind in (("std", "STD"), ("sfd", "SFD"), ("sfg", "SFG")):
-        for path in sorted((args.run / dossier).glob("*.md")):
-            rel = path.relative_to(args.run)
-            fm, corps, _ = lire(path)
+    plans = sorted(args.run.glob("plan-*.y*ml"))
+    if not plans:
+        print("aucun plan de document (plan-*.yaml) — rien à contrôler")
+        return 0
 
-            check_d16(rel, corps, erreurs)
-            if not check_frontmatter(rel, fm, erreurs):
-                continue
+    for chemin_plan in plans:
+        plan = yaml.safe_load(chemin_plan.read_text(encoding="utf-8"))
+        kind = plan["kind"]
+        path = args.run / plan["output"]
+        if not path.exists():
+            erreurs.append(
+                f'{plan["output"]} — déclaré par {chemin_plan.name} mais absent. '
+                "Composer avec okf-compose.py avant de contrôler"
+            )
+            continue
 
-            declare = str(fm.get("type", "")).upper()
-            if declare and declare != kind:
-                erreurs.append(
-                    f"{rel} — type « {declare} » dans le dossier {dossier}/. "
-                    "Le dossier et le frontmatter doivent dire la même chose"
-                )
-            docs.append((path, kind, fm))
+        rel = path.relative_to(args.run)
+        fm, corps, _ = lire(path)
 
-            parents = check_cascade(rel, kind, fm, erreurs)
-            check_diagrammes(rel, corps, erreurs, args.run, moteur, seuils)
-            if kind == "STD":
-                check_std(rel, corps, erreurs)
-            elif kind == "SFD":
-                check_sfd(rel, corps, parents, erreurs)
-            else:
-                check_sfg(rel, corps, erreurs)
+        check_d16(rel, corps, erreurs)
+        if not check_frontmatter(rel, fm, erreurs):
+            continue
+        declare = str(fm.get("type", "")).upper()
+        if declare and declare != kind:
+            erreurs.append(f"{rel} — type « {declare} », le plan dit « {kind} »")
+        docs.append((path, kind, fm))
+
+        parents = check_cascade(rel, kind, fm, erreurs)
+        check_diagrammes(rel, corps, erreurs, args.run, moteur, seuils)
+        check_plan(rel, corps, plan, erreurs)
+        if kind == "SFD":
+            check_sfd(rel, corps, parents, erreurs)
+        elif kind == "SFG":
+            check_sfg(rel, corps, erreurs)
 
     check_blocage_sfg(args.run, [(p, k, f) for p, k, f in docs], erreurs)
-
-    if not docs and not erreurs:
-        print("aucun document de corpus trouvé (std/, sfd/, sfg/)")
-        return 0
 
     if erreurs:
         print(f"✗ {len(erreurs)} erreur(s) sur {len(docs)} document(s)\n")

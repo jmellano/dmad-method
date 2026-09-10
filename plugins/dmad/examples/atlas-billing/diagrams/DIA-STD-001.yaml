@@ -1,0 +1,24 @@
+id: DIA-STD-001
+kind: flowchart
+document: DOC-STD-FACT-001
+question: "quels composants ce batch mobilise-t-il, et lesquels franchissent une frontière ?"
+confidence: C
+caveats: "deux dispatchs non résolus, cf. § 14"
+direction: LR
+nodes:
+  - {id: SCH, label: Planificateur, shape: terminal}
+  - {id: RUN, label: BillingRun}
+  - {id: DISP, label: InvoiceDispatcher}
+  - {id: CALC, label: AmountCalculator}
+  - {id: ACC, label: "port AccountingGateway", shape: external}
+  - {id: PRI, label: "port PricingClient", shape: external}
+  - {id: DB, label: invoices, shape: data}
+  - {id: DBL, label: invoice_lines, shape: data}
+edges:
+  - {from: SCH, to: RUN}
+  - {from: RUN, to: DISP}
+  - {from: DISP, to: CALC}
+  - {from: DISP, to: ACC}
+  - {from: CALC, to: PRI}
+  - {from: DISP, to: DB}
+  - {from: CALC, to: DBL}

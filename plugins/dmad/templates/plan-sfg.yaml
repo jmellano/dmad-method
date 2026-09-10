@@ -1,0 +1,32 @@
+# Plan de niveau 1 d'une SFG — IMPOSÉ. Le chapitre 3 est libre.
+#
+# Le NOMBRE de cas d'usage est un résultat : le gabarit n'en impose ni trois ni
+# cinq. Une variation qui ne change ni les acteurs, ni le déclencheur, ni le
+# résultat attendu n'est pas un cas d'usage mais une règle à l'intérieur d'un cas.
+#
+# Chaque cas d'usage porte SEPT BLOCS, sans numéro — la numérotation s'arrête au
+# cas d'usage, qui est l'unité d'évolution.
+kind: SFG
+unit: domain
+unit_ref: "{{domaine}}"
+output: "dmad-output/SFG-{{slug}}.md"
+title: "SFG — {{domaine}}"
+derives_from: ["dmad-output/SFD-{{slug}}.md"]
+
+sections:
+  - number: ""
+    title: "Note d'audience"
+    concept: "{{P}}/sfg/note-audience.md"
+  - number: "1"
+    title: "Ce que le domaine résout"
+  - number: "2"
+    title: "Invariants du domaine"
+  - number: "3"
+    title: "Les cas d'usage"
+    free_subsections: true
+  - number: "4"
+    title: "Index inverse — quelle règle pour quel cas d'usage"
+  - number: "5"
+    title: "Ce que la rédaction a révélé"
+  - number: "6"
+    title: "Historique"

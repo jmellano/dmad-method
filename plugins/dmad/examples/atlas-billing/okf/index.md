@@ -15,6 +15,8 @@ Les trois documents du corpus — STD, SFD, SFG — ne sont **pas** dans ce bund
 - [Réfutations](challenges/index.md)
 - [Affirmations](claims/index.md)
 - [Contrats sortants](contracts/index.md)
+- [Diagrammes](diagrams/index.md)
 - [Documents du corpus](documents/index.md)
 - [Intentions](intents/index.md)
 - [Questions ouvertes](open-questions/index.md)
+- [processus](processus/index.md)

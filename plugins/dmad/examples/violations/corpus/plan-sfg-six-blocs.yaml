@@ -1,0 +1,23 @@
+kind: SFG
+unit: domain
+unit_ref: Fixture
+output: sfg-six-blocs.md
+title: Fixture sfg-six-blocs
+sections:
+- number: '1'
+  title: Ce que le domaine résout
+- number: '2'
+  title: Invariants du domaine
+- number: '3'
+  title: Les cas d'usage
+- number: '3.1'
+  title: CU-01 — Refacturation
+- number: '4'
+  title: Index inverse — quelle règle pour quel cas d'usage
+- number: '5'
+  title: Ce que la rédaction a révélé
+- number: '6'
+  title: Historique
+frontmatter:
+  module: fixture
+  confidence: medium

@@ -1,0 +1,76 @@
+kind: SFD
+unit: process
+unit_ref: Facturation
+output: output/SFD-facturation.md
+title: FACTURATION — Spécification Fonctionnelle Détaillée
+derives_from:
+- output/STD-facturation.md
+frontmatter:
+  module: billing
+  audience: hybride MOA/MOE
+  confidence: medium
+  entry_point_type: BATCH + API
+  entry_point_name: JOB nightly-billing ; POST /invoices/reinvoice
+  perimetre: processus de facturation
+  last_code_sync: a1b2c3d
+  generated_at: '2026-09-08'
+  generated_by: dmad-writer-sfd/0.4.0 — composé depuis le bundle OKF
+sections:
+- number: ''
+  title: Chapeau — audience, périmètre, prérequis lecteur
+  concept: processus/facturation/sfd/note-audience.md
+- number: '1'
+  title: Processus métier
+  free_subsections: true
+- number: '1.2'
+  title: Le problème que ce traitement résout
+  concept: processus/facturation/sfd/niveau-1-2.md
+- number: '2'
+  title: Processus général du système d'information
+  concept: processus/facturation/sfd/niveau-2.md
+- number: '2.3'
+  title: Étapes de transformation du traitement
+  concept: processus/facturation/sfd/niveau-2-3.md
+- number: '3'
+  title: Processus détaillé du système d'information
+  free_subsections: true
+- number: '3.1'
+  title: N2 — Campagne de facturation
+  concept: processus/facturation/sfd/niveau-3-1.md
+- number: '3.2'
+  title: N1 — Facture à émettre
+  concept: processus/facturation/sfd/niveau-3-2.md
+- number: '3.3'
+  title: N0 — Ligne valorisée
+  concept: processus/facturation/sfd/niveau-3-3.md
+- number: '3.4'
+  title: Synthèse des niveaux
+  concept: processus/facturation/sfd/niveau-3-4.md
+- number: '4'
+  title: Services externes sollicités
+  concept: processus/facturation/sfd/services-externes.md
+- number: '5'
+  title: Gestion des erreurs
+  concept: processus/facturation/sfd/gestion-erreurs.md
+  free_subsections: true
+- number: '6'
+  title: Cas de test
+  concept: processus/facturation/sfd/cas-de-test.md
+- number: '7'
+  title: Règles de gestion
+  concept: processus/facturation/sfd/regles-de-gestion.md
+- number: '7.2'
+  title: À confirmer par le métier
+  concept: processus/facturation/sfd/a-confirmer.md
+- number: '8'
+  title: Références
+  concept: processus/facturation/sfd/references-croisees.md
+- number: '9'
+  title: Historique
+  concept: processus/facturation/sfd/historique.md
+- number: '10'
+  title: Annexes
+  free_subsections: true
+- number: '10.1'
+  title: Ce qui n'a pas été analysé
+  concept: processus/facturation/sfd/limites-analyse.md

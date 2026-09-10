@@ -1,0 +1,39 @@
+# Plan de niveau 1 d'une SFD — IMPOSÉ. Les sous-sections sont libres.
+#
+# Le chapitre 3 est entièrement libre : un § par sous-processus, puis une vue
+# récursive par objet métier dont le NOMBRE DE NIVEAUX EST UN RÉSULTAT de
+# l'analyse, pas une décision de mise en page.
+kind: SFD
+unit: process
+unit_ref: "{{processus}}"
+output: "dmad-output/SFD-{{slug}}.md"
+title: "{{CODE}} — Spécification Fonctionnelle Détaillée"
+derives_from: ["dmad-output/STD-{{slug}}.md"]
+
+sections:
+  - number: ""
+    title: "Chapeau — audience, périmètre, prérequis lecteur"
+    concept: "{{P}}/sfd/note-audience.md"
+  - number: "1"
+    title: "Processus métier"
+    free_subsections: true
+  - number: "2"
+    title: "Processus général du système d'information"
+  - number: "3"
+    title: "Processus détaillé du système d'information"
+    free_subsections: true
+  - number: "4"
+    title: "Services externes sollicités"
+  - number: "5"
+    title: "Gestion des erreurs"
+    free_subsections: true
+  - number: "6"
+    title: "Cas de test"
+  - number: "7"
+    title: "Règles de gestion"
+  - number: "8"
+    title: "Références"
+  - number: "9"
+    title: "Historique"
+  - number: "10"
+    title: "Annexes"

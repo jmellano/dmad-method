@@ -51,6 +51,7 @@ Les documents se lisent dans l'ordre, mais chacun est autonome.
 | `tools/diagram-engine.py` | rend un diagramme depuis son plan, le compte, et refuse au-delà du seuil |
 | `tools/freshness.py` | ce qui a péri, et la propagation vers le haut de la cascade |
 | `tools/coverage.py` | les chiffres du rapport de couverture ; l'interprétation reste écrite |
+| `tools/okf-compose.py` | bundle + plan → le document composé ; refuse plutôt que d'approximer |
 | `tools/okf-export.py` | l'evidence store en bundle Open Knowledge Format conformant |
 | `tools/selftest.sh` | prouve que les garde-fous refusent bien ce qu'ils doivent refuser |
 

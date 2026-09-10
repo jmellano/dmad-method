@@ -1,5 +1,22 @@
 # DMAD — Livrables
 
+## Le bundle d'abord, le document ensuite
+
+Depuis la v0.4, **les rédacteurs n'écrivent pas de document** : ils écrivent des **concepts** dans le bundle OKF, et un **plan** les recompose en un fichier par audience (D26).
+
+```
+claims, graphe ──► concepts OKF ──► [plan-std.yaml] ──► STD-<processus>.md
+                    LIVRABLE 1                            LIVRABLE 2, dérivé
+```
+
+```bash
+python3 tools/okf-compose.py <bundle> --all <run>
+```
+
+Une correction se fait **dans le concept**, jamais dans le fichier composé — une édition faite là est perdue à la régénération suivante.
+
+**Le plan de niveau 1 est imposé** : onze chapitres en STD, dix en SFD, six en SFG. Les sous-sections sont un **résultat de l'analyse** — le nombre de niveaux d'une vue récursive, le nombre de cas d'usage. Une section dont le sujet n'existe pas **ne se supprime pas** : elle porte son constat d'absence et son périmètre.
+
 ## Le corpus
 
 Depuis la v0.4, DMAD produit un **corpus à trois documents en cascade d'abstraction** : STD, puis SFD, puis SFG. Ce ne sont pas trois rendus parallèles du même graphe — c'est une suite où chaque document est l'abstraction du précédent, et où **chaque étage est aveugle à l'étage n−2** (D17).

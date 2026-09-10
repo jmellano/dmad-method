@@ -1,0 +1,26 @@
+id: DIA-SFD-002
+kind: flowchart
+document: DOC-SFD-FACT-001
+question: "comment le processus se décompose-t-il, et jusqu'où ?"
+confidence: I
+caveats: "regroupements proposés par l'analyse, validés au gate de découpage"
+direction: TD
+nodes:
+  - {id: N2, label: "N2 — Campagne de facturation"}
+  - {id: N1, label: "N1 — Facture à émettre"}
+  - {id: N0, label: "N0 — Ligne valorisée"}
+  - {id: CR, label: "compte-rendu de campagne", shape: data}
+  - {id: INV, label: factures, shape: data}
+  - {id: ACC, label: "service comptable", shape: external}
+  - {id: LIT, label: "statuts de litige", shape: data}
+  - {id: LIG, label: "lignes de facture", shape: data}
+  - {id: TAR, label: "service de tarification", shape: external}
+edges:
+  - {from: N2, to: N1}
+  - {from: N1, to: N0}
+  - {from: N2, to: CR, style: dashed}
+  - {from: N1, to: INV, style: dashed}
+  - {from: N1, to: ACC, style: dashed}
+  - {from: N1, to: LIT, style: dashed}
+  - {from: N0, to: LIG, style: dashed}
+  - {from: N0, to: TAR, style: dashed}

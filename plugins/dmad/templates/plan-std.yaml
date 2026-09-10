@@ -1,0 +1,43 @@
+# Plan de niveau 1 d'une STD — IMPOSÉ. Les sous-sections sont libres.
+#
+# Une section dont le sujet n'existe pas dans ce traitement NE SE SUPPRIME PAS :
+# elle porte son constat d'absence et son périmètre. Un résultat négatif explicite
+# fait gagner du temps ; une section absente laisse croire à un oubli.
+#
+# Le champ `concept` est rempli par le rédacteur au fur et à mesure : c'est lui qui
+# fait le lien entre le numéro de section et le concept du bundle qui le porte.
+kind: STD
+unit: process
+unit_ref: "{{processus}}"
+output: "dmad-output/STD-{{slug}}.md"
+title: "{{CODE}} — Spécification Technique Détaillée"
+derives_from: []          # une STD dérive du graphe et des claims
+
+sections:
+  - number: ""
+    title: "Chapeau — audience, périmètre, prérequis lecteur"
+    concept: "{{P}}/std/note-audience.md"
+  - number: "1"
+    title: "Cartographie des composants"
+    free_subsections: true
+  - number: "2"
+    title: "Modèle de données"
+  - number: "3"
+    title: "Traitement de données"
+    free_subsections: true
+  - number: "4"
+    title: "Gestion des erreurs"
+  - number: "5"
+    title: "Appels externes"
+  - number: "6"
+    title: "Dépendances"
+  - number: "7"
+    title: "Points d'attention pour le développeur"
+  - number: "8"
+    title: "Cas de test"
+  - number: "9"
+    title: "Références"
+  - number: "10"
+    title: "Historique"
+  - number: "11"
+    title: "Annexes"

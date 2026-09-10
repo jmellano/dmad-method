@@ -1,0 +1,31 @@
+kind: STD
+unit: process
+unit_ref: Fixture
+output: std-bloc-sql.md
+title: Fixture std-bloc-sql
+sections:
+- number: '1'
+  title: Cartographie des composants
+- number: '2'
+  title: Modèle de données
+- number: '3'
+  title: Traitement de données
+- number: '4'
+  title: Gestion des erreurs
+- number: '5'
+  title: Appels externes
+- number: '6'
+  title: Dépendances
+- number: '7'
+  title: Points d'attention pour le développeur
+- number: '8'
+  title: Cas de test
+- number: '9'
+  title: Références
+- number: '10'
+  title: Historique
+- number: '11'
+  title: Annexes
+frontmatter:
+  module: fixture
+  confidence: medium
