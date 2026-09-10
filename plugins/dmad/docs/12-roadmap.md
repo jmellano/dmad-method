@@ -2,7 +2,24 @@
 
 ## Où en est le projet
 
-**v0.4 — le corpus à trois documents est spécifié.** Ce qui existe :
+**v0.4 — outillée, éprouvée à moitié.**
+
+| Dimension | Niveau | Sur quoi ça repose |
+|---|---|---|
+| Spécification | 4/5 | 28 décisions écrites, et **auto-corrigées** : D4 révisée par D23, D20 par D25 |
+| Contrainte mécanique | 3,5/5 | 9 outils, 10 sections de selftest, 31 fixtures — mais ils contrôlent la **forme**, jamais la vérité |
+| Épreuve terrain | **1/5** | un run partiel : cycles 0 et 1, un batch, sur une architecture depuis remplacée |
+| Reproductibilité | 0/5 | un opérateur, une fois, trois reprises |
+| Modèle de coût | 0,5/5 | un point de mesure, aucune ligne de base |
+| Distribution | 3/5 | packagé et validé, jamais installé par quelqu'un d'autre |
+
+> **Le selftest est vert contre une fixture écrite pour l'être.** Les 31 fixtures de violation prouvent que les garde-fous refusent ce qu'ils doivent refuser — mais « le run de référence passe » est circulaire, puisque ce run est fictif et rédigé conforme. C'est le motif que le premier run réel désigne comme dominant, *« rapporter un succès qu'on n'a pas vérifié »*, appliqué un cran au-dessus.
+>
+> **Rien de la refonte v0.4 n'a rencontré de code réel** : la cascade, l'inversion bundle-d'abord, les plans et l'arborescence sont spécifiés, outillés, et non éprouvés. Ce sur quoi le plus d'effort a été dépensé est ce qui est le moins prouvé.
+
+État détaillé, intégration du corpus `skills-doc` et reste à faire : `docs/superpowers/specs/2026-09-10-etat-des-lieux.md` à la racine du dépôt.
+
+Ce qui existe :
 
 | Brique | État |
 |---|---|
