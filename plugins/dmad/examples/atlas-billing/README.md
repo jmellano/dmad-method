@@ -54,7 +54,7 @@ Résultat : `demoted` de `C` à `I`, reformulation exigée, et une question ouve
 
 En parallèle, le Test Forger écrit `AmountCalculatorCharacterizationTest`. Le test passe → **`BR-FACT-021` est promue en `V`**. C'est le seul mécanisme qui atteint le niveau maximal, et il produit au passage un filet de sécurité réutilisable pour le changement de barème.
 
-### Cycle 1 — la STD → [`output/std/nightly-billing.md`](output/std/nightly-billing.md)
+### Cycle 1 — la STD → [`output/STD-facturation.md`](output/STD-facturation.md)
 
 Dix-sept sections, **aucune omise** : la section « Événements » porte son constat d'absence plutôt que de disparaître, et la section « Requêtes clés » signale que les requêtes de `reporting` portent sur les mêmes tables **sans appartenir à ce batch** — le piège d'attribution le plus probable ici.
 
@@ -64,7 +64,7 @@ La section 9 montre **les deux bouts de l'échelle des contrats** : un contrat r
 
 La revue de cycle 1 a produit une **correction factuelle** : le document annonçait une reprise indéfinie de la transmission ; elle s'arrête à cinq campagnes. Le développeur l'a vue, la traversée l'avait manquée.
 
-### Cycle 2 — la SFD → [`output/sfd/facturation.md`](output/sfd/facturation.md)
+### Cycle 2 — la SFD → [`output/SFD-facturation.md`](output/SFD-facturation.md)
 
 Vue récursive à trois niveaux, chacun avec ses six blocs. **Analysée bas → haut, rédigée haut → bas.**
 
@@ -72,7 +72,7 @@ Ce que la classification ISO 25010 fait apparaître et qu'une rédaction libre a
 
 Le document ne contient **aucun nom de classe et aucun nom de patron** : le Template Method reconnu par le Carver a servi au découpage, il n'apparaît pas.
 
-### Cycle 3 — la SFG → [`output/sfg/facturation.md`](output/sfg/facturation.md)
+### Cycle 3 — la SFG → [`output/SFG-facturation.md`](output/SFG-facturation.md)
 
 Deux cas d'usage, sept blocs chacun, dont « ce qui n'est pas couvert » — le bloc qu'on oublie, et le plus structurant.
 

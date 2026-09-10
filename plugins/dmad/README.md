@@ -55,7 +55,7 @@ Cycle 3   Archaeologist ─► Curator ─► Challenger ─► Writer:SFG ─�
 
 **→ [Run de référence : Atlas ERP, capacité Facturation](examples/atlas-billing/)**
 
-Un run complet déroulé de bout en bout : le cadrage, le découpage validé par un expert, deux claims aux régimes opposés, un challenge qui trouve deux défauts invisibles en relecture, et le corpus qui en sort — [STD](examples/atlas-billing/output/std/nightly-billing.md), [SFD](examples/atlas-billing/output/sfd/facturation.md), [SFG](examples/atlas-billing/output/sfg/facturation.md).
+Un run complet déroulé de bout en bout : le cadrage, le découpage validé par un expert, deux claims aux régimes opposés, un challenge qui trouve deux défauts invisibles en relecture, et le corpus qui en sort — [STD](examples/atlas-billing/output/STD-facturation.md), [SFD](examples/atlas-billing/output/SFD-facturation.md), [SFG](examples/atlas-billing/output/SFG-facturation.md).
 
 ## Structure du dépôt
 
