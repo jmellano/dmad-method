@@ -1,8 +1,8 @@
 kind: STD
 unit: process
 unit_ref: Fixture
-output: std-diagramme-a-la-main.md
-title: Fixture std-diagramme-a-la-main
+output: std-compteur-faux.md
+title: Fixture std-compteur-faux
 sections:
 - number: '1'
   title: Cartographie des composants
@@ -26,8 +26,6 @@ sections:
   title: Historique
 - number: '11'
   title: Annexes
-- number: '11.1'
-  title: Légende — diagramme de séquence
 frontmatter:
   module: fixture
   confidence: medium

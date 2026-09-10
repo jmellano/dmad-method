@@ -79,6 +79,13 @@ sections:
 - number: '11'
   title: Annexes
   free_subsections: true
+  concept: processus/facturation/std/annexes-chapeau.md
 - number: '11.1'
   title: Limites de cette analyse
   concept: processus/facturation/std/limites-analyse.md
+- number: '11.2'
+  title: Légende — diagramme d'activité
+  concept: processus/facturation/std/legende-activite.md
+- number: '11.3'
+  title: Légende — diagramme de séquence
+  concept: processus/facturation/std/legende-sequence.md

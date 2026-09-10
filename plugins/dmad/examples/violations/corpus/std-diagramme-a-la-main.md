@@ -58,4 +58,8 @@ Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
 
 ## 11. Annexes
 
-Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
+Ce chapitre porte **1 légende** de notation, pour le **1 diagramme** du document.
+
+### 11.1 Légende — diagramme de séquence
+
+Le temps descend ; une flèche pleine est un appel, une pointillée une réponse.

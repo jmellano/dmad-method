@@ -1,62 +1,53 @@
-# Task 63 — Rendre la STD
+# Task 63 — Écrire la strate STD du bundle
 
-**Agent :** `writer-std` · **Cycle :** 1 · **Sortie :** `dmad-output/std/<point-d-entree>.md`
+**Agent :** `writer-std` · **Cycle :** 1 · **Sorties :** concepts `<bundle>/processus/<p>/std/`, `plan-std.yaml`, puis `STD-<processus>.md` composée
 
-## Les deux contraintes
+## Tu écris des concepts, pas un document
+
+Le bundle est la sortie primaire ; le fichier est composé (D26).
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/tools/scaffold.py <plan> --bundle <bundle> --prefix processus/<processus>
+# … rédaction, un concept à la fois …
+python3 ${CLAUDE_PLUGIN_ROOT}/tools/okf-compose.py <bundle> --all <run>
+```
+
+`scaffold.py` matérialise un concept vide par section du plan, chacun portant **sa consigne en bloc `[gabarit]`**. Tu la supprimes au fur et à mesure : `check-corpus.py` refuse un document qui en porte encore.
+
+Il **n'écrase jamais** un concept existant. Le rejouer après une passe sert à créer les sections que l'analyse a fait apparaître.
+
+## Le plan
+
+Le **plan de niveau 1 est imposé** — le gabarit le fixe. Les **sous-sections sont un résultat de l'analyse**, pas une décision de mise en page : tu les ajoutes au plan à mesure que tu les découvres, et `scaffold.py` les matérialise.
+
+Une section imposée dont le sujet n'existe pas **ne se supprime pas** : elle porte son constat d'absence **et son périmètre**. Le plus grand gain est le **piège d'attribution** — signaler les artefacts voisins qui ressemblent à ce que le lecteur cherche mais n'appartiennent pas au périmètre.
+
+## Ce que le composeur refuse
+
+Un concept du plan introuvable · **un concept du bundle absent du plan** — écrit, et que personne ne lira · une section imposée sans concept ni sous-section · un saut de niveau de titre · un lien ou une ancre morts.
+
+Il ne produit pas un document approximatif : il refuse.
+
+## Les deux contraintes du contenu
 
 **Pas d'accès au code.** Le graphe et les claims, rien d'autre.
 
-**Aucun bloc de code, aucune requête, aucune configuration.** Des **références** : `fichier:lignes`, signatures, noms de tables et de colonnes (D16). C'est la conformité ISO 25010, et c'est ce qui rend la première contrainte tenable — tant qu'un extrait est permis, aller lire le code a un motif légitime.
+**Aucun bloc de code, aucune requête, aucune configuration** (D16). Des **références** : `fichier:lignes`, signatures, noms de tables et de colonnes. C'est ce qui rend la première contrainte tenable — tant qu'un extrait est permis, aller lire le code a un motif légitime.
 
-## Un document par point d'entrée
+## L'unité est le processus
 
-C'est l'unité que cherche le lecteur : il ouvre la STD parce qu'il doit modifier un batch, une route, un consumer. Le frontmatter porte `entry_point_type` et `entry_point_name`.
+Une STD documente **un processus**, pas un point d'entrée (D25) : un processus en a rarement un seul. Le chapitre 1 les catalogue, et le périmètre déclaré dans le frontmatter **se vérifie contre ce chapitre** — pas l'inverse.
 
-## Les dix-sept sections
+## Les onze chapitres
 
-Grille complète : `${CLAUDE_PLUGIN_ROOT}/docs/07-livrables.md`. Gabarit : `${CLAUDE_PLUGIN_ROOT}/templates/std.md`.
+Le plan les fixe : cartographie · modèle de données · traitement de données · gestion des erreurs · appels externes · dépendances · points d'attention · cas de test · références · historique · annexes.
 
-## Ne jamais omettre une section
+**Chapitre 1**, la cartographie se clôt par la cohésion et le couplage : chaque ligne **cite un fait documenté ailleurs**. Cette table rassemble sous le critère, elle ne redécouvre pas. Si le fait est introuvable ailleurs, soit il manque, soit la qualification est faible.
 
-Une section dont le sujet n'existe pas se remplit avec le constat d'absence **et son périmètre** :
+**Chapitre 4**, sépare le **site de levée** et l'**effet observable**. Ce ne sont pas le même fait, et les confondre crée des contradictions qui deviendront des promesses fausses en SFG.
 
-| Situation | ❌ | ✅ |
-|---|---|---|
-| Aucune requête native | supprimer la section | « Aucune requête annotée dans ce chemin. Trois mécanismes d'accès : dérivation par nom, API de critères, sauvegarde en lot. **Les requêtes de `XJpaRepository` l.44-91 relèvent du flux Y — ne pas les attribuer ici.** » |
-| Aucun mapper | supprimer la section | « Aucun mapper généré dans ce chemin. Les transformations sont manuelles dans `<méthodes>`. Le seul mapper du module concerne Z, hors périmètre. » |
-| Aucun événement | supprimer la section | « Point d'entrée synchrone, aucun événement émis ni consommé. » |
-
-**Le plus grand gain est le piège d'attribution** : signaler les artefacts *voisins* qui ressemblent à ce que le lecteur cherche mais n'appartiennent pas au périmètre. C'est ce qui évite qu'un développeur optimise une requête que ce batch n'exécute jamais.
-
-## Section 1.5 — cohésion et couplage
-
-Clôt la cartographie des composants. Table ordonnée du plus fort — cohésion de fonction — au plus faible — cohésion accidentelle, puis une seconde table pour les couplages problématiques.
-
-```markdown
-| Composant / relation | Degré | Fait qui le prouve |
-|---|---|---|
-| `AbstractDocumentStrategy` | cohésion **de fonction** ✔ | Template Method à 5 hooks ordonnés (§ 3.2.3) |
-| Les 3 hooks sans appelant | cohésion **accidentelle** ✘ | 10 implémentations, zéro site d'appel (point d'attention 22) |
-```
-
-**Chaque ligne cite un fait déjà documenté ailleurs.** Cette table rassemble sous le critère, elle ne redécouvre pas. Si le fait est introuvable ailleurs, soit il manque, soit la qualification est faible — dans les deux cas, ne pas l'inventer.
-
-C'est un excellent catalyseur de revue : un lead technique la parcourt en trente secondes pour arbitrer une passe de nettoyage.
-
-## Section 9 — appels externes
-
-Une ligne par contrat : `Code | Barreau | Artefact:version | Interface | Méthode | Contexte | Comportement d'échec`.
-
-Un contrat au barreau 3 se présente comme tel. Un contrat non résolu porte son placeholder et figure dans les points d'attention.
-
-## Section « limites de l'analyse » — obligatoire
-
-Profondeur de traversée, frontières atteintes, dispatchs non résolus, absence de traces runtime, modules hors périmètre. C'est ce qui distingue une documentation professionnelle d'une génération automatique.
-
-## Table de correspondance
-
-En tête : quelle SFD couvre ce point d'entrée, et sur quels niveaux. Le lecteur doit pouvoir passer d'une unité documentaire à l'autre.
+**Chapitre 5**, une ligne par contrat avec son **barreau** et sa **version d'artefact**. Un contrat non résolu porte un placeholder visible et une ligne au chapitre 7 — jamais un code plausible.
 
 ## Quand il manque quelque chose
 
-Une `gap_request`, jamais un comblement. `blocking` relance la cartographie ou la résolution des contrats sur ce point ; `degrades` devient une question ouverte et le document sort avec son trou visible.
+Une `gap_request`, jamais un comblement. `blocking` relance la cartographie ou la résolution des contrats ; `degrades` devient une question ouverte, et le document sort avec son trou visible.

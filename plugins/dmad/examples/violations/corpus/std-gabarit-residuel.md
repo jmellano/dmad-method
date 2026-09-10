@@ -6,17 +6,12 @@ unit_ref: Fixture
 generated_by: "modèle — fixture de non-régression"
 ---
 
-<!-- Violation R1 : un diagramme qu'aucune question n'introduit. -->
+<!-- Violation : gabarit livré à moitié rempli. Le marqueur est fait pour être vu,
+     et il a survécu jusqu'à la livraison. -->
 
 ## 1. Cartographie des composants
 
 Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
-
-<!-- diagram: DIA-BAD-001 · N=2 E=1 McCabe=1 -->
-```mermaid
-sequenceDiagram
-  A->>B: x
-```
 
 ## 2. Modèle de données
 
@@ -36,7 +31,12 @@ Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
 
 ## 6. Dépendances
 
-Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
+<!-- [gabarit]
+  Dépendances non standard uniquement.
+  Supprimer ce bloc une fois la section écrite.
+-->
+
+{{à écrire}}
 
 ## 7. Points d'attention pour le développeur
 
@@ -56,8 +56,4 @@ Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
 
 ## 11. Annexes
 
-Ce chapitre porte **1 légende** de notation, pour le **1 diagramme** du document.
-
-### 11.1 Légende — diagramme de séquence
-
-Le temps descend ; une flèche pleine est un appel, une pointillée une réponse.
+Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.

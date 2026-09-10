@@ -6,17 +6,11 @@ unit_ref: Fixture
 generated_by: "modèle — fixture de non-régression"
 ---
 
-<!-- Violation R1 : un diagramme qu'aucune question n'introduit. -->
+<!-- Violation : le chapeau des annexes annonce un compte que le document ne tient pas. -->
 
 ## 1. Cartographie des composants
 
 Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
-
-<!-- diagram: DIA-BAD-001 · N=2 E=1 McCabe=1 -->
-```mermaid
-sequenceDiagram
-  A->>B: x
-```
 
 ## 2. Modèle de données
 
@@ -24,7 +18,14 @@ Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
 
 ## 3. Traitement de données
 
-Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
+> **Question :** qui appelle quoi ?
+> **Confiance : C — corroboré**
+
+<!-- diagram: DIA-FIX-001 · N=2 E=1 McCabe=1 -->
+```mermaid
+sequenceDiagram
+  A->>B: dispatch
+```
 
 ## 4. Gestion des erreurs
 
@@ -56,8 +57,8 @@ Aucun objet dans ce chemin. Périmètre : le seul point d'entrée documenté.
 
 ## 11. Annexes
 
-Ce chapitre porte **1 légende** de notation, pour le **1 diagramme** du document.
+Ce chapitre porte **1 légende** de notation, pour les **7 diagrammes** du document.
 
 ### 11.1 Légende — diagramme de séquence
 
-Le temps descend ; une flèche pleine est un appel, une pointillée une réponse.
+Le temps descend ; une flèche pleine est un appel.

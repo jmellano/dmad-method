@@ -76,6 +76,14 @@
             "type": "boolean",
             "default": false,
             "description": "Le nombre de sous-sections est un RÉSULTAT de l'analyse, pas une décision de mise en page. Le composeur ne vérifie alors que leur cohérence de numérotation."
+          },
+          "guidance": {
+            "type": "string",
+            "description": "Ce qu'il faut écrire dans cette section, et les pièges. Matérialisé par `scaffold.py` en commentaire dans le concept vide, et supprimé par le rédacteur au fur et à mesure. La consigne vit ici et pas dans un gabarit séparé : deux copies d'une consigne divergent."
+          },
+          "type": {
+            "type": "string",
+            "description": "Type OKF du concept à créer. Défaut : Technical Section."
           }
         }
       }

@@ -1,39 +1,51 @@
-# Plan de niveau 1 d'une SFD — IMPOSÉ. Les sous-sections sont libres.
-#
-# Le chapitre 3 est entièrement libre : un § par sous-processus, puis une vue
-# récursive par objet métier dont le NOMBRE DE NIVEAUX EST UN RÉSULTAT de
-# l'analyse, pas une décision de mise en page.
 kind: SFD
 unit: process
-unit_ref: "{{processus}}"
-output: "dmad-output/SFD-{{slug}}.md"
-title: "{{CODE}} — Spécification Fonctionnelle Détaillée"
-derives_from: ["dmad-output/STD-{{slug}}.md"]
-
+unit_ref: '{{processus}}'
+output: dmad-output/SFD-{{slug}}.md
+title: '{{CODE}} — Spécification Fonctionnelle Détaillée'
+derives_from:
+- dmad-output/STD-{{slug}}.md
 sections:
-  - number: ""
-    title: "Chapeau — audience, périmètre, prérequis lecteur"
-    concept: "{{P}}/sfd/note-audience.md"
-  - number: "1"
-    title: "Processus métier"
-    free_subsections: true
-  - number: "2"
-    title: "Processus général du système d'information"
-  - number: "3"
-    title: "Processus détaillé du système d'information"
-    free_subsections: true
-  - number: "4"
-    title: "Services externes sollicités"
-  - number: "5"
-    title: "Gestion des erreurs"
-    free_subsections: true
-  - number: "6"
-    title: "Cas de test"
-  - number: "7"
-    title: "Règles de gestion"
-  - number: "8"
-    title: "Références"
-  - number: "9"
-    title: "Historique"
-  - number: "10"
-    title: "Annexes"
+- number: ''
+  title: Chapeau — audience, périmètre, prérequis lecteur
+  concept: '{{P}}/sfd/note-audience.md'
+  guidance: 'Audience HYBRIDE MOA/MOE. La SFD décrit le processus et le comportement observable ; la STD
+    associée renseigne le comment technique. Interdits : bloc de code, nom de classe, nom de patron de
+    conception — le patron a servi au découpage, il n''apparaît pas.'
+- number: '1'
+  title: Processus métier
+  free_subsections: true
+  guidance: Acteurs métier, problème résolu, variantes, et les sous-processus. Le nombre est un résultat.
+- number: '2'
+  title: Processus général du système d'information
+  guidance: 'Le processus vu de l''extérieur : acteurs et flux, modèle de données métier, étapes.'
+- number: '3'
+  title: Processus détaillé du système d'information
+  free_subsections: true
+  guidance: 'Libre. Un § par sous-processus, puis la vue récursive par objet métier dont le NOMBRE DE
+    NIVEAUX EST UN RÉSULTAT de l''analyse. Chaque niveau porte les six blocs : traitement, contrôle, données
+    initiales, données ad-hoc, données de contrôle, sorties normales et anormales. Signale les données
+    ad-hoc chargées en boucle.'
+- number: '4'
+  title: Services externes sollicités
+  guidance: 'Un par service : qui l''appelle, à quelle cardinalité, et si son contrat est résolu.'
+- number: '5'
+  title: Gestion des erreurs
+  free_subsections: true
+  guidance: Où les erreurs sont levées, ce que l'utilisateur observe, et la distinction entre le site
+    de levée et l'effet observable.
+- number: '6'
+  title: Cas de test
+  guidance: Si les cas de test sont en STD, le dire et renvoyer — ne pas supprimer le chapitre.
+- number: '7'
+  title: Règles de gestion
+  guidance: Les règles établies, avec leur niveau de preuve, et ce qui reste à confirmer par le métier.
+- number: '8'
+  title: Références
+  guidance: STD dont cette SFD est l'abstraction, SFG qui en dérive.
+- number: '9'
+  title: Historique
+  guidance: Dont les corrections factuelles, avec ce qui était écrit et pourquoi c'était faux.
+- number: '10'
+  title: Annexes
+  guidance: Légendes des notations employées, et ce qui n'a pas été analysé.

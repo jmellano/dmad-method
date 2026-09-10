@@ -79,6 +79,7 @@ plugins/dmad/
 │                   coverage.py       les chiffres ; l'interprétation reste écrite
 │                   okf-export.py     le graphe en bundle Open Knowledge Format
 │                   okf-compose.py    bundle + plan → STD, SFD, SFG composées
+│                   scaffold.py       les concepts à remplir, depuis le plan
 │                   selftest.sh       prouve que les garde-fous mordent
 └── examples/       run de référence + fixtures de violation
 ```

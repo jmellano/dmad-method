@@ -1,32 +1,36 @@
-# Plan de niveau 1 d'une SFG — IMPOSÉ. Le chapitre 3 est libre.
-#
-# Le NOMBRE de cas d'usage est un résultat : le gabarit n'en impose ni trois ni
-# cinq. Une variation qui ne change ni les acteurs, ni le déclencheur, ni le
-# résultat attendu n'est pas un cas d'usage mais une règle à l'intérieur d'un cas.
-#
-# Chaque cas d'usage porte SEPT BLOCS, sans numéro — la numérotation s'arrête au
-# cas d'usage, qui est l'unité d'évolution.
 kind: SFG
 unit: domain
-unit_ref: "{{domaine}}"
-output: "dmad-output/SFG-{{slug}}.md"
-title: "SFG — {{domaine}}"
-derives_from: ["dmad-output/SFD-{{slug}}.md"]
-
+unit_ref: '{{domaine}}'
+output: dmad-output/SFG-{{slug}}.md
+title: SFG — {{domaine}}
+derives_from:
+- dmad-output/SFD-{{slug}}.md
 sections:
-  - number: ""
-    title: "Note d'audience"
-    concept: "{{P}}/sfg/note-audience.md"
-  - number: "1"
-    title: "Ce que le domaine résout"
-  - number: "2"
-    title: "Invariants du domaine"
-  - number: "3"
-    title: "Les cas d'usage"
-    free_subsections: true
-  - number: "4"
-    title: "Index inverse — quelle règle pour quel cas d'usage"
-  - number: "5"
-    title: "Ce que la rédaction a révélé"
-  - number: "6"
-    title: "Historique"
+- number: ''
+  title: Note d'audience
+  concept: '{{P}}/sfg/note-audience.md'
+  guidance: À qui, ce qu'on n'y trouvera pas et où c'est écrit, comment le document est organisé ET POURQUOI.
+    Seul endroit où la doctrine du cas d'usage est expliquée.
+- number: '1'
+  title: Ce que le domaine résout
+  guidance: Le problème métier en une page, SANS le système. Un lecteur qui s'arrête ici doit avoir compris.
+- number: '2'
+  title: Invariants du domaine
+  guidance: 'Table à trois colonnes : énoncé, intention, ce que l''utilisateur voit.'
+- number: '3'
+  title: Les cas d'usage
+  free_subsections: true
+  guidance: 'Un § par cas d''usage, et le NOMBRE est un résultat. Sept blocs chacun, sans numéro et sans
+    exception : Situation · Acteurs et rôles métier · Déclencheur et cadence (AVEC le fuseau horaire)
+    · Règles applicables · Ce que l''utilisateur voit (succès ET échec) · Ce qui n''est pas couvert ·
+    Traçabilité. Une variation qui ne change ni les acteurs, ni le déclencheur, ni le résultat n''est
+    pas un cas d''usage.'
+- number: '4'
+  title: Index inverse — quelle règle pour quel cas d'usage
+  guidance: GÉNÉRÉ, jamais édité. Un écart entre le corps et l'index est un défaut, pas un arrondi.
+- number: '5'
+  title: Ce que la rédaction a révélé
+  guidance: Constats de méthode et arbitrages attendus, chacun énonçant ses options.
+- number: '6'
+  title: Historique
+  guidance: Dont les corrections factuelles, avec ce qui était écrit et pourquoi c'était faux.

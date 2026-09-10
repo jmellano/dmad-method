@@ -71,6 +71,13 @@ sections:
 - number: '10'
   title: Annexes
   free_subsections: true
+  concept: processus/facturation/sfd/annexes-chapeau.md
 - number: '10.1'
   title: Ce qui n'a pas été analysé
   concept: processus/facturation/sfd/limites-analyse.md
+- number: '10.2'
+  title: Légende — diagramme d'activité
+  concept: processus/facturation/sfd/legende-activite.md
+- number: '10.3'
+  title: Légende — diagramme de séquence
+  concept: processus/facturation/sfd/legende-sequence.md

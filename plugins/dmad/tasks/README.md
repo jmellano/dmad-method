@@ -19,9 +19,9 @@ Procédures opérationnelles mobilisées par les agents. Chaque tâche indique s
 | [50 — Réfuter une claim](50-challenge-claim.md) | challenger | 1, 2, 3 |
 | [51 — Forger un test de caractérisation](51-forge-characterization-test.md) | test-forger | 2 |
 | [60 — Planifier les diagrammes](60-plan-diagrams.md) | diagram-planner | 1, 2 |
-| [63 — Rendre la STD](63-render-std.md) | writer-std | 1 |
-| [64 — Rendre la SFD](64-render-sfd.md) | writer-sfd | 2 |
-| [65 — Rendre la SFG](65-render-sfg.md) | writer-sfg | 3 |
+| [63 — Écrire la strate STD](63-render-std.md) | writer-std | 1 |
+| [64 — Écrire la strate SFD](64-render-sfd.md) | writer-sfd | 2 |
+| [65 — Écrire la strate SFG](65-render-sfg.md) | writer-sfg | 3 |
 | [70 — Calculer la couverture](70-compute-coverage.md) | curator | 3 |
 | [71 — Vérifier la fraîcheur](71-check-freshness.md) | curator | maintien |
 

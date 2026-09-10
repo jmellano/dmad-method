@@ -26,6 +26,8 @@ sections:
   title: Historique
 - number: '11'
   title: Annexes
+- number: '11.1'
+  title: Légende — diagramme de séquence
 frontmatter:
   module: fixture
   confidence: medium

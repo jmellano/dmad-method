@@ -1,6 +1,32 @@
-# Task 65 — Rendre la SFG
+# Task 65 — Écrire la strate SFG du bundle
 
-**Agent :** `writer-sfg` · **Cycle :** 3 · **Sortie :** `dmad-output/sfg/<domaine>.md`
+**Agent :** `writer-sfg` · **Cycle :** 3 · **Sorties :** concepts `<bundle>/processus/<p>/sfg/`, `plan-sfg.yaml`, puis `SFG-<domaine>.md` composée
+
+## Tu écris des concepts, pas un document
+
+Le bundle est la sortie primaire ; le fichier est composé (D26).
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/tools/scaffold.py <plan> --bundle <bundle> --prefix processus/<processus>
+# … rédaction, un concept à la fois …
+python3 ${CLAUDE_PLUGIN_ROOT}/tools/okf-compose.py <bundle> --all <run>
+```
+
+`scaffold.py` matérialise un concept vide par section du plan, chacun portant **sa consigne en bloc `[gabarit]`**. Tu la supprimes au fur et à mesure : `check-corpus.py` refuse un document qui en porte encore.
+
+Il **n'écrase jamais** un concept existant. Le rejouer après une passe sert à créer les sections que l'analyse a fait apparaître.
+
+## Le plan
+
+Le **plan de niveau 1 est imposé** — le gabarit le fixe. Les **sous-sections sont un résultat de l'analyse**, pas une décision de mise en page : tu les ajoutes au plan à mesure que tu les découvres, et `scaffold.py` les matérialise.
+
+Une section imposée dont le sujet n'existe pas **ne se supprime pas** : elle porte son constat d'absence **et son périmètre**. Le plus grand gain est le **piège d'attribution** — signaler les artefacts voisins qui ressemblent à ce que le lecteur cherche mais n'appartiennent pas au périmètre.
+
+## Ce que le composeur refuse
+
+Un concept du plan introuvable · **un concept du bundle absent du plan** — écrit, et que personne ne lira · une section imposée sans concept ni sous-section · un saut de niveau de titre · un lien ou une ancre morts.
+
+Il ne produit pas un document approximatif : il refuse.
 
 ## Ce qui est lu
 
@@ -8,48 +34,22 @@
 
 ## Prérequis bloquant
 
-Le `Curator` a vérifié que la SFD ne se contredit pas. **Une contradiction laissée en SFD devient ici une promesse fausse faite à l'utilisateur**, et le lecteur n'a aucun moyen de la détecter.
+Le `Curator` a vérifié que la SFD ne se contredit pas. Si une contradiction apparaît malgré tout en cours de rédaction : **arrête et remonte**. Ne choisis pas la version la plus plausible, n'écris pas une formulation qui concilie — les deux sections peuvent être vraies à deux moments différents du traitement, et c'est cette distinction qui est l'information.
 
-Si une contradiction apparaît malgré tout en cours de rédaction : **arrêter et remonter**. Ne pas choisir la version la plus plausible, ne pas écrire une formulation qui concilie. Les deux sections peuvent être vraies à deux moments différents du traitement — et c'est cette distinction qui est l'information.
+## L'unité est le cas d'usage
 
-## L'unité : le cas d'usage
+Ce qui se demande, s'arbitre et se livre d'un bloc. Le **nombre de cas d'usage est un résultat** : le plan n'en impose ni trois ni cinq. Une variation qui ne change ni les acteurs, ni le déclencheur, ni le résultat attendu **n'est pas un cas d'usage** mais une règle à l'intérieur d'un cas.
 
-Ce qui se demande, s'arbitre et se livre d'un bloc. **Le découpage se fait par ce qui évolue ensemble**, jamais par les valeurs que prend un paramètre.
+## Les six chapitres, et les sept blocs
 
-Test à rejouer sur chaque candidat *et* sur chaque variation : si deux candidats partagent leurs règles et ne diffèrent que par une valeur, c'est **un** cas d'usage et une propriété.
+Ce que le domaine résout · invariants · les cas d'usage · index inverse · ce que la rédaction a révélé · historique.
 
-## Sections de tête
-
-1. **Note d'audience** — à qui, ce qu'on n'y trouvera pas et où c'est écrit, comment le document est organisé **et pourquoi**. Seul endroit où la doctrine est expliquée ; ailleurs elle est appliquée.
-2. **Ce que le domaine résout** — le problème métier en une page, **sans le système**. Un lecteur qui s'arrête ici doit avoir compris à quoi sert la chose.
-3. **Invariants du domaine** — même table à trois colonnes que les règles.
-
-## Les sept blocs, par cas d'usage, sans exception
-
-| Bloc | Piège |
-|---|---|
-| **Situation** | décrire le système au lieu de la situation |
-| **Acteurs et rôles métier** | glisser un nom d'application |
-| **Déclencheur et cadence** | « chaque nuit » sans fuseau horaire — inutilisable |
-| **Règles applicables** | énoncé · intention · ce que l'utilisateur voit. Ne pas factoriser vers un autre cas d'usage |
-| **Ce que l'utilisateur voit** | oublier l'échec, qui est le cas le plus consulté |
-| **Ce qui n'est pas couvert** | **le bloc qu'on oublie** |
-| **Traçabilité** | règle → section SFD. Le laisser incomplet « en attendant » |
+Chaque cas d'usage porte **sept blocs, sans numéro et sans exception** : Situation · Acteurs et rôles métier · Déclencheur et cadence (**avec le fuseau horaire**) · Règles applicables · Ce que l'utilisateur voit (**succès et échec**) · Ce qui n'est pas couvert · Traçabilité.
 
 > **« Ce qui n'est pas couvert » conditionne tout le reste.** Un cas d'usage dont la frontière n'est pas écrite ne peut être l'unité d'évolution de rien.
 
-## Les règles partagées s'arbitrent, elles ne se subissent pas
+L'**index inverse** se génère, il ne s'édite pas : un écart entre le corps et l'index est un défaut, pas un arrondi.
 
-Une règle présente dans plusieurs cas d'usage a **une décision écrite** : soit elle remonte en invariant du domaine, soit elle est contextualisée dans chacun. La contextualisation révèle souvent ce que la factorisation masquait — deux formulations d'une même règle qui n'ont pas le même effet observable.
+## Interdit d'audience — le frontmatter compris
 
-## Sections de queue
-
-- **Index inverse** règle → cas d'usage. **Généré, jamais édité.** Compter les règles du corps et les entrées de l'index : un écart est un défaut.
-- **Constats** — distinguer ce qui relève de la méthode et ce qui attend un arbitrage. Chaque arbitrage énonce ses options.
-- **Historique** — y consigner les **corrections factuelles**, avec ce qui était écrit et pourquoi c'était faux. C'est la seule trace qu'un relecteur aura de la fiabilité du document.
-
-## Interdits d'audience
-
-Aucun nom de composant, d'application, de table, de code technique, de vocabulaire d'exploitation — hors du bloc traçabilité, seul endroit où les identifiants ont droit de cité.
-
-Grep des interdits en fin de passe : constituer la liste une fois par domaine, la rejouer à chaque fois.
+Aucun nom de composant, d'application, de table, de code technique, hors du bloc traçabilité. **Le frontmatter est du contenu** : une SFG ne porte ni `entry_point_type` ni `entry_point_name` — un lecteur métier n'a pas à lire un nom de job sur son premier écran.

@@ -64,6 +64,9 @@ expected_corpus=(
   "sans ligne de traçabilité"
   "index inverse incomplet"
   "R3 : diagramme sans marqueur de rendu"
+  "marqueur de gabarit résiduel"
+  "employée sans sa légende"
+  "annonce 7 diagramme"
 )
 out=$(python3 tools/check-corpus.py examples/violations/corpus 2>&1)
 for e in "${expected_corpus[@]}"; do

@@ -52,6 +52,17 @@ SFG_BLOCS = [
 ]
 
 RE_FENCE = re.compile(r"^\s*```([A-Za-z0-9_+-]+)\s*$", re.M)
+
+# Notation Mermaid → nom de la légende qui doit l'accompagner. Une notation
+# employée sans sa légende laisse un lecteur devant un dessin qu'il interprète ;
+# une légende sans son diagramme survit au retrait du dernier qui l'employait.
+NOTATIONS = {
+    "flowchart": "activité", "graph": "activité",
+    "sequencediagram": "séquence",
+    "statediagram": "état-transition", "statediagram-v2": "état-transition",
+    "erdiagram": "entité-relation",
+    "classdiagram": "classe",
+}
 RE_MARQUEUR = re.compile(r"^<!-- diagram: ([A-Z0-9-]+) ·[^>]*-->$", re.M)
 RE_BLOC_MERMAID = re.compile(r"^```mermaid\n(.*?)^```$", re.M | re.S)
 
@@ -125,6 +136,23 @@ def check_d16(rel, corps, erreurs):
             "Le corpus porte des références — fichier:lignes, signatures, noms de "
             "tables — jamais un extrait. Tant qu'un extrait est permis, aller lire "
             "le code a un motif légitime, et l'échelle de lecture devient poreuse"
+        )
+
+
+def check_gabarit(rel, corps, erreurs):
+    """Un gabarit livré à moitié rempli. Un seul contrôle, donc un seul message."""
+    trouves = []
+    for motif, quoi in ((r"\[gabarit\]", "consigne de rédaction"),
+                        (r"\{\{[^}\n]{0,80}\}\}", "placeholder")):
+        m = re.search(motif, corps)
+        if m:
+            ligne = corps[:m.start()].count("\n") + 1
+            trouves.append(f"{quoi} l.{ligne} (`{m.group(0)[:40]}`)")
+    if trouves:
+        erreurs.append(
+            f"{rel} — marqueur de gabarit résiduel : {' · '.join(trouves)}. "
+            "Le marqueur se supprime au fur et à mesure que la section est écrite ; "
+            "celui-ci a survécu jusqu'à la livraison"
         )
 
 
@@ -217,6 +245,51 @@ def check_diagrammes(rel, corps, erreurs, run, moteur, seuils):
                 f"{rel}:{ligne} — R3 : le diagramme {plan_id} diverge de son plan. "
                 "Il a été retouché à la main après rendu — et il peut désormais "
                 "contredire le graphe dont il est censé sortir"
+            )
+
+
+def check_annexes(rel, corps, erreurs):
+    """Contrôles 6 et 7 — les légendes des notations, et les compteurs annoncés.
+
+    Ils ne s'appliquent qu'aux documents qui portent un chapitre d'annexes : une
+    SFG cadre un arbitrage métier, pas une analyse technique, et n'en a pas.
+    """
+    annexes = next((x for t_, x in sections(corps) if "annexe" in t_.lower()), None)
+    if annexes is None:
+        return
+
+    employees = set()
+    for m in re.finditer(r"^```mermaid\n\s*([A-Za-z-]+)", corps, re.M):
+        n = NOTATIONS.get(m.group(1).lower())
+        if n:
+            employees.add(n)
+
+    declarees = set()
+    for titre, _ in sections(annexes, "###"):
+        for nom in set(NOTATIONS.values()):
+            if nom in titre.lower():
+                declarees.add(nom)
+
+    for manque in sorted(employees - declarees):
+        erreurs.append(
+            f"{rel} — notation « {manque} » employée sans sa légende. Un lecteur "
+            "devant un dessin dont la convention n'est pas écrite l'interprète"
+        )
+    for orpheline in sorted(declarees - employees):
+        erreurs.append(
+            f"{rel} — légende « {orpheline} » orpheline : plus aucun diagramme ne "
+            "l'emploie. Elle a survécu au retrait du dernier qui s'en servait"
+        )
+
+    chapeau = re.split(r"^###", annexes, maxsplit=1, flags=re.M)[0]
+    reels = {"diagramme": len(re.findall(r"^```mermaid\s*$", corps, re.M)),
+             "légende": len(declarees)}
+    for mot, reel in reels.items():
+        m = re.search(rf"(\d+)\s+{mot}", chapeau, re.I)
+        if m and int(m.group(1)) != reel:
+            erreurs.append(
+                f"{rel} — le chapeau des annexes annonce {m.group(1)} {mot}(s), "
+                f"il y en a {reel}. Un compteur faux se recopie d'une version à l'autre"
             )
 
 
@@ -385,6 +458,7 @@ def main() -> int:
         fm, corps, _ = lire(path)
 
         check_d16(rel, corps, erreurs)
+        check_gabarit(rel, corps, erreurs)
         if not check_frontmatter(rel, fm, erreurs):
             continue
         declare = str(fm.get("type", "")).upper()
@@ -395,6 +469,7 @@ def main() -> int:
         parents = check_cascade(rel, kind, fm, erreurs)
         check_diagrammes(rel, corps, erreurs, args.run, moteur, seuils)
         check_plan(rel, corps, plan, erreurs)
+        check_annexes(rel, corps, erreurs)
         if kind == "SFD":
             check_sfd(rel, corps, parents, erreurs)
         elif kind == "SFG":

@@ -1,43 +1,59 @@
-# Plan de niveau 1 d'une STD — IMPOSÉ. Les sous-sections sont libres.
-#
-# Une section dont le sujet n'existe pas dans ce traitement NE SE SUPPRIME PAS :
-# elle porte son constat d'absence et son périmètre. Un résultat négatif explicite
-# fait gagner du temps ; une section absente laisse croire à un oubli.
-#
-# Le champ `concept` est rempli par le rédacteur au fur et à mesure : c'est lui qui
-# fait le lien entre le numéro de section et le concept du bundle qui le porte.
 kind: STD
 unit: process
-unit_ref: "{{processus}}"
-output: "dmad-output/STD-{{slug}}.md"
-title: "{{CODE}} — Spécification Technique Détaillée"
-derives_from: []          # une STD dérive du graphe et des claims
-
+unit_ref: '{{processus}}'
+output: dmad-output/STD-{{slug}}.md
+title: '{{CODE}} — Spécification Technique Détaillée'
+derives_from: []
 sections:
-  - number: ""
-    title: "Chapeau — audience, périmètre, prérequis lecteur"
-    concept: "{{P}}/std/note-audience.md"
-  - number: "1"
-    title: "Cartographie des composants"
-    free_subsections: true
-  - number: "2"
-    title: "Modèle de données"
-  - number: "3"
-    title: "Traitement de données"
-    free_subsections: true
-  - number: "4"
-    title: "Gestion des erreurs"
-  - number: "5"
-    title: "Appels externes"
-  - number: "6"
-    title: "Dépendances"
-  - number: "7"
-    title: "Points d'attention pour le développeur"
-  - number: "8"
-    title: "Cas de test"
-  - number: "9"
-    title: "Références"
-  - number: "10"
-    title: "Historique"
-  - number: "11"
-    title: "Annexes"
+- number: ''
+  title: Chapeau — audience, périmètre, prérequis lecteur
+  concept: '{{P}}/std/note-audience.md'
+  guidance: 'À qui s''adresse ce document, ce qu''il couvre, ce qu''il exclut, et ce que le lecteur doit
+    déjà connaître. La STD est PUREMENT MOE : elle expose ce que la SFD retient hors de son périmètre
+    — noms de classes, patrons nommés, attributs transactionnels, tables, dépendances.'
+- number: '1'
+  title: Cartographie des composants
+  free_subsections: true
+  guidance: 'Vue structurelle : câblage des composants, puis une vue par couche. Se termine par la cohésion
+    et le couplage, qui QUALIFIE des faits documentés ailleurs — elle ne les redécouvre pas. Catalogue
+    ici les points d''entrée : un processus en a rarement un seul, et le périmètre déclaré doit se vérifier
+    contre ce chapitre (D25).'
+- number: '2'
+  title: Modèle de données
+  guidance: Tables lues, tables écrites, colonnes déterminantes, contraintes, stratégie d'accès.
+- number: '3'
+  title: Traitement de données
+  free_subsections: true
+  guidance: Le cœur du document. Un § par étape ou par phase, PAR RÉFÉRENCES — signatures et fichier:lignes,
+    jamais d'extrait (D16). Le nombre de sous-sections est un résultat.
+- number: '4'
+  title: Gestion des erreurs
+  guidance: 'Hiérarchie, propagation, exceptions métier, techniques, NON DÉCLARÉES, sources d''infrastructure,
+    sorties dégradées silencieuses, chemins inatteignables et pièges d''attribution. SÉPARE le site de
+    levée et l''effet observable : ce ne sont pas le même fait, et les confondre crée des contradictions
+    qui deviendront des promesses fausses en SFG.'
+- number: '5'
+  title: Appels externes
+  guidance: 'Un tableau, une ligne par contrat : code, BARREAU de résolution, artefact:version, interface,
+    méthode, contexte, comportement d''échec. Un contrat non résolu porte un placeholder visible et une
+    ligne au chapitre 7 — jamais un code plausible.'
+- number: '6'
+  title: Dépendances
+  guidance: Dépendances non standard uniquement, et ce que leur version fige.
+- number: '7'
+  title: Points d'attention pour le développeur
+  guidance: 'Liste numérotée. C''est le chapitre le plus relu : ce qui surprendrait un développeur.'
+- number: '8'
+  title: Cas de test
+  guidance: Pré-condition, action, attendu. Les tests de caractérisation forgés y figurent.
+- number: '9'
+  title: Références
+  guidance: SFD et SFG associées, objets métier, documents comparables.
+- number: '10'
+  title: Historique
+  guidance: 'Version, date, nature. Consigne les CORRECTIONS FACTUELLES avec ce qui était écrit et pourquoi
+    c''était faux : c''est la seule trace de fiabilité qu''un relecteur aura.'
+- number: '11'
+  title: Annexes
+  guidance: Légendes des notations employées — une par notation, et pas de légende orpheline — puis les
+    limites de l'analyse. Le chapeau annonce les compteurs, qui sont vérifiés.

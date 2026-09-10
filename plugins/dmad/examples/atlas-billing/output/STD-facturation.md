@@ -229,6 +229,10 @@ SFD associée : [SFD Facturation](../okf/documents/doc-sfd-fact-001.md) · SFG :
 
 ## 11. Annexes
 
+Ce chapitre porte **2 légendes** de notation, pour les **3 diagrammes** du document, puis les limites de l'analyse.
+
+Une légende sans diagramme qui l'emploie se retire ; une notation employée sans sa légende laisse le lecteur interpréter un dessin. Les deux sont contrôlés.
+
 ### 11.1 Limites de cette analyse
 
 - **Profondeur de traversée : 5.** 17 frontières atteintes sur l'ensemble du run.
@@ -236,3 +240,28 @@ SFD associée : [SFD Facturation](../okf/documents/doc-sfd-fact-001.md) · SFG :
 - **Un contrat sortant non résolu** sur deux — le placeholder du § 9 est volontaire.
 - **Aucune trace d'exécution.** Les chemins décrits sont possibles, pas nécessairement empruntés.
 - **Modules hors périmètre :** `legacy-import`, `reporting-v1`, `admin-tools`.
+
+### 11.2 Légende — diagramme d'activité
+
+Ces diagrammes se lisent de gauche à droite ou de haut en bas, chaque nœud étant une opération ou une donnée, chaque flèche un enchaînement.
+
+| Forme | Ce qu'elle désigne |
+|---|---|
+| rectangle | une opération du processus |
+| cylindre | une donnée persistée — table, fichier |
+| double rectangle | une frontière du système — service externe, port |
+| cercle | un point de départ ou d'arrivée |
+| flèche pointillée | une lecture ou une écriture, par opposition à un enchaînement |
+
+### 11.3 Légende — diagramme de séquence
+
+Ces diagrammes montrent **qui parle à qui, et dans quel ordre**. Le temps descend.
+
+| Élément | Ce qu'il désigne |
+|---|---|
+| colonne | un participant : composant du périmètre, ou acteur externe |
+| flèche pleine | un appel |
+| flèche pointillée | une réponse |
+| bloc `alt` | une alternative — une seule branche s'exécute |
+| bloc `loop` | une répétition, dont la cardinalité est dite en note |
+| note | une frontière non franchie par l'analyse |
